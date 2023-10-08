@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import React, { useState } from 'react';
+import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,17 +9,19 @@ import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
+import ContentCut from '@mui/icons-material/ContentCut';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
 import { Avatar, ListItemAvatar, ListItemButton } from '@mui/material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Cookies from 'js-cookie';
 
 const drawerWidth = 240;
 
@@ -53,11 +56,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
 }));
 
-export function Admindrawer() {
-    const theme = useTheme();
+export function Admindrawer(props: { adminDate: any; }) {
+    const { adminDate } = props
+    const nav = useNavigate()
     const drawerpath = [{ name: 'Home', path: 'sspanel' }, { name: 'Product', path: 'product' }, { name: 'Orders', path: 'orderlist' }, { name: 'Users', path: 'userlist' }]
     const [open, setOpen] = useState(false);
 
@@ -65,9 +69,20 @@ export function Admindrawer() {
         setOpen(op => !op);
     };
 
-    const handleDrawerClose = () => {
-        setOpen(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
     };
+
+    const handleCloseUserMenu = () => {
+        setAnchorEl(null);
+    };
+
+    const logOut = () => {
+        Cookies.remove("token")
+        nav("/admin/login")
+    }
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -78,9 +93,33 @@ export function Admindrawer() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Smart Store</Typography>
-                    <Button color="inherit">
-                        <Avatar>{"NP"}</Avatar>
-                    </Button>
+                    <Box>                        
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                            {adminDate._id && (<Avatar alt="Remy Sharp" {...stringAvatar(adminDate?.fullName)} />)}
+                        </IconButton>                        
+                        <Menu sx={{ mt: '45px' }} id="menu-appbar" anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }} keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }} open={Boolean(anchorEl)} onClose={handleCloseUserMenu} >
+                            <MenuItem>
+                                <ListItemIcon>
+                                    <AccountCircle />
+                                </ListItemIcon>
+                                <ListItemText>{"My Profile"}</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={logOut}>
+                                <ListItemIcon>
+                                    <ContentCut fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>{"Log Out"}</ListItemText>
+                            </MenuItem>
+                        </Menu>
+                    </Box>
                 </Toolbar>
             </AppBar>
             <Drawer sx={{
@@ -92,11 +131,7 @@ export function Admindrawer() {
                     zIndex: 0
                 },
             }} variant="persistent" anchor="left" open={open}>
-                <DrawerHeader>
-                    <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                    </IconButton>
-                </DrawerHeader>
+                <DrawerHeader />
                 <Divider />
                 <List>
                     {
@@ -123,4 +158,27 @@ export function Admindrawer() {
             </Main>
         </Box>
     );
+}
+
+function stringToColor(string: string) {
+    let hash = 0;
+    let i;
+    for (i = 0; i < string?.length; i += 1) {
+        hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = '#';
+    for (i = 0; i < 3; i += 1) {
+        const value = (hash >> (i * 8)) & 0xff;
+        color += `00${value.toString(16)}`.slice(-2);
+    }
+    return color;
+}
+
+function stringAvatar(name: string) {
+    return {
+        sx: {
+            bgcolor: stringToColor(name),
+        },
+        children: `${name?.split(' ')[0][0]}${name?.split(' ')[1][0]}`,
+    };
 }

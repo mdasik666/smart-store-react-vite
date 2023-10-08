@@ -19,3 +19,11 @@ export const adminAddProduct = async(data:any) => {
 export const adminGetProduct = async(id:any) => {    
     return await axiosInstance.get(`/admin/getproducts/${id}`)
 }
+
+export const adminUpdateProductById = async(id:any, data:any) => {    
+    return await axiosInstance.post(`/admin/updateproduct/${id}`,data)
+}
+
+export const adminDeleteProductById = async(id:any) => {    
+    return await axiosInstance.delete(`/admin/deleteproduct/${id}`)
+}

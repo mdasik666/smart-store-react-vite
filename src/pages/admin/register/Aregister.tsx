@@ -58,6 +58,7 @@ const Aregister = () => {
                     <Stack width={"100%"}>
                         <Typography variant={"h5"} gutterBottom textAlign={"center"}>Admin Register Form</Typography>
                         <Stack spacing={2} direction="column">
+                            <TextField error={Boolean(errors?.fullName)} helperText={errors?.fullName && errors.fullName?.message?.toString() || ""} {...register("fullName", { required: "Name is mandatory" })} label="Full Name" size="small" variant="outlined" required />
                             <TextField error={Boolean(errors?.username)} helperText={errors?.username && errors.username?.message?.toString() || ""} {...register("username", { required: "Username is mandatory" })} label="Username" size="small" variant="outlined" required />
                             <TextField error={Boolean(errors?.email)} helperText={errors?.email && errors.email?.message?.toString() || ""} {...register("email", { required: "Email is mandatory" })} label="Email" type="email" size="small" variant="outlined" required />
                             <TextField error={Boolean(errors?.password)} helperText={errors?.password && errors.password?.message?.toString() || ""} {...register("password", { required: "Password is mandatory" })} label="Password" type="password" size="small" variant="outlined" required />

@@ -1,4 +1,6 @@
-import { Alert,AlertColor, Button, CircularProgress, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Alert,AlertColor, Button, CircularProgress, Paper, Snackbar, Stack, TextField, Typography, IconButton, InputAdornment } from "@mui/material";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React, { useState, useEffect } from 'react';
 import { adminLogin } from "../../../services/Adminservice";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +17,11 @@ const Alogin = () => {
     const { register, handleSubmit, formState: { errors, isValid } } = useForm({
         mode: "onChange"
     })
+
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const nav = useNavigate()
     const [isLoading, setLoading] = useState<boolean>(false)
@@ -48,7 +55,7 @@ const Alogin = () => {
                 nav("/admin/dashboard/sspanel")                                                 
             }
         } catch (err:any) {
-            setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+            setSnackOpen({ open: true, severity: "info", message: err?.messsage })
             setLoading(false)
         }
     }
@@ -61,7 +68,11 @@ const Alogin = () => {
                         <Typography variant={"h5"} gutterBottom textAlign={"center"}>Admin Login Form</Typography>
                         <Stack spacing={2} direction="column">
                             <TextField error={Boolean(errors?.username_email)} helperText={errors?.username_email && errors.username_email?.message?.toString() || ""} {...register("username_email",{required:"Username or Email is mandatory"})} label="Username or Email" size="small" variant="outlined" required />
-                            <TextField error={Boolean(errors?.password)} helperText={errors?.password && errors.password?.message?.toString() || ""} {...register("password",{required:"Password is mandatory"})} label="Password" type="password" size="small" variant="outlined" required />
+                            <TextField error={Boolean(errors?.password)} helperText={errors?.password && errors.password?.message?.toString() || ""} {...register("password",{required:"Password is mandatory"})} label="Password" type={showPassword?"text":"password"} size="small" variant="outlined" required InputProps={{
+                                endAdornment:(<InputAdornment position="end"><IconButton onClick={togglePasswordVisibility} edge="end">
+                                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                            </IconButton></InputAdornment>)
+                            }}/>
                             <Button variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} sx={{ color: 'white' }} />}>Sign In</Button>
                         </Stack>
                     </Stack>
