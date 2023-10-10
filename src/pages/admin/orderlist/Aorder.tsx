@@ -1,6 +1,6 @@
 const Aorder = () => {
     return (
-        <div>admin login</div>
+        <div>Admin Orders</div>
     )
 }
 

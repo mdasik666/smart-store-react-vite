@@ -1,6 +1,6 @@
 const Ausers = () => {
     return (
-        <div>admin login</div>
+        <div>Admin User</div>
     )
 }
 

@@ -2,23 +2,20 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-function ConfirmDialog({ open, onClose, onConfirm }:{ open:any, onClose:any, onConfirm:any }) {
+function ModalDialog({ open, onClose, onConfirm, title, dividers, children }: { open: any, onClose?: any, onConfirm: any, title: any, dividers?: any, children: any }) {
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Confirm Action</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Are you sure you want to proceed with this action?
-        </DialogContentText>
+    <Dialog open={open} >
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent dividers={dividers}>
+        {children}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onClose} variant='contained' color="error">
           Cancel
         </Button>
-        <Button onClick={onConfirm} color="primary">
+        <Button onClick={onConfirm} variant='contained' color="primary">
           Confirm
         </Button>
       </DialogActions>
@@ -26,4 +23,4 @@ function ConfirmDialog({ open, onClose, onConfirm }:{ open:any, onClose:any, onC
   );
 }
 
-export default ConfirmDialog;
+export default ModalDialog;
