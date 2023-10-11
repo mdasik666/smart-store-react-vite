@@ -80,7 +80,7 @@ export function Admindrawer(props: { adminDate: any; }) {
   };
 
   const logOut = () => {
-    Cookies.remove("token")
+    Cookies.remove("admintoken")
     nav("/admin/login")
     handleCloseUserMenu()
   }

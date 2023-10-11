@@ -6,6 +6,7 @@ import { adminLogin } from "../../../services/Adminservice";
 import { Link, useNavigate } from "react-router-dom";
 import { adminLoginVerify } from "../../../services/Adminservice";
 import { useForm } from "react-hook-form";
+import { CustomStack } from "../../../custom/Styles/CustomStack";
 
 interface IPropsError {
   open: boolean,
@@ -61,36 +62,31 @@ const Alogin = () => {
   }
 
   return (
-    <Stack alignItems={"center"} justifyContent={"center"} height={"100%"} bgcolor={"#eeeeee"} sx={{
-      backgroundImage:"url('../src/asserts/login_bg.jpg')",
-      backgroundSize: "cover",
-      backgroundRepeat:"no-repeat",
-      backgroundPosition:"center"        
-    }}>
-      <Stack width={{ xs: "80%", sm: "80%", md: "30%" }} component={Paper} direction={"column"} alignItems={"center"} justifyContent={"center"} p={2}>
-        <Stack width={"100%"}>
+    <CustomStack alignItems={"center"} justifyContent={"center"} height={"100%"} bgcolor={"#eeeeee"} >
+      <Stack width={{ xs: "80%", sm: "80%", md: "30%" }} zIndex={1} component={Paper} direction={"column"} alignItems={"center"} justifyContent={"center"} p={2}>        
           <form style={{ width: "100%" }} onSubmit={handleSubmit(loginValidate)}>
             <Typography variant={"h5"} gutterBottom textAlign={"center"}>Admin Login Form</Typography>
-            <Stack spacing={2} direction="column">
+            <Stack spacing={2} direction="column" mt={2}>
               <TextField error={Boolean(errors?.un_email_pn)} helperText={errors?.un_email_pn && errors.un_email_pn?.message?.toString() || ""} {...register("un_email_pn", { required: "Username or Email or Ph.Number is mandatory" })} label="Username or Email or Phone Number" size="small" variant="outlined" required />
               <TextField error={Boolean(errors?.password)} helperText={errors?.password && errors.password?.message?.toString() || ""} {...register("password", { required: "Password is mandatory" })} label="Password" type={showPassword ? "text" : "password"} size="small" variant="outlined" required
                 InputProps={{
                   endAdornment: (<InputAdornment position="end"><IconButton onClick={togglePasswordVisibility} edge="end">
                     {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                   </IconButton></InputAdornment>)
-                }} />
-              <Button variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} sx={{ color: 'white' }} />}>Sign In</Button>
+                }} />   
+                <Stack spacing={2} direction="row">
+                  <Button fullWidth component={Link} to={"/admin/register"} variant="contained" disabled={isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} sx={{ color: 'white' }} />}>Sign Up</Button>
+                  <Button fullWidth variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} sx={{ color: 'white' }} />}>Sign In</Button>
+                </Stack>                           
             </Stack>
           </form>
-          <Typography variant="h6" textAlign={"center"} p={1}>Create a new user? <Link to={"/admin/register"}>Sign Up</Link></Typography>
-        </Stack>
-      </Stack>
+        </Stack>      
       {snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert onClose={handleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
           {snackopen.message}
         </Alert>
       </Snackbar>}
-    </Stack>
+    </CustomStack>
   )
 }
 
