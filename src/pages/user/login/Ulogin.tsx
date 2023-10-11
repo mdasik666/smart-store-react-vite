@@ -61,9 +61,9 @@ const Ulogin = () => {
   }
 
   return (
-    <CustomStack alignItems={"center"} justifyContent={{ xs: "start", sm: "center" }} width={"100%"} height={"100%"} >
-      <Stack component={"form"} onSubmit={handleSubmit(loginValidate)} height={{xs:"100%",sm:"auto"}} width={{ xs: "100%", sm: "50%", md: "25%" }} zIndex={1} bgcolor={{sm:"white"}} p={{sm:6}}>
-        <Stack spacing={2} direction="column" height={{xs:"60%",sm:"auto"}} borderRadius={{ xs: "0 0 25px 25px", sm: "0 0 0 0" }} bgcolor={"white"} p={{xs:6,sm:0}}>
+    <CustomStack alignItems={"center"} justifyContent={{ xs: "start", sm: "center" }} width={"100%"} height={"100%"}>
+      <Stack component={"form"} onSubmit={handleSubmit(loginValidate)} width={{ xs: "100%", sm: "50%", md: "25%" }} height={{ xs: "100%", sm: "auto" }} zIndex={1} bgcolor={{ xs: "darkred", sm: "white" }} p={{ sm: 6 }}>
+        <Stack spacing={2} flex={{ xs: 1 }} borderRadius={{ xs: "0 0 50px 50px", sm: "0 0 0 0" }} bgcolor={"white"} p={{ xs: 6, sm: 0 }}>
           <Typography variant={"h3"} gutterBottom textAlign={"left"} fontWeight={"bold"} color={"orangered"}>LOGIN</Typography>
           <Typography gutterBottom textAlign={"left"}>Enter your username and password to get access your account</Typography>
           <Stack spacing={1}>
@@ -79,14 +79,14 @@ const Ulogin = () => {
                 </IconButton></InputAdornment>)
               }} />
           </Stack>
-          <Stack spacing={2} direction="row" justifyContent={"center"} >
+          <Stack spacing={2} direction="row" justifyContent={"center"} alignItems={"center"}>
             <Typography>Remember me</Typography>
             <Typography>Forget password</Typography>
           </Stack>
         </Stack>
 
-        <Stack spacing={2} p={{xs:6,sm:0}} direction={{xs:"column",sm:"row"}} height={{xs:"40%",sm:"auto"}} justifyContent={"center"} mt={1}>
-          <Button component={Link} to={"/user/register"} variant="contained"
+        <Stack spacing={1} p={{ xs: "0 80px" }} flex={{ xs: 1 }} justifyContent={"center"} direction={{ xs: "column-reverse", sm: "row" }} >
+          <Button fullWidth component={Link} to={"/user/register"} variant="contained" disabled={isLoading} endIcon={isLoading && <CircularProgress sx={{ color: "white" }} size={20} thickness={6} />}
             sx={{
               background: "white",
               color: "darkred",
@@ -97,14 +97,12 @@ const Ulogin = () => {
                 background: "darkred",
                 color: "white"
               }
-            }} fullWidth
-          >
-            Sign Up
-          </Button>
-          <Button fullWidth variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} />}
+            }}>Sign Up</Button>
+          <Button fullWidth variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress sx={{ color: "white" }} size={20} thickness={6} />}
             sx={{
               backgroundColor: "darkred",
               fontWeight: "bold",
+              border: "1px solid white",
               borderRadius: 25,
               "&:hover": {
                 border: "1px solid",
