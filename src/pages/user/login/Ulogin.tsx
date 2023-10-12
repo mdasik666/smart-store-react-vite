@@ -1,11 +1,9 @@
-import { Alert, AlertColor, Button, CircularProgress, Paper, Snackbar, Stack, TextField, Typography, IconButton, InputAdornment, styled, FormGroup, FormLabel, FormControl, InputLabel, Input, FormHelperText } from "@mui/material";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Alert, AlertColor, Snackbar } from "@mui/material";
 import React, { useState, useEffect } from 'react';
 import { userLogin, userLoginVerify } from "../../../services/Userservice";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { CustomStack } from "../../../custom/Styles/CustomStack";
+import "./login.css"
 
 interface IPropsError {
   open: boolean,
@@ -17,11 +15,6 @@ const Ulogin = () => {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({
     mode: "onChange"
   })
-
-  const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
   const nav = useNavigate()
   const [isLoading, setLoading] = useState<boolean>(false)
@@ -61,63 +54,55 @@ const Ulogin = () => {
   }
 
   return (
-    <CustomStack alignItems={"center"} justifyContent={{ xs: "start", sm: "center" }} width={"100%"} height={"100%"}>
-      <Stack component={"form"} onSubmit={handleSubmit(loginValidate)} width={{ xs: "100%", sm: "50%", md: "25%" }} height={{ xs: "100%", sm: "auto" }} zIndex={1} bgcolor={{ xs: "darkred", sm: "white" }} p={{ sm: 6 }}>
-        <Stack spacing={2} flex={{ xs: 1 }} borderRadius={{ xs: "0 0 50px 50px", sm: "0 0 0 0" }} bgcolor={"white"} p={{ xs: 6, sm: 0 }}>
-          <Typography variant={"h3"} gutterBottom textAlign={"left"} fontWeight={"bold"} color={"orangered"}>LOGIN</Typography>
-          <Typography gutterBottom textAlign={"left"}>Enter your username and password to get access your account</Typography>
-          <Stack spacing={1}>
-            <Typography fontWeight={"bold"}>Login</Typography>
-            <TextField error={Boolean(errors?.email)} helperText={errors?.email && errors.email?.message?.toString() || ""} {...register("email", { required: "Email is mandatory" })} placeholder="youremail@gmail.com" size="small" variant="standard" required />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography fontWeight={"bold"}>Password</Typography>
-            <TextField error={Boolean(errors?.password)} helperText={errors?.password && errors.password?.message?.toString() || ""} {...register("password", { required: "Password is mandatory" })} placeholder="************" type={showPassword ? "text" : "password"} size="small" variant="standard" required
-              InputProps={{
-                endAdornment: (<InputAdornment position="end"><IconButton onClick={togglePasswordVisibility} edge="end">
-                  {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton></InputAdornment>)
-              }} />
-          </Stack>
-          <Stack spacing={2} direction="row" justifyContent={"center"} alignItems={"center"}>
-            <Typography>Remember me</Typography>
-            <Typography>Forget password</Typography>
-          </Stack>
-        </Stack>
-
-        <Stack spacing={1} p={{ xs: "0 80px" }} flex={{ xs: 1 }} justifyContent={"center"} direction={{ xs: "column-reverse", sm: "row" }} >
-          <Button fullWidth component={Link} to={"/user/register"} variant="contained" disabled={isLoading} endIcon={isLoading && <CircularProgress sx={{ color: "white" }} size={20} thickness={6} />}
-            sx={{
-              background: "white",
-              color: "darkred",
-              fontWeight: "bold",
-              border: "1px solid",
-              borderRadius: 25,
-              "&:hover": {
-                background: "darkred",
-                color: "white"
-              }
-            }}>Sign Up</Button>
-          <Button fullWidth variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress sx={{ color: "white" }} size={20} thickness={6} />}
-            sx={{
-              backgroundColor: "darkred",
-              fontWeight: "bold",
-              border: "1px solid white",
-              borderRadius: 25,
-              "&:hover": {
-                border: "1px solid",
-                background: "white",
-                color: "darkred"
-              }
-            }}>Login</Button>
-        </Stack>
-      </Stack>
+    <section id="login">
+      <div className="logWrapper">
+        <div className="login-wrap pt-5 pb-3">
+          <div className="img d-flex align-items-center justify-content-center"
+            style={{ backgroundImage: "url(../../../src/asserts/images/logo.png)" }}></div>
+          <h1 className="text-left mb-0">Login</h1>
+          <p className="text-left">Enter your username and password
+            to get access your account
+          </p>
+          <form onSubmit={handleSubmit(loginValidate)} className="login-form">
+            <div className="Wrap_white">
+              <div className="form-group">
+                <div className="mb-3">
+                  <label htmlFor="usermail" className="form-label text-bold">Login</label>
+                  <input type="email" {...register("email", { required: "Email is mandatory" })} className="form-control" id="usermail" placeholder="youremail@mail.com" />
+                  {Boolean(errors?.email) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.email && errors.email?.message?.toString() || ""}</small>}
+                </div>
+              </div>
+              <div className="form-group">
+                <div className="mb-3">
+                  <label htmlFor="userpass" className="form-label text-bold">Password</label>
+                  <input type="password" {...register("password", { required: "Password is mandatory" })} className="form-control" id="userpass" placeholder="********" />
+                  {Boolean(errors?.password) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.password && errors.password?.message?.toString() || ""}</small>}
+                </div>
+              </div>
+              <div className="d-flex justify-content-between align-items-center rememberWrap">
+                <div className="form-check mb-0">
+                  <input className="form-check-input me-2" type="checkbox" value="" id="rememberMe" />
+                  <label className="form-check-label" htmlFor="rememberMe">
+                    Remember me
+                  </label>
+                </div>
+                <a href="#!" className="text-body">Forgot password</a>
+              </div>
+            </div>
+            <div className="d-flex justify-content-between align-items-center mt-4 pt-2" id="btnsWrap">
+              <Link to="/user/register" className="btn btn-secondary btn-lg">Sign Up</Link>
+              <button type="submit" id="loginBrn" disabled={!isValid} className="btn btn-primary btn-lg">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
       {snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert onClose={handleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
           {snackopen.message}
         </Alert>
       </Snackbar>}
-    </CustomStack>
+    </section>
+
   )
 }
 

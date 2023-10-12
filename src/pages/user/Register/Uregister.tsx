@@ -1,12 +1,9 @@
-import { Alert, AlertColor, Button, CircularProgress, IconButton, InputAdornment, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Alert, AlertColor, Snackbar, CircularProgress } from "@mui/material";
 import React, { useState } from 'react';
 import { userRegister } from "../../../services/Userservice";
 import { useForm } from "react-hook-form";
-import { CustomStack } from "../../../custom/Styles/CustomStack";
-import { ArrowBack } from "@mui/icons-material";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Link } from "react-router-dom";
+import './Uregister.css'
 
 interface IPropsError {
   open: boolean,
@@ -47,75 +44,63 @@ const Uregister = () => {
     }
   }
 
-  const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <CustomStack alignItems={"center"} justifyContent={{ xs: "start", sm: "center" }} width={"100%"} height={"100%"} bgcolor={{ xs: "darkred" }}>
-      <Stack component={"form"} onSubmit={handleSubmit(registerValidate)} width={{ xs: "100%", sm: "50%", md: "25%" }} zIndex={1} bgcolor={{ xs: "darkred", sm: "white" }} p={{ sm: 6 }}>
-        <IconButton component={Link} to={"/user/login"} sx={{ position: "absolute", top: 0, left: 0, m: 1 }}>
-          <ArrowBack />
-        </IconButton>
-        <Stack spacing={2} borderRadius={{ xs: "0 0 50px 50px", sm: "0 0 0 0" }} bgcolor={"white"} p={{ xs: 6, sm: 0 }}>
-          <Typography variant={"h3"} gutterBottom textAlign={"left"} fontWeight={"bold"} color={"orangered"}>SIGN UP</Typography>
-          <Typography gutterBottom textAlign={"left"}>Enter your information to get activate your account</Typography>
-          <Stack spacing={1}>
-            <Typography fontWeight={"bold"}>Name</Typography>
-            <TextField error={Boolean(errors?.fullName)} helperText={errors?.fullName && errors.fullName?.message?.toString() || ""} {...register("fullName", { required: "Name is mandatory" })} placeholder="your name" size="small" variant="standard" />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography fontWeight={"bold"}>Email</Typography>
-            <TextField error={Boolean(errors?.email)} helperText={errors?.email && errors.email?.message?.toString() || ""} {...register("email", { required: "Email is mandatory" })} placeholder="youremail@mail.com" type="email" size="small" variant="standard" />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography fontWeight={"bold"}>Mobile No.</Typography>
-            <TextField error={Boolean(errors?.phoneNumber)} helperText={errors?.phoneNumber && errors.phoneNumber?.message?.toString() || ""} {...register("phoneNumber", { required: "Phone Number is mandatory", minLength: { value: 10, message: "Phone Number must be exactly 10 characters" } })} placeholder="999999 999999" type="number" size="small" variant="standard" />
-          </Stack>
-          <Stack spacing={1}>
-            <Typography fontWeight={"bold"}>Password</Typography>
-            <TextField error={Boolean(errors?.password)} helperText={errors?.password && errors.password?.message?.toString() || ""} {...register("password", { required: "Password is mandatory" })} placeholder="************" type={showPassword ? "text" : "password"} size="small" variant="standard"
-              InputProps={{
-                endAdornment: (<InputAdornment position="end"><IconButton onClick={togglePasswordVisibility} edge="end">
-                  {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton></InputAdornment>)
-              }} />
-          </Stack>
-        </Stack>
-        <Stack spacing={1} m={{ xs: "20px 80px",sm:"0" }} mt={{sm:2}} justifyContent={"center"} direction={{ xs: "column-reverse", sm: "row" }} >
-          <Button fullWidth type="reset" variant="contained" disabled={isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} />}
-            sx={{
-              background: "white",
-              color: "darkred",
-              fontWeight: "bold",
-              border: "1px solid",
-              borderRadius: 25,
-              "&:hover": {
-                background: "darkred",
-                color: "white"
-              }
-            }}>Reset</Button>
-          <Button fullWidth variant="contained" type="submit" disabled={!isValid || isLoading} endIcon={isLoading && <CircularProgress color="primary" size={20} thickness={6} />}
-            sx={{
-              backgroundColor: "darkred",
-              fontWeight: "bold",
-              border: "1px solid white",
-              borderRadius: 25,
-              "&:hover": {
-                border: "1px solid",
-                background: "white",
-                color: "darkred"
-              }
-            }}>Register</Button>
-        </Stack>
-      </Stack>
+    <>
+      <section id="register">
+        <div className="logWrapper">
+          <div className="register-wrap pt-5 pb-3">
+            <Link id="backtoLogin" to={"/user/login"}>
+              <img src="../../../src/asserts/images/arrow-left.svg" alt="back Arrow" />
+            </Link>
+            <h1 className="text-left mb-0">SIGN UP</h1>
+            <p className="text-left">
+              Enter your informations to get activate your account
+            </p>
+            <form onSubmit={handleSubmit(registerValidate)} className="register-form">
+              <div className="Wrap_white">
+                <div className="form-group">
+                  <div className="mb-3">
+                    <label htmlFor="rName" className="form-label text-bold">Name</label>
+                    <input type="text" {...register("fullName", { required: "Name is mandatory" })} className="form-control" id="rName" placeholder="Your Name" />
+                    {Boolean(errors?.fullName) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.fullName && errors.fullName?.message?.toString() || ""}</small>}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="mb-3">
+                    <label htmlFor="rEmail" className="form-label text-bold">Email</label>
+                    <input type="email" {...register("email", { required: "Email is mandatory" })} className="form-control" id="rEmail" placeholder="youremail@mail.com" />
+                    {Boolean(errors?.email) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.email && errors.email?.message?.toString() || ""}</small>}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="mb-3">
+                    <label htmlFor="rMobile" className="form-label text-bold">Mobile No.</label>
+                    <input type="text" {...register("phoneNumber", { required: "Phone Number is mandatory", minLength: { value: 10, message: "Phone Number must be exactly 10 characters" } })} className="form-control" id="rMobile" placeholder="99999 99999" />
+                    {Boolean(errors?.phoneNumber) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.phoneNumber && errors.phoneNumber?.message?.toString() || ""}</small>}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="mb-3">
+                    <label htmlFor="rAddress" className="form-label text-bold">Password</label>
+                    <input type="text" {...register("password", { required: "Password is mandatory" })} className="form-control" id="rAddress" placeholder="********" />
+                    {Boolean(errors?.password) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.password && errors.password?.message?.toString() || ""}</small>}
+                  </div>
+                </div>
+              </div>
+              <div className="d-flex justify-content-between align-items-center mt-4 pt-2" id="btnsWrap">
+                <button type="reset" className="btn btn-secondary btn-lg">Reset {isLoading && <CircularProgress color="primary" size={20} thickness={6} />}</button>
+                <button type="submit" disabled={!isValid} className="btn btn-primary btn-lg">Register {isLoading && <CircularProgress color="primary" size={20} thickness={6} />}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
       {snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert onClose={handleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
           {snackopen.message}
         </Alert>
       </Snackbar>}
-    </CustomStack>
+    </>
   )
 }
 

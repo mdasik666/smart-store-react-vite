@@ -3,13 +3,13 @@ import { styled, Stack, Button } from "@mui/material";
 export const CustomStack = styled(Stack)(({ theme }) => ({  
   [theme.breakpoints.down("sm")]:{    
     backgroundColor: `darkred`,
-    backgroundImage:"unset",    
+    backgroundImage:"unset",        
   },
   [theme.breakpoints.up("sm")]:{
   backgroundImage: `url('../src/asserts/login_bg.jpg')`,
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center',  
+  backgroundPosition: 'center',    
   '&::before': {
     content: '""',
     backgroundColor: `rgba(46, 8, 8, 0.5)`,
