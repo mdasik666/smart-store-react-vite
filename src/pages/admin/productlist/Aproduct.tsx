@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useForm } from "react-hook-form";
 import { adminAddProduct, adminGetProduct, adminLoginVerify, adminUpdateProductById, adminDeleteProductById } from "../../../services/Adminservice";
 import { useNavigate } from "react-router-dom";
-import { Delete, Update } from "@mui/icons-material";
+import { Add, Delete, Update } from "@mui/icons-material";
 import ModalDialog from "../../../components/Dialog/Dialog";
 
 interface IPropsError {
@@ -22,12 +22,10 @@ interface IPropsError {
 
 interface IPropsProductData {
   productName: string,
-  productDescription: string,
-  price: number,
+  productDescription: string,  
   category: string,
   title: string,
-  quantity: number
-  quantityType: string,
+  quantityAndType: Array<{ price: number, quantity: string; type: string }>,
   minOrder: number
 }
 
@@ -37,7 +35,7 @@ const Aproduct = () => {
 
   const nav = useNavigate()
 
-  const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, unregister } = useForm({
+  const { register, handleSubmit, formState: { errors, isValid }, reset, setValue, unregister, getValues } = useForm({
     mode: "onChange",
 
   })
@@ -47,12 +45,13 @@ const Aproduct = () => {
   const [isDeleteLoading, setDeleteLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
   const [modalopen, setModalOpen] = useState(false);
-  const [quantityChange, setQuantityChange] = useState<string>("");
   const [changeCategory, setChangeCategory] = useState<string>("");
   const [adminId, setAdminId] = useState<string>("");
   const [productList, setProductList] = useState<any>([]);
   const [productKey, setProductKey] = useState<any>([]);
-  const [updateProductId, setUpdateProductId] = useState<string>("");
+  const [updateProductId, setUpdateProductId] = useState<string>("");  
+  const [qtArray, setQTArray] = useState<Array<any>>([1]);
+
 
   const modalHandleOpen = () => {
     setUpdateProductId("")
@@ -69,10 +68,6 @@ const Aproduct = () => {
       return;
     }
     setSnackOpen({ open: false, severity: undefined, message: "" });
-  };
-
-  const handleQuantityChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-    setQuantityChange(event.target.value);
   };
 
   const handleCategoryChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
@@ -109,6 +104,7 @@ const Aproduct = () => {
   }, [])
 
   const addOrUpdateProduct = async (data: any) => {
+    console.log(data)
     try {
       setButtonLoading(true)
       var res;
@@ -172,14 +168,12 @@ const Aproduct = () => {
     const productdata = productList.filter((data: any) => id == data._id)
     const updateData: IPropsProductData = productdata[0]
     setValue("productName", updateData.productName)
-    setValue("productDescription", updateData.productDescription)
-    setValue("price", updateData.price)
+    setValue("productDescription", updateData.productDescription)    
     setChangeCategory(updateData.category)
     setValue("category", updateData.category)
     setValue("title", updateData.title)
-    setValue("quantity", updateData.quantity)
-    setQuantityChange(updateData.quantityType)
-    setValue("quantityType", updateData.quantityType)
+    setQTArray(updateData.quantityAndType)
+    setValue("quantityAndType", updateData.quantityAndType)    
     setValue("minOrder", updateData.minOrder)
     setModalOpen(true)
   }
@@ -199,7 +193,6 @@ const Aproduct = () => {
 
   const resetForm = () => {
     setChangeCategory("")
-    setQuantityChange("")
     reset()
   }
 
@@ -229,7 +222,15 @@ const Aproduct = () => {
       setDeleteLoading(false)
       handleCloseDialog()
     }
-  };
+  }; 
+
+  const setQT =  (e:string) => {
+    if (e === 'add') {
+      setQTArray((c) => [...c, 1]); 
+    } else if (e === 'delete' && qtArray.length > 0) {
+      setQTArray((c) => c.slice(0, -1)); 
+    }
+  }
 
   return (
     <>
@@ -309,8 +310,7 @@ const Aproduct = () => {
                   <TextField fullWidth error={Boolean(errors?.productName)} helperText={errors?.productName && errors.productName?.message?.toString() || ""} size="small" {...register("productName", { required: "Product Name is mandatory" })} variant="outlined" type="text" label="Product Name"></TextField>
                   <TextField fullWidth size="small" {...register("productDescription")} variant="outlined" type="text" label="Product Description"></TextField>
                 </Stack>
-                <Stack spacing={2} direction="row" width={"100%"}>
-                  <TextField fullWidth error={Boolean(errors?.price)} helperText={errors?.price && errors.price?.message?.toString() || ""} size="small" {...register("price", { required: "Price is mandatory" })} variant="outlined" type="number" label="Price"></TextField>
+                <Stack spacing={2} direction="row" width={"100%"}>                  
                   <FormControl fullWidth size="small" error={Boolean(errors?.category)}>
                     <InputLabel id="category">Category</InputLabel>
                     <Select labelId="category" {...register("category", { required: "Category is mandatory" })} onChange={handleCategoryChange} value={changeCategory} label="Category">
@@ -325,22 +325,31 @@ const Aproduct = () => {
                     </FormHelperText>
                   </FormControl>
                 </Stack>
-                <Stack spacing={2} direction="row" width={"100%"}>
-                  <TextField fullWidth size="small" {...register("title")} variant="outlined" type="text" label="Title"></TextField>
-                  <Stack width={"100%"} direction="row" spacing={1}>
-                    <TextField fullWidth size="small" {...register("quantity")} variant="outlined" type="number" label="Quantity"></TextField>
+                <TextField fullWidth size="small" {...register("title")} variant="outlined" type="text" label="Title"></TextField>
+
+                {qtArray.map((_, index:number) => (
+                  <Stack width={"100%"} key={index} direction="row" spacing={1}>
+                    <TextField fullWidth {...register(`quantityAndType[${index}].price`,{required:"Price is mandatory"})} error={Boolean((errors as any)?.quantityAndType?.[index]?.price)} helperText={(errors as any)?.quantityAndType?.[index]?.price && (errors as any).quantityAndType?.[index].price?.message?.toString() || ""} size="small" variant="outlined" type="number" label="Price"></TextField>                    
+                    <TextField fullWidth {...register(`quantityAndType[${index}].quantity`,{
+                        pattern: {
+                          value: /^[0-9]*\.?[0-9]*$/,
+                          message: "Enter a valid number",
+                        },
+                      })} size="small" variant="outlined" type="text" label="Quantity"></TextField>                   
                     <FormControl fullWidth size="small">
                       <InputLabel id="qtype">Type</InputLabel>
-                      <Select labelId="qtype" {...register("quantityType")} onChange={handleQuantityChange} value={quantityChange} label="Type">
+                      <Select labelId="qtype" {...register(`quantityAndType[${index}].type`)} defaultValue={getValues(`quantityAndType[${index}].type`) || ""} label="Type">
                         {
                           quantityTypes.map((qtype, i) => {
                             return (<MenuItem value={qtype} key={i}>{qtype}</MenuItem>)
                           })
                         }
                       </Select>
-                    </FormControl>
+                    </FormControl>                    
+                    <Button variant="outlined" onClick={() => setQT('add')}><Add /></Button>
+                    <Button disabled={index===0} variant="outlined" onClick={() => setQT('delete')}><Delete /></Button>
                   </Stack>
-                </Stack>
+                ))}
                 <Stack spacing={2} direction="row" width={"100%"}>
                   <TextField fullWidth size="small" {...register("minOrder")} variant="outlined" type="number" label="Minimum Order"></TextField>
                   {

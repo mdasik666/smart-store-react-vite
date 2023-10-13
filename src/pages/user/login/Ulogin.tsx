@@ -91,7 +91,7 @@ const Ulogin = () => {
             </div>
             <div className="d-flex justify-content-between align-items-center mt-4 pt-2" id="btnsWrap">
               <Link to="/user/register" className="btn btn-secondary btn-lg">Sign Up</Link>
-              <button type="submit" id="loginBrn" disabled={!isValid} className="btn btn-primary btn-lg">Login</button>
+              <button type="submit" id="loginBrn" disabled={isLoading || !isValid} className="btn btn-primary btn-lg">Login</button>
             </div>
           </form>
         </div>

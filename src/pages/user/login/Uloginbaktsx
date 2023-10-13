@@ -1,4 +1,4 @@
-import { Alert, AlertColor, Button, CircularProgress, Paper, Snackbar, Stack, TextField, Typography, IconButton, InputAdornment, styled, FormGroup, FormLabel, FormControl, InputLabel, Input, FormHelperText, Avatar, Box } from "@mui/material";
+import { Alert, AlertColor, Button, CircularProgress, Snackbar, Stack, TextField, Typography, IconButton, InputAdornment, Box } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React, { useState, useEffect } from 'react';
@@ -13,7 +13,7 @@ interface IPropsError {
   message: string
 }
 
-const Ulogin = () => {
+const Ulog = () => {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({
     mode: "onChange"
   })
@@ -60,10 +60,20 @@ const Ulogin = () => {
     }
   }
 
-  return (
-    <CustomStack alignItems={"center"} justifyContent={{ xs: "start", sm: "center" }} width={"100%"} height={"100%"} bgcolor={{ xs: "darkred" }}>
-      <Stack component={"form"} onSubmit={handleSubmit(loginValidate)} width={{ xs: "100%", sm: "50%", md: "25%" }} zIndex={1} bgcolor={{ xs: "darkred", sm: "white" }} p={{ sm: 6 }}>
-      <Stack spacing={2} borderRadius={{ xs: "0 0 50px 50px", sm: "0 0 0 0" }} bgcolor={"white"} p={{ xs: 6, sm: 0 }}>
+  return (    
+    <CustomStack alignItems={"center"} justifyContent={{ xs: "start", sm: "center" }} width={"100%"} height={"100%"} bgcolor={{ xs: "darkred", sm: "white" }}>
+      <Stack display={{xs:"none",sm:"unset"}}
+        sx={{
+          backgroundImage: `url('../src/asserts/border-d.png')`, 
+          backgroundRepeat: 'repeat-x',
+          zIndex:1,
+          height: '10px',
+          width: '50%',
+          backgroundSize: 'contain',
+          display:"inline-block"
+        }}></Stack>   
+      <Stack component={"form"} onSubmit={handleSubmit(loginValidate)} width={{ xs: "100%", sm: "50%"}} bgcolor={{sm:"white"}} zIndex={1} p={{ sm: 6 }}>
+        <Stack spacing={2} borderRadius={{ xs: "0 0 50px 50px", sm: "0 0 0 0" }} bgcolor={"white"} p={{ xs: 6, sm: 0 }}>
           <Typography variant={"h3"} gutterBottom textAlign={"left"} fontWeight={"bold"} color={"orangered"}>LOGIN</Typography>
           <Typography gutterBottom textAlign={"left"}>Enter your username and password to get access your account</Typography>
           <Stack spacing={1}>
@@ -85,7 +95,7 @@ const Ulogin = () => {
           </Stack>
         </Stack>
 
-        <Stack spacing={1} m={{ xs: "20px 80px",sm:"0" }} mt={{sm:2}} justifyContent={"center"} direction={{ xs: "column-reverse", sm: "row" }} >
+        <Stack spacing={1} m={{ xs: "20px 80px", sm: "0" }} mt={{ sm: 2 }} justifyContent={"center"} direction={{ xs: "column-reverse", sm: "row" }} >
           <Button fullWidth component={Link} to={"/user/register"} variant="contained" disabled={isLoading} endIcon={isLoading && <CircularProgress sx={{ color: "white" }} size={20} thickness={6} />}
             sx={{
               background: "white",
@@ -111,7 +121,11 @@ const Ulogin = () => {
               }
             }}>Login</Button>
         </Stack>
-                
+        <Stack display={{sm:"none"}} direction={"row"} width={"100%"} justifyContent={"space-between"} alignItems={"baseline"}>
+          <Box flex={2}><img style={{ width: "100%" }} src="../src/asserts/art-pic-left.png"></img></Box>
+          <Box flex={1}><img style={{ width: "100%" }} src="../src/asserts/art-pic-right.png"></img></Box>
+        </Stack>
+
       </Stack>
       {snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert onClose={handleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
@@ -122,4 +136,4 @@ const Ulogin = () => {
   )
 }
 
-export default Ulogin;
+export default Ulog;

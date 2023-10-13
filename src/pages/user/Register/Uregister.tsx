@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { userRegister } from "../../../services/Userservice";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import './Uregister.css'
+import "./register.css"
 
 interface IPropsError {
   open: boolean,
@@ -88,8 +88,8 @@ const Uregister = () => {
                 </div>
               </div>
               <div className="d-flex justify-content-between align-items-center mt-4 pt-2" id="btnsWrap">
-                <button type="reset" className="btn btn-secondary btn-lg">Reset {isLoading && <CircularProgress color="primary" size={20} thickness={6} />}</button>
-                <button type="submit" disabled={!isValid} className="btn btn-primary btn-lg">Register {isLoading && <CircularProgress color="primary" size={20} thickness={6} />}</button>
+                <button type="reset" className="btn btn-secondary btn-lg">Reset</button>
+                <button type="submit" disabled={isLoading || !isValid} className="btn btn-primary btn-lg">Register</button>
               </div>
             </form>
           </div>
