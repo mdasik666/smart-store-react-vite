@@ -86,7 +86,7 @@ const Ulogin = () => {
                     Remember me
                   </label>
                 </div>
-                <a href="#!" className="text-body">Forgot password</a>
+                <Link to={"/user/forgotpassword"} className="text-body">Forgot password</Link>
               </div>
             </div>
             <div className="d-flex justify-content-between align-items-center mt-4 pt-2" id="btnsWrap">

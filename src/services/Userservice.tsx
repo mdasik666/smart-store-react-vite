@@ -12,3 +12,7 @@ export const userLoginVerify = async() => {
     return await axiosInstance.get('/user/dashboard')
 }
 
+export const userGetProducts = async() => {    
+    return await axiosInstance.get('/user/getproducts')
+}
+

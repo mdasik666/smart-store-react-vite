@@ -103,8 +103,7 @@ const Aproduct = () => {
     })();
   }, [])
 
-  const addOrUpdateProduct = async (data: any) => {
-    console.log(data)
+  const addOrUpdateProduct = async (data: any) => {    
     try {
       setButtonLoading(true)
       var res;
@@ -324,8 +323,8 @@ const Aproduct = () => {
                       {errors?.category && errors.category?.message?.toString() || ""}
                     </FormHelperText>
                   </FormControl>
+                  <TextField fullWidth size="small" {...register("title")} variant="outlined" type="text" label="Title"></TextField>
                 </Stack>
-                <TextField fullWidth size="small" {...register("title")} variant="outlined" type="text" label="Title"></TextField>
 
                 {qtArray.map((_, index:number) => (
                   <Stack width={"100%"} key={index} direction="row" spacing={1}>

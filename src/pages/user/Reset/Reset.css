@@ -1,0 +1,327 @@
+@font-face {
+    font-family: "Fils-regular";
+    src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-medium";
+    src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-book";
+    src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-black";
+    src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-bold";
+    src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-heavy";
+    src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-regular";
+    src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-medium";
+    src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-book";
+    src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-black";
+    src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-bold";
+    src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  }
+  @font-face {
+    font-family: "Fils-heavy";
+    src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  }
+  body {
+    font-family: "Fils-book";
+    font-size: 16px;
+  }
+  
+  .text-bold {
+    font-weight: bold;
+  }
+  
+  .btn {
+    font-family: "Fils-bold";
+  }
+  
+  .btn-primary {
+    border-radius: 2em;
+    padding: 0.35em 2em !important;
+    font-size: 1.15em;
+    background-color: #ff5901;
+    border-color: #ff5901;
+    min-width: 145px;
+  }
+  .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: #ff5901 !important;
+    border-color: #ff5901 !important;
+  }
+  
+  .btn-secondary {
+    border-radius: 2em;
+    padding: 0.35em 2em !important;
+    font-size: 1.15em;
+    border-color: #ff5901;
+    background-color: transparent;
+    color: #ff5901;
+    min-width: 145px;
+  }
+  .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active, .btn-secondary :not(.btn-check) + .btn:active {
+    border-color: #ff5901 !important;
+    background-color: transparent !important;
+    color: #ff5901 !important;
+  }
+  
+  @media screen and (max-width: 550px) {
+    body {
+      background-color: #ff5901;
+    }
+  }
+  #login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-image: url(../../../asserts/images/login_bg.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+  }
+  #login:before {
+    content: "";
+    background-color: rgba(145, 20, 6, 0.3);
+    height: 100%;
+    width: 100%;
+    display: block;
+    position: absolute;
+    z-index: 0;
+    background-attachment: fixed;
+  }
+  @media screen and (max-width: 550px) {
+    #login {
+      height: auto;
+      background-color: #ff5901;
+      background-image: none;
+      padding-bottom: 20em;
+    }
+    #login::before {
+      display: none;
+    }
+    #login::before {
+      content: "";
+      display: inline-block;
+      bottom: 0px;
+      height: 100px;
+      background-image: url(../../../asserts/images/mb-art-pic-left.png);
+      background-repeat: no-repeat;
+      width: 75%;
+      position: absolute;
+      background-size: contain;
+      left: 0;
+      background-color: transparent;
+      background-attachment: unset;
+    }
+    #login::after {
+      content: "";
+      display: inline-block;
+      bottom: 0;
+      height: 100px;
+      background-image: url(../../../asserts/images/art-pic-right.png);
+      background-repeat: no-repeat;
+      width: 25%;
+      position: absolute;
+      background-size: cover;
+      right: 0;
+      vertical-align: bottom;
+    }
+    #login .img {
+      display: none !important;
+    }
+  }
+  #login .logWrapper {
+    z-index: 9;
+    position: relative;
+    background-color: #ffffff;
+    padding: 0px 50px 30px;
+    max-width: 420px;
+    min-height: 560px;
+  }
+  @media screen and (max-width: 550px) {
+    #login .logWrapper {
+      max-width: 100%;
+      width: 100%;
+      padding: 0 0 50px;
+      min-height: fit-content;
+      border-bottom-left-radius: 50px;
+      border-bottom-right-radius: 50px;
+    }
+    #login .logWrapper .login-wrap {
+      padding: 50px 40px !important;
+    }
+    #login .logWrapper #btnsWrap {
+      flex-direction: column-reverse;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+    }
+    #login .logWrapper #btnsWrap .btn {
+      min-width: 75%;
+    }
+    #login .logWrapper #btnsWrap .btn.btn-primary {
+      background-color: #ffffff !important;
+      border-color: #ffffff !important;
+      color: #ff5901;
+    }
+    #login .logWrapper #btnsWrap .btn.btn-primary:hover, #login .logWrapper #btnsWrap .btn.btn-primary:focus {
+      background-color: #ffffff !important;
+      border-color: #ffffff !important;
+      color: #ff5901;
+    }
+    #login .logWrapper #btnsWrap .btn.btn-secondary {
+      margin-top: 2em;
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+    #login .logWrapper #btnsWrap .btn.btn-secondary:hover, #login .logWrapper #btnsWrap .btn.btn-secondary:focus {
+      color: #ffffff !important;
+      border-color: #ffffff !important;
+      background-color: #ff5901;
+    }
+  }
+  @media screen and (min-width: 551px) {
+    #login .logWrapper::before {
+      content: "";
+      display: inline-block;
+      top: -8px;
+      height: 10px;
+      background-image: url(../../../asserts/images/border-d.png);
+      background-repeat: repeat-x;
+      width: 100%;
+      position: absolute;
+      background-size: contain;
+      left: 0;
+    }
+    #login .logWrapper::after {
+      content: "";
+      display: inline-block;
+      bottom: -8px;
+      height: 10px;
+      background-image: url(../../../asserts/images/border-d.png);
+      background-repeat: repeat-x;
+      width: 100%;
+      position: absolute;
+      background-size: contain;
+      transform: rotate(180deg);
+      left: 0;
+    }
+  }
+  #login .logWrapper .login-wrap .img.d-flex {
+    width: 90px;
+    height: 90px;
+    background-size: 75px;
+    background-repeat: no-repeat;
+    background-color: #ffe200;
+    background-position: center;
+    position: absolute;
+    top: 0;
+  }
+  #login .logWrapper .login-wrap h1 {
+    margin-top: 1.85em;
+    text-transform: uppercase;
+    color: #ff666d;
+    font-family: "Fils-bold";
+  }
+  @media screen and (max-width: 550px) {
+    #login .logWrapper .login-wrap h1 {
+      margin-top: 1em;
+    }
+  }
+  #login .logWrapper .login-wrap h1 + p {
+    color: darkgray;
+    font-family: "Fils-book";
+  }
+  #login .logWrapper .login-wrap label {
+    margin-bottom: 0;
+    font-weight: bold;
+    color: #000000;
+    font-family: "Fils-bold";
+  }
+  #login .logWrapper .login-wrap .form-control {
+    border: none;
+    border-bottom: 2px solid #fff079;
+    padding-left: 0;
+    padding-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 0px;
+  }
+  #login .logWrapper .login-wrap .form-control:focus, #login .logWrapper .login-wrap .form-control:active, #login .logWrapper .login-wrap .form-control:hover {
+    box-shadow: none !important;
+  }
+  #login .logWrapper .login-wrap .rememberWrap input#rememberMe {
+    opacity: 0;
+  }
+  #login .logWrapper .login-wrap .rememberWrap input#rememberMe:checked + label:after {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    left: -25px;
+    top: 2px;
+    color: #ffffff;
+    background-image: url(../../../asserts/images/check.svg);
+    background-repeat: no-repeat;
+    background-size: 18px;
+  }
+  #login .logWrapper .login-wrap .rememberWrap label {
+    font-family: "Fils-book";
+    color: darkgray;
+    font-weight: normal;
+    font-size: 0.9em;
+    position: relative;
+    cursor: pointer;
+  }
+  #login .logWrapper .login-wrap .rememberWrap label:before {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ff5901;
+  }
+  #login .logWrapper .login-wrap .rememberWrap a.text-body {
+    text-decoration: none;
+    font-family: "Fils-book";
+    font-size: 1em;
+    color: #ff5901 !important;
+    font-size: 0.9em;
+  }
+  #login .logWrapper .login-wrap .rememberWrap button.btn {
+    font-family: "Fils-book" !important;
+    font-size: 1em;
+  }
+  
+  /*# sourceMappingURL=reset.css.map */
+  
