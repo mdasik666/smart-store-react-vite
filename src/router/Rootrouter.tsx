@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Adminroute from "./Adminrouters/Adminroute";
-import Userroute from "./Userrouters/Userroute";
-import Ulogin from "../pages/User/Login/Ulogin";
+import Adminroute from "@/router/Adminrouters/Adminroute";
+import Userroute from "@/router/Userrouters/Userroute";
+import Ulogin from "@/pages/User/Login/Ulogin";
 
 const Rootrouter = () => {
 

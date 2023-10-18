@@ -1,11 +1,11 @@
 import { Alert, AlertColor, Box, Button, CircularProgress, IconButton, InputAdornment, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import React, { useState } from 'react';
-import { adminRegister } from "../../../services/Adminservice";
+import { adminRegister } from "@/services/Adminservice";
 import { useForm } from "react-hook-form";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Link } from "react-router-dom";
-import { CustomStack } from "../../../custom/Styles/CustomStack";
+import { CustomStack } from "@/custom/Styles/CustomStack";
 import { ArrowBack } from "@mui/icons-material";
 
 interface IPropsError {

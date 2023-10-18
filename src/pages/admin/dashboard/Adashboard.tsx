@@ -1,6 +1,6 @@
-import { Admindrawer } from "../../../components/Admindrawer/Admindrawer";
+import { Admindrawer } from "@/components/Admindrawer/Admindrawer";
 import { useEffect, useState } from "react";
-import { adminLoginVerify } from "../../../services/Adminservice";
+import { adminLoginVerify } from "@/services/Adminservice";
 import { useNavigate } from "react-router-dom";
 
 const Adashboard = () => {

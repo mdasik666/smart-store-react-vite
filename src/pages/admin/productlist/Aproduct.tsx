@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { adminAddProduct, adminGetProduct, adminLoginVerify, adminUpdateProductById, adminDeleteProductById } from "../../../services/Adminservice";
 import { useNavigate } from "react-router-dom";
 import { Add, Delete, Update } from "@mui/icons-material";
-import ModalDialog from "../../../components/Dialog/Dialog";
+import ModalDialog from "@/components/Dialog/Dialog";
 
 interface IPropsError {
   open: boolean,

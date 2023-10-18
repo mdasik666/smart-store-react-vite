@@ -1,9 +1,9 @@
 import { Alert, AlertColor, Snackbar, CircularProgress } from "@mui/material";
 import React, { useState } from 'react';
-import { userOTPVerify, userRegister } from "../../../services/Userservice";
+import { userOTPVerify, userRegister } from "@/services/Userservice";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import "./register.css"
+import {Helmet} from "react-helmet";
 
 interface IPropsError {
   open: boolean,
@@ -66,6 +66,12 @@ const Uregister = () => {
 
   return (
     <>
+    <Helmet>
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Register</title>
+        <link rel="stylesheet" type="text/css" href="../src/pages/User/Register/Register.css" />
+      </Helmet>
       <section id="register">
         <div className="logWrapper">
           <div className="register-wrap pt-5 pb-3">

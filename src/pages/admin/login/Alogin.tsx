@@ -2,11 +2,11 @@ import { Alert, AlertColor, Button, CircularProgress, Paper, Snackbar, Stack, Te
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React, { useState, useEffect } from 'react';
-import { adminLogin } from "../../../services/Adminservice";
+import { adminLogin } from "@/services/Adminservice";
 import { Link, useNavigate } from "react-router-dom";
-import { adminLoginVerify } from "../../../services/Adminservice";
+import { adminLoginVerify } from "@/services/Adminservice";
 import { useForm } from "react-hook-form";
-import { CustomStack } from "../../../custom/Styles/CustomStack";
+import { CustomStack } from "@/custom/Styles/CustomStack";
 
 interface IPropsError {
   open: boolean,

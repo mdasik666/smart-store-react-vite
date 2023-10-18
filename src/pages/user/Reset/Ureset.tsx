@@ -1,5 +1,14 @@
+import {Helmet} from "react-helmet";
+
 const Ureset = () => {
     return (
+      <>
+      <Helmet>
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Reset</title>
+        <link rel="stylesheet" type="text/css" href="../src/pages/User/Reset/Reset.css" />
+      </Helmet>
         <section id="login">
             <div className="logWrapper">                
                 <div className="login-wrap pt-5 pb-3">
@@ -30,6 +39,7 @@ const Ureset = () => {
 
             </div>
         </section>
+      </>
     )
 }
 
