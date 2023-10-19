@@ -7,6 +7,8 @@ import Uregister from "@/pages/User/Register/Uregister";
 import Uforgotpassword from "@/pages/User/Forgotpass/Uforgotpass";
 import Ureset from "@/pages/User/Reset/Ureset";
 import Ucart from "@/pages/User/Cart/Ucart";
+import Uproductlist from "@/pages/User/Products/Uproductlist";
+import Uprofile from "@/pages/User/Profile/Uprofile";
 
 
 const Userroute = () => {
@@ -20,6 +22,8 @@ const Userroute = () => {
             <Route path="dashboard" element={<Udashboard />} />            
             <Route path="dashboard/checkout" element={<Ucheckout />} />
             <Route path="dashboard/cart" element={<Ucart />} />
+            <Route path="dashboard/products" element={<Uproductlist />} />
+            <Route path="dashboard/profile" element={<Uprofile />} />
             <Route path="*" element={<UserNotfound />} />      
         </Routes>
     );

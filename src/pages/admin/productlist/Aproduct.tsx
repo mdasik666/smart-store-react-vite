@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import React, { useEffect, useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm } from "react-hook-form";
-import { adminAddProduct, adminGetProduct, adminLoginVerify, adminUpdateProductById, adminDeleteProductById } from "../../../services/Adminservice";
+import { adminAddProduct, adminGetProduct, adminLoginVerify, adminUpdateProductById, adminDeleteProductById, adminGetCategoryList } from "../../../services/Adminservice";
 import { useNavigate } from "react-router-dom";
 import { Add, Delete, Update } from "@mui/icons-material";
 import ModalDialog from "@/components/Dialog/Dialog";
@@ -30,7 +30,7 @@ interface IPropsProductData {
 }
 
 const Aproduct = () => {
-  const productCategory = ["Nuts", "Badam"]
+  const [productCategory, setProductCategory] = useState<{categoryName:string}[]>([]);
   const quantityTypes = ["KG", "Piece"]
 
   const nav = useNavigate()
@@ -91,9 +91,19 @@ const Aproduct = () => {
               setProductList(getProduct.data.producList)
               const { productName, productDescription, price, category, minOrder, image } = getProduct.data.producList[0]
               setProductKey(Object.keys({ productName, productDescription, price, category, minOrder, image }))
+              try {
+                const prodCat = await adminGetCategoryList();
+                if(prodCat.data.status === "Success"){
+                  setProductCategory(prodCat.data.category)
+                }else{
+                  setSnackOpen({ open: true, severity: "error", message: prodCat.data.message })
+                }
+              } catch (error:any) {
+                setSnackOpen({ open: true, severity: "info", message: error?.messsage })
+              }
             }
           } catch (error: any) {
-            setSnackOpen({ open: false, severity: "info", message: error?.messsage })
+            setSnackOpen({ open: true, severity: "info", message: error?.messsage })
           }
         }
       } catch (err: any) {
@@ -125,7 +135,7 @@ const Aproduct = () => {
       } else {
         setSnackOpen({ open: true, severity: "success", message: res.data.message })
         if (updateProductId.length > 0) {
-          setUpdateProductId("")
+          setUpdateProductId("")          
           setModalOpen(false)
           resetForm()
         } else {
@@ -312,10 +322,11 @@ const Aproduct = () => {
                 <Stack spacing={2} direction="row" width={"100%"}>                  
                   <FormControl fullWidth size="small" error={Boolean(errors?.category)}>
                     <InputLabel id="category">Category</InputLabel>
-                    <Select labelId="category" {...register("category", { required: "Category is mandatory" })} onChange={handleCategoryChange} value={changeCategory} label="Category">
+                    <Select labelId="category" {...register("category", { required: "Category is mandatory" })} onChange={handleCategoryChange} defaultValue={changeCategory} label="Category">
                       {
+                        productCategory.length &&
                         productCategory.map((cat, i) => {
-                          return (<MenuItem value={cat} key={i}>{cat}</MenuItem>)
+                          return (<MenuItem value={cat.categoryName} key={i}>{cat?.categoryName}</MenuItem>)
                         })
                       }
                     </Select>

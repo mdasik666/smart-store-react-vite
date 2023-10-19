@@ -1,51 +1,63 @@
 @font-face {
   font-family: "Fils-regular";
-  src: url("@/asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-medium";
-  src: url("@/asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-book";
-  src: url("@/asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-black";
-  src: url("@/asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-bold";
-  src: url("@/asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-heavy";
-  src: url("@/asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-regular";
-  src: url("@/asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-medium";
-  src: url("@/asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-book";
-  src: url("@/asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-black";
-  src: url("@/asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-bold";
-  src: url("@/asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
 }
+
 @font-face {
   font-family: "Fils-heavy";
-  src: url("@/asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
 }
+
 body {
   font-family: "Fils-book";
   font-size: 16px;
@@ -67,10 +79,14 @@ body {
   border-color: #ff5901;
   min-width: 145px;
 }
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
   background-color: #ff5901 !important;
   border-color: #ff5901 !important;
 }
+
 @media screen and (max-width: 800px) {
   .btn-primary {
     padding: 0.35em 1.5em !important;
@@ -88,12 +104,16 @@ body {
   color: #ff5901;
   min-width: 145px;
 }
-.btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active,
-.btn-secondary :not(.btn-check) + .btn:active {
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active,
+.btn-secondary :not(.btn-check)+.btn:active {
   border-color: #ff5901 !important;
   background-color: transparent !important;
   color: #ff5901 !important;
 }
+
 @media screen and (max-width: 800px) {
   .btn-secondary {
     padding: 0.35em 1.5em !important;
@@ -103,6 +123,7 @@ body {
 }
 
 @media (min-width: 1300px) {
+
   .container,
   .container-lg,
   .container-md,
@@ -111,7 +132,9 @@ body {
     max-width: 1260px;
   }
 }
+
 @media (min-width: 1360px) {
+
   .container,
   .container-lg,
   .container-md,
@@ -120,6 +143,7 @@ body {
     max-width: 1300px;
   }
 }
+
 body {
   overflow-x: hidden;
 }
@@ -149,6 +173,7 @@ body {
     max-width: 95% !important;
   }
 }
+
 #wrapper header {
   position: absolute;
   top: 0;
@@ -156,26 +181,31 @@ body {
   right: 0;
   z-index: 9;
 }
+
 #wrapper header h1 {
   color: #ffffff;
 }
+
 #wrapper header h1 a {
   align-items: flex-end !important;
 }
+
 #wrapper header h1 a .logo_ic {
-  background-image: url(@/asserts/images/logo.png);
+  background-image: url(../../../asserts/images/logo.png);
   background-color: #ffe200;
   background-repeat: no-repeat;
   background-size: contain;
   width: 85px;
   height: 85px;
 }
+
 #wrapper header h1 a .logo_txt {
   padding-left: 20px;
   font-family: "Fils-heavy";
   font-size: 0.8em;
   color: #ffffff;
 }
+
 #wrapper header .dropdown a {
   display: flex !important;
   align-items: center;
@@ -183,26 +213,48 @@ body {
   text-align: left;
   color: #ffffff;
 }
+
 #wrapper header .dropdown a img {
   width: 45px;
   height: 45px;
   margin-left: 20px;
 }
+
+#wrapper header .dropdown .dropdown-menu.show {
+  position: absolute;
+  right: 0 !important;
+  top: 60px;
+  left: auto !important;
+}
+
+#wrapper header .dropdown .dropdown-menu.show a {
+  color: #000000;
+  justify-content: center;
+}
+
+#wrapper header .dropdown .dropdown-menu.show a:hover,
+#wrapper header .dropdown .dropdown-menu.show a:focus {
+  color: #ff5901;
+}
+
 #wrapper header .dropdown .textWrap span {
   display: block;
   font-size: 0.9em;
   margin-bottom: -3px;
   color: #ffffff;
 }
+
 #wrapper header .dropdown .textWrap .username {
   font-size: 1.5em;
   font-family: "Fils-heavy";
 }
+
 #wrapper header .dropdown .dropdown-toggle::after {
   display: none;
 }
+
 #wrapper #searchWrap {
-  background-image: url(@/asserts/images/login_bg.jpg);
+  background-image: url(../../../asserts/images/login_bg.jpg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -210,6 +262,7 @@ body {
   padding-bottom: 70px;
   position: relative;
 }
+
 #wrapper #searchWrap::before {
   content: "";
   width: 100%;
@@ -221,10 +274,12 @@ body {
   z-index: 1;
   pointer-events: none;
 }
-#wrapper #searchWrap > .row {
+
+#wrapper #searchWrap>.row {
   position: relative;
   z-index: 7;
 }
+
 #wrapper #searchWrap .input-group {
   display: flex;
   align-items: center;
@@ -233,14 +288,37 @@ body {
   border-radius: 30px;
   border: 1px solid;
 }
-#wrapper #searchWrap .input-group > * {
+
+#wrapper #searchWrap .input-group>* {
   box-shadow: none;
 }
+
+#wrapper #searchWrap .input-group .btn {
+  font-family: "Fils-book";
+  outline: none !important;
+  border: none !important;
+}
+
+#wrapper #searchWrap .input-group .dropdown-menu li a {
+  color: #000000;
+  width: 100%;
+  padding: 5px 10px;
+  display: inline-block;
+  text-decoration: none;
+}
+
+#wrapper #searchWrap .input-group .dropdown-menu li a:hover,
+#wrapper #searchWrap .input-group .dropdown-menu li a:active,
+#wrapper #searchWrap .input-group .dropdown-menu li a:focus {
+  color: #ff5901;
+}
+
 #wrapper #searchWrap .input-group #txt-search {
   border: none;
   border-left: 1px solid;
 }
-#wrapper #searchWrap .input-group .input-group-btn > button[data-toggle] {
+
+#wrapper #searchWrap .input-group .input-group-btn>button[data-toggle] {
   border-radius: 25px;
   font-family: "Fils-book";
   display: flex;
@@ -248,12 +326,15 @@ body {
   padding-left: 30px;
   border: none !important;
 }
-#wrapper #searchWrap .input-group .input-group-btn > button[data-toggle] i {
+
+#wrapper #searchWrap .input-group .input-group-btn>button[data-toggle] i {
   margin-left: 10px;
 }
-#wrapper #searchWrap .input-group .input-group-btn > button[data-toggle]:active {
+
+#wrapper #searchWrap .input-group .input-group-btn>button[data-toggle]:active {
   border: none !important;
 }
+
 #wrapper #searchWrap .input-group .input-group-btn #btn-search {
   position: relative;
   z-index: 2;
@@ -264,24 +345,29 @@ body {
   font-family: "Fils-book";
   margin-left: 5px;
 }
+
 #wrapper #searchWrap .input-group .input-group-btn #btn-search i {
   margin-right: 5px;
 }
+
 #wrapper #searchWrap .freqWrap {
   display: flex;
   align-items: center;
   margin-top: 30px;
 }
+
 #wrapper #searchWrap .freqWrap p {
   margin: 0;
   color: #ffffff;
 }
+
 #wrapper #searchWrap .freqWrap ul {
   display: flex;
   column-gap: 20px;
   margin-bottom: 0;
   list-style-type: none;
 }
+
 #wrapper #searchWrap .freqWrap ul li {
   border: 2px solid #ffffff;
   border-radius: 25px;
@@ -289,14 +375,17 @@ body {
   color: #ffffff;
   white-space: nowrap;
 }
+
 #wrapper #productWrap {
   background-color: #fff079;
 }
+
 #wrapper #productWrap section[id] {
   padding: 50px 0px;
 }
+
 #wrapper #productWrap section[id] .colOrdersec {
-  background-image: url(@/asserts/images/order.jpg);
+  background-image: url(../../../asserts/images/order.jpg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -305,6 +394,7 @@ body {
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
 }
+
 #wrapper #productWrap section[id] .ur-order {
   background-color: #FF9D01;
   padding: 25px;
@@ -313,9 +403,10 @@ body {
   border-bottom-right-radius: 0px;
   position: relative;
 }
+
 #wrapper #productWrap section[id] .ur-order:after {
   content: "";
-  background-image: url(@/asserts/images/border-tri.png);
+  background-image: url(../../../asserts/images/border-tri.png);
   background-position: center;
   position: absolute;
   top: 0;
@@ -326,17 +417,20 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
 }
+
 @media screen and (max-width: 767px) {
   #wrapper #productWrap section[id] .ur-order:after {
     display: none;
   }
 }
+
 #wrapper #productWrap section[id] .ur-order h2 {
   text-transform: uppercase;
   font-family: "Fils-heavy";
   color: #ffffff;
   margin-bottom: 0;
 }
+
 #wrapper #productWrap section[id] .ur-order ul {
   list-style-type: none;
   padding: 0;
@@ -344,37 +438,44 @@ body {
   column-gap: 25px;
   width: 100%;
 }
+
 @media screen and (max-width: 767px) {
   #wrapper #productWrap section[id] .ur-order ul {
     column-gap: 15px;
     row-gap: 15px;
   }
 }
+
 #wrapper #productWrap section[id] .ur-order ul li {
   width: 100%;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders {
   padding: 20px 25px;
   background-color: #FFF6B4;
   border-radius: 25px;
   position: relative;
 }
+
 @media screen and (max-width: 767px) {
   #wrapper #productWrap section[id] .ur-order ul li .orders {
     padding: 20px 15px;
   }
-  #wrapper #productWrap section[id] .ur-order ul li .orders > p {
+
+  #wrapper #productWrap section[id] .ur-order ul li .orders>p {
     position: absolute;
     top: 10px;
     right: 10px;
   }
-  #wrapper #productWrap section[id] .ur-order ul li .orders > p.text-right a {
+
+  #wrapper #productWrap section[id] .ur-order ul li .orders>p.text-right a {
     width: 25px !important;
     height: 25px !important;
     line-height: 25px !important;
     font-size: 0.9em !important;
   }
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders span {
   display: block;
   display: -webkit-box;
@@ -382,31 +483,38 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders span.date {
   font-family: "Fils-book";
   -webkit-line-clamp: 1;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders span.brand {
   font-family: "Fils-heavy";
   font-size: 1.5em;
   margin-bottom: -5px;
   -webkit-line-clamp: 2;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders span.product {
   font-family: "Fils-heavy";
   font-size: 1em;
   -webkit-line-clamp: 1;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders span.tracking {
   font-family: "Fils-book";
   -webkit-line-clamp: 1;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders p {
   margin-bottom: 0;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders p.text-right {
   text-align: right;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders p.text-right a {
   background-color: #ff666d;
   color: #ffffff;
@@ -418,29 +526,35 @@ body {
   border-radius: 50%;
   font-size: 1.4em;
 }
+
 #wrapper #productWrap section[id] .ur-order ul li .orders p.text-right a i {
   transform: rotate(45deg);
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tab-pane {
   opacity: 1;
   padding-bottom: 5em;
 }
+
 @media screen and (min-width: 801px) {
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tab-pane {
     display: block !important;
   }
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 3.5em;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabHeader h2 {
   font-family: "Fils-heavy";
   color: #000000;
   margin-bottom: 0;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList {
   display: flex;
   justify-content: flex-start;
@@ -452,14 +566,17 @@ body {
   flex-wrap: wrap;
   align-items: stretch;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li {
   flex: 0 1 calc(20% - 2em);
 }
+
 @media screen and (max-width: 550px) {
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li {
     flex: 0 1 45.5%;
   }
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product {
   background-color: #ffffff;
   padding: 20px;
@@ -468,6 +585,7 @@ body {
   position: relative;
   height: 100%;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product .actionBtn {
   position: absolute;
   display: flex;
@@ -477,12 +595,14 @@ body {
   right: 18px;
   top: 18px;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product .actionBtn button {
   padding: 0;
   border: none;
   font-size: 1.2em;
   color: #ff666d;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product img {
   width: 100%;
   margin: auto;
@@ -490,26 +610,32 @@ body {
   object-fit: contain;
   margin-bottom: 1em;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product span {
   display: block;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product span.title {
   font-size: 1.1em;
   font-family: "Fils-heavy";
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product span.measure {
   font-size: 1em;
   font-family: "Fils-book";
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product span.price {
   color: #911406;
   font-size: 1.3em;
   font-family: "Fils-heavy";
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product span.stock {
   font-size: 0.9em;
   font-family: "Fils-book";
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList {
   display: flex;
   justify-content: space-between;
@@ -521,15 +647,18 @@ body {
   flex-wrap: wrap;
   align-items: stretch;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li {
   flex: 1 1 calc(20% - 2em);
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category {
   padding: 20px 20px 0px;
   border-radius: 1.5em;
   width: 100%;
   height: 100%;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category img {
   width: 100%;
   margin: auto;
@@ -537,34 +666,41 @@ body {
   object-fit: contain;
   margin-bottom: 0em;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category span {
   display: block;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category span.cTitle {
   font-size: 1.2em;
   font-family: "Fils-medium";
   font-weight: 500;
 }
+
 #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category span.prodName {
   font-size: 1.7em;
   font-family: "Fils-medium";
   font-weight: 500;
 }
+
 @media screen and (max-width: 1200px) {
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category span.cTitle {
     font-size: 0.9em;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li .category span.prodName {
     font-size: 1.4em;
   }
 }
+
 #wrapper #brandWrap {
   padding: 40px 0px 60px;
   position: relative;
 }
+
 #wrapper #brandWrap:before {
   content: "";
-  background-image: url(@/asserts/images/art-pic-left.png);
+  background-image: url(../../../asserts/images/art-pic-left.png);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: left bottom;
@@ -575,9 +711,10 @@ body {
   width: 50%;
   z-index: -1;
 }
+
 #wrapper #brandWrap:after {
   content: "";
-  background-image: url(@/asserts/images/art-pic-right.png);
+  background-image: url(../../../asserts/images/art-pic-right.png);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: right bottom;
@@ -588,11 +725,13 @@ body {
   width: 200px;
   z-index: -1;
 }
+
 #wrapper #brandWrap h2 {
   font-family: "Fils-heavy";
   text-align: center;
   margin-bottom: 40px;
 }
+
 #wrapper #brandWrap ul {
   display: flex;
   justify-content: space-around;
@@ -600,16 +739,25 @@ body {
   align-items: center;
   padding-left: 0;
 }
+
 #wrapper #brandWrap ul li {
   max-height: 75px;
   width: 100%;
   object-fit: contain;
 }
+
 #wrapper #brandWrap ul li a img {
   max-height: 65px;
   width: 100%;
   object-fit: contain;
 }
+
+@media screen and (max-width: 767px) {
+  #wrapper #brandWrap ul li a img {
+    max-height: 50px;
+  }
+}
+
 #wrapper #copyrights {
   display: flex;
   justify-content: space-between;
@@ -618,18 +766,22 @@ body {
   background-color: #000000;
   color: #ffffff;
 }
+
 #wrapper #copyrights .copywrap {
   display: flex;
   justify-content: space-between;
 }
+
 #wrapper #copyrights .copywrap p {
   font-size: 1.1em;
   margin-bottom: 0;
 }
+
 #wrapper #copyrights .copywrap p a {
   text-decoration: none;
   color: #ffffff;
 }
+
 #wrapper #copyrights .copywrap ul {
   list-style-type: none;
   display: flex;
@@ -637,16 +789,19 @@ body {
   margin-bottom: 0;
   padding: 0;
 }
+
 #wrapper #copyrights .copywrap ul li {
   padding-right: 5px;
   padding-left: 5px;
 }
+
 #wrapper #copyrights .copywrap ul li a {
   color: #ffffff;
   text-decoration: none;
   font-size: 1.1em;
   padding: 0px 10px;
 }
+
 #wrapper #copyrights .copywrap ul li:last-child a {
   border-left: 1px solid #ffffff;
   padding-left: 15px;
@@ -657,98 +812,124 @@ body {
     max-width: 95% !important;
   }
 }
+
 @media screen and (max-width: 1024px) {
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList {
     column-gap: 1em;
     row-gap: 1em;
     justify-content: flex-start;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li {
     flex-basis: 30%;
   }
-  #wrapper #searchWrap > .row {
+
+  #wrapper #searchWrap>.row {
     margin: 0;
   }
 }
+
 @media screen and (max-width: 800px) {
   #wrapper #productWrap section[id] .ur-order h2 {
     font-size: 1.3em;
   }
+
   #wrapper #productWrap section#orderWrap .col-md-7 {
     flex: 1;
     width: 100% !important;
   }
-  #wrapper #productWrap section#orderWrap .col-md-7 + .col-md-5 {
+
+  #wrapper #productWrap section#orderWrap .col-md-7+.col-md-5 {
     display: none;
   }
+
   #wrapper header {
     position: relative;
     padding-top: 50px;
   }
+
   #wrapper header .d-flex {
     width: 100%;
   }
+
   #wrapper header .d-flex .dropdown {
     width: 100%;
   }
+
   #wrapper #productWrap ul#prodTabs {
     display: flex !important;
   }
+
   #wrapper header .dropdown a {
     justify-content: space-between;
   }
+
   #wrapper header .dropdown a span.textWrap {
     color: #ff666d;
   }
+
   #wrapper header .dropdown a span.textWrap * {
     color: #ff666d;
   }
+
   #wrapper #searchWrap,
   #wrapper header h1 {
     display: none;
   }
-  section#productWrap > .container {
+
+  section#productWrap>.container {
     display: flex;
     flex-direction: column-reverse;
   }
+
   #wrapper #productWrap section[id] .ur-order:after {
     display: none;
   }
+
   #wrapper #productWrap section[id] .ur-order {
     border-radius: 25px !important;
   }
+
   #wrapper #productWrap section[id] .colOrdersec {
     display: none;
   }
+
   #wrapper #productWrap {
     background-color: #ffffff;
   }
+
   #wrapper #productWrap ul#prodTabs {
     border: none;
     margin-bottom: 3em;
   }
+
   #wrapper #productWrap ul#prodTabs li button {
     border: none;
     color: #5A5A5A;
     border-radius: 5px;
   }
+
   #wrapper #productWrap ul#prodTabs li button.active {
     background-color: #ffe6dd;
     color: #ff5901;
     font-family: "Fils-bold";
   }
+
   #wrapper #copyrights .copywrap {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 11px;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tab-pane {
     padding-bottom: 0;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li .product {
     padding: 40px 20px 20px;
   }
+
   .mobiBar {
     position: fixed;
     bottom: 0;
@@ -761,6 +942,16 @@ body {
     display: flex;
     justify-content: space-around;
   }
+
+  .mobiBar .dropdown {
+    line-height: 35px;
+  }
+
+  .mobiBar .dropdown .dropdown-menu {
+    line-height: 2em;
+    text-align: center;
+  }
+
   .mobiBar button.btn {
     border-radius: 5px !important;
     min-width: initial;
@@ -768,6 +959,7 @@ body {
     font-size: 1em;
     line-height: normal;
   }
+
   .mobiBar button.transBtn {
     background-color: transparent;
     border: none;
@@ -775,30 +967,34 @@ body {
     font-size: 1.1em;
   }
 }
+
 @media screen and (min-width: 768px) {
   .mobiBar {
     display: none;
   }
 }
+
 @media screen and (max-width: 767px) {
-  #wrapper #copyrights {
-    padding-bottom: 6em;
-  }
   #wrapper header h1 {
     color: #ff666d;
   }
+
   #wrapper header h1 a {
     color: #ff666d;
   }
+
   #wrapper header h1 a .logo_txt {
     color: #ff666d;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabHeader {
     display: none;
   }
+
   #wrapper #productWrap section[id] {
     padding-top: 10px;
   }
+
   #wrapper #productWrap section[id] .ur-order ul li .orders span.brand {
     font-size: 1.25em;
     display: -webkit-box;
@@ -807,6 +1003,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   #wrapper #productWrap section[id] .ur-order ul li .orders span.product {
     font-size: 0.8em;
     display: -webkit-box;
@@ -815,6 +1012,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   #wrapper #productWrap section[id] .ur-order ul li .orders span.date,
   #wrapper #productWrap section[id] .ur-order ul li .orders span.tracking {
     font-size: 0.8em;
@@ -824,59 +1022,94 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   #wrapper #brandWrap ul {
     column-gap: 1em;
     row-gap: 1em;
     flex-wrap: wrap;
   }
+
   #wrapper #brandWrap ul li {
     width: 40%;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li {
     flex: 1 1 45%;
     font-size: 0.8em;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li:last-child {
     flex-grow: 1;
     max-width: 48%;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li {
     flex: 1;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li:last-child {
     flex-grow: 0;
     flex-basis: 21%;
   }
+
+  #copyrights {
+    text-align: center;
+    font-size: 0.9em;
+    margin-bottom: 65px !important;
+    padding-bottom: 100px !important;
+  }
+
+  #copyrights .container {
+    max-width: 100% !important;
+  }
+
+  #copyrights .copywrap {
+    flex-direction: column !important;
+    row-gap: 15px !important;
+  }
+
+  #copyrights .copywrap ul {
+    justify-content: center !important;
+  }
 }
+
 @media screen and (max-width: 520px) {
   #wrapper header {
     padding-top: 30px;
   }
+
   #wrapper #productWrap ul#prodTabs li button {
     font-size: 0.8em;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.prodList li {
     flex: 1 1 45%;
     font-size: 0.8em;
   }
+
   #wrapper #productWrap section[id] .ur-order ul li .orders span.brand {
     font-size: 1em;
   }
+
   #wrapper #productWrap section[id] .ur-order ul li .orders span.product {
     font-size: 0.7em;
   }
+
   #wrapper #productWrap section[id] .ur-order ul li .orders span.date,
   #wrapper #productWrap section[id] .ur-order ul li .orders span.tracking {
     font-size: 0.65em;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li {
     flex: 1;
   }
+
   #wrapper #productWrap section[id]#tabsWrap #prodTabcontent .tabContent ul.catList li:last-child {
     flex-grow: 0;
     flex-basis: 46%;
   }
 }
+
 .btn {
   white-space: nowrap;
 }

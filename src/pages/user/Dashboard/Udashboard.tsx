@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { userLoginVerify } from '@/services/Userservice';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { ChangeEvent, useEffect, useState } from 'react'
+import { userGetCategoryList, userLoginVerify } from '@/services/Userservice';
+import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 
@@ -19,8 +19,24 @@ const Udashboard = () => {
   const nav = useNavigate()
 
   const [productList, setProductList] = useState<IPropsProductLisst[]>([])
+  const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
   const [isLoading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
+  const [categoryFilter, setCategoryFilter] = useState<string>("")
+  const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
+  const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
+
+  const filterByNameChange = (e: string) => {
+    setCategoryFilterByNameTrack(e)
+  }
+
+  const filterByName = () => {
+    if (!categoryFilterByNameTrack.length) {
+      setCategoryFilterByName("")
+    } else {
+      setCategoryFilterByName(categoryFilterByNameTrack)     
+    }
+  }
 
   useEffect(() => {
     (async function () {
@@ -40,6 +56,13 @@ const Udashboard = () => {
       if (res.data.status === "Success") {
         setError("")
         setProductList(res.data.producList)
+        try {
+          const prodCat = await userGetCategoryList();
+          if (prodCat.data.status === "Success") {
+            setProductCategory(prodCat.data.category)
+          }
+        } catch (error) {
+        }
       } else {
         setError(res.data.message)
       }
@@ -84,13 +107,13 @@ const Udashboard = () => {
                   <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32"
                     className="rounded-circle" />
                 </a>
-                <ul className="dropdown-menu text-small" aria-labelledby="profileDrop">
-                  <li><a className="dropdown-item" href="#">Settings</a></li>
-                  <li><a className="dropdown-item" href="#">Profile</a></li>
+                <ul className="dropdown-menu text-small" id="profDrop" aria-labelledby="profileDrop">
+                  <li><a className="dropdown-item" href="cart.html">Checkout</a></li>
+                  <li><a className="dropdown-item" href="profile.html">Profile</a></li>
                   <li>
                     <hr className="dropdown-divider" />
                   </li>
-                  <li><a className="dropdown-item" href="#">Sign out</a></li>
+                  <li><a className="dropdown-item" href="index.html">Sign out</a></li>
                 </ul>
               </div>
             </div>
@@ -102,12 +125,21 @@ const Udashboard = () => {
               <button onClick={() => nav("/user/dashboard/cart")} id="cartAdd" className="transBtn">
                 <i className="fa-solid fa-cart-shopping"></i>
               </button>
-              <button id="userProf" className="transBtn">
+              <button onClick={() => nav("/user/dashboard/profile")} id="userProf" className="transBtn">
                 <i className="fa-regular fa-user"></i>
               </button>
-              <button id="toggleMenu" className="transBtn">
-                <i className="fa-solid fa-bars"></i>
-              </button>
+
+              <div className="dropdown show">
+                <button id="toggleMenu dropdown-toggle" className="transBtn" data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i className="fa-solid fa-bars"></i>
+                </button>
+
+                <div className="dropdown-menu" aria-labelledby="optBar" role="menu">
+                  <a className="dropdown-item" href="#">Settings</a>
+                  <a className="dropdown-item" href="#">Signout</a>
+                  <a className="dropdown-item" href="#">Checkout</a>
+                </div>
+              </div>
             </div>
           </div>
         </header>
@@ -117,22 +149,26 @@ const Udashboard = () => {
             <div className="col-lg-8 col-md-9">
               <div role="search">
                 <div className="input-group">
-                  <div className="input-group-btn">
-                    <button type="button" className="btn btn-default" data-toggle="dropdown">
+                  <div className="input-group-btn dropdown">
+                    <button type="button" className="btn btn-default" id="catDrop" data-bs-toggle="dropdown" aria-expanded="false">
                       <span id="srch-category">Category</span> <i className="fa fa-angle-down"></i>
                     </button>
-                    <ul className="dropdown-menu" id="mnu-category">
-                      <li><a href="#Apps">Apps</a></li>
-                      <li><a href="#eBooks">eBooks</a></li>
-                      <li><a href="#Games">Games</a></li>
-                      <li><a href="#Music">Music</a></li>
-                      <li><a href="#Videos">Videos</a></li>
+                    <ul className="dropdown-menu" role="menu" aria-labelledby="catDrop" id="mnu-category">
+                      <li key={0} className='p-2' onClick={() => setCategoryFilter("")}>{"All"}</li>
+                      {
+                        productCategory.length > 0 ?
+                          productCategory.map((cat, i) => {
+                            return (
+                              <li key={i + 1} className='p-2' onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
+                            )
+                          }) : <li>Loading...</li>
+                      }
                     </ul>
                   </div>
                   <input type="hidden" id="txt-category" />
-                  <input type="text" id="txt-search" className="form-control" />
+                  <input type="text" id="txt-search" className="form-control" onChange={(e: ChangeEvent<HTMLInputElement>) => filterByNameChange(e.target.value)} />
                   <span className="input-group-btn">
-                    <button id="btn-search" type="submit" className="btn btn-primary">
+                    <button id="btn-search" type="submit" className="btn btn-primary" onClick={filterByName}>
                       <i className="fa fa-search"></i>
                       Search
                     </button>
@@ -223,44 +259,42 @@ const Udashboard = () => {
               <div className="tab-content" id="prodTabcontent">
                 <div className="tab-pane fade show active" id="trends" role="tabpanel" aria-labelledby="trends-tab">
                   {
-                    isLoading && <div>Loading...</div>
-                  }
-                  {
-                    error.length > 0 && <div>{error}</div>
-                  }
-                  {
-                    productList.length > 0 && !isLoading &&
-                    <>
-                      <div className="tabHeader">
-                        <h2>NEW ARRIVALS</h2>
-                        <a href="productlist.html" className="btn btn-primary">View All</a>
-                      </div>
-                      <div className="tabContent">
-                        <ul className="prodList">
-                          {
-                            productList.slice(0, 11).map((prod, i) => {
-                              return (<li key={i}>
-                                <div className="product shadow">
-                                  <div className="actionBtn">
-                                    <button className="btn">
-                                      <i className="fa-regular fa-heart"></i>
-                                    </button>
-                                    <button className="btn">
-                                      <i className="fa-solid fa-cart-shopping"></i>
-                                    </button>
+                    productList.length > 0 ?
+                      <>
+                        <div className="tabHeader">
+                          <h2>NEW ARRIVALS</h2>
+                          <Link to={"/user/dashboard/products"} className="btn btn-primary">View All</Link>
+                        </div>
+                        <div className="tabContent">
+                          <ul className="prodList">
+                            {
+                              productList.slice(0, 11).map((prod, i) => {
+                                return (<li key={i}>
+                                  <div className="product shadow">
+                                    <div className="actionBtn">
+                                      <button className="btn">
+                                        <i className="fa-regular fa-heart"></i>
+                                      </button>
+                                      <button className="btn">
+                                        <i className="fa-solid fa-cart-shopping"></i>
+                                      </button>
+                                    </div>
+                                    <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                    <span className="title">{prod.productName}</span>
+                                    <span className="measure">{prod.productDescription}</span>
+                                    <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
+                                    <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
                                   </div>
-                                  <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                  <span className="title">{prod.title}</span>
-                                  <span className="measure">{prod.productDescription}</span>
-                                  <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                  <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
-                                </div>
-                              </li>)
-                            })
-                          }
-                        </ul>
-                      </div>
-                    </>
+                                </li>)
+                              })
+                            }
+                          </ul>
+                        </div>
+                      </>
+                      :
+                      isLoading ? <div>Loading...</div>
+                        :
+                        error.length > 0 ? <div>{error}</div> : <div>Product not found</div>
                   }
                 </div>
                 <div className="tab-pane fade" id="avail" role="tabpanel" aria-labelledby="avail-tab">
@@ -309,44 +343,64 @@ const Udashboard = () => {
                 </div>
                 <div className="tab-pane fade" id="recom" role="tabpanel" aria-labelledby="recom-tab">
                   {
-                    isLoading && <div>Loading...</div>
-                  }
-                  {
-                    error.length > 0 && <div>{error}</div>
-                  }
-                  {
-                    productList.length > 0 && !isLoading &&
-                    <>
-                      <div className="tabHeader">
-                        <h2>FEATURED PRODUCTS</h2>
-                        <button className="btn btn-primary">View All</button>
-                      </div>
-                      <div className="tabContent">
-                        <ul className="prodList">
-                          {
-                            productList.slice(0, 11).map((prod, i) => {
-                              return (<li key={i}>
-                                <div className="product shadow">
-                                  <div className="actionBtn">
-                                    <button className="btn">
-                                      <i className="fa-regular fa-heart"></i>
-                                    </button>
-                                    <button className="btn">
-                                      <i className="fa-solid fa-cart-shopping"></i>
-                                    </button>
-                                  </div>
-                                  <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                  <span className="title">{prod.title}</span>
-                                  <span className="measure">{prod.productDescription}</span>
-                                  <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                  <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
-                                </div>
-                              </li>)
-                            })
-                          }
-                        </ul>
-                      </div>
-                    </>
+                    productList.length > 0 ?
+                      <>
+                        <div className="tabHeader">
+                          <h2>FEATURED PRODUCTS</h2>
+                          <Link to={"/user/dashboard/products"} className="btn btn-primary">View All</Link>
+                        </div>
+                        <div className="tabContent">
+                          <ul className="prodList">
+                            {
+                              categoryFilter.length || categoryFilterByName.length ?
+                                  productList.filter(pc=>(pc.category.indexOf(categoryFilter)>-1))
+                                  .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1)).map((prod, i) => {
+                                    return (<li key={i}>
+                                      <div className="product shadow">
+                                        <div className="actionBtn">
+                                          <button className="btn">
+                                            <i className="fa-regular fa-heart"></i>
+                                          </button>
+                                          <button className="btn">
+                                            <i className="fa-solid fa-cart-shopping"></i>
+                                          </button>
+                                        </div>
+                                        <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                        <span className="title">{prod.productName}</span>
+                                        <span className="measure">{prod.productDescription}</span>
+                                        <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
+                                        <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
+                                      </div>
+                                    </li>)
+                                  })
+                                :
+                                productList.slice(0, 11).map((prod, i) => {
+                                  return (<li key={i}>
+                                    <div className="product shadow">
+                                      <div className="actionBtn">
+                                        <button className="btn">
+                                          <i className="fa-regular fa-heart"></i>
+                                        </button>
+                                        <button className="btn">
+                                          <i className="fa-solid fa-cart-shopping"></i>
+                                        </button>
+                                      </div>
+                                      <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                      <span className="title">{prod.productName}</span>
+                                      <span className="measure">{prod.productDescription}</span>
+                                      <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
+                                      <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
+                                    </div>
+                                  </li>)
+                                })
+                            }
+                          </ul>
+                        </div>
+                      </>
+                      :
+                      isLoading ? <div>Loading...</div>
+                        :
+                        error.length > 0 ? <div>{error}</div> : <div>Product not found</div>
                   }
                 </div>
               </div>

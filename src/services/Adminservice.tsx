@@ -27,3 +27,7 @@ export const adminUpdateProductById = async(id:any, data:any) => {
 export const adminDeleteProductById = async(id:any) => {    
     return await axiosInstance.delete(`/admin/deleteproduct/${id}`)
 }
+
+export const adminGetCategoryList = async() => {    
+    return await axiosInstance.get(`/admin/productcategory`)
+}
