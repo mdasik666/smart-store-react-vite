@@ -1,10 +1,11 @@
 import { useEffect, useState, ChangeEvent } from 'react'
-import { userGetCategoryList, userLoginVerify } from '@/services/Userservice';
+import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCart, userGetCategoryList, userGetWishList, userLoginVerify } from '@/services/Userservice';
 import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 
-interface IPropsProductLisst {
+interface IPropsProductList {
+    _id: string,
     productName: String,
     productDescription: String,
     category: String,
@@ -12,57 +13,93 @@ interface IPropsProductLisst {
     quantityAndType: Array<{ price: Number, quantity: String, type: String }>,
     minOrder: Number,
     image: String,
-    adminId: String
+    adminId: String,
+    wishlist?: boolean,
+    cart?: boolean
+}
+
+interface IPropsUserData {
+    _id: string,
+    fullName: string,
+    email: string
 }
 
 const Uproductlist = () => {
     const nav = useNavigate()
 
-    const [productList, setProductList] = useState<IPropsProductLisst[]>([])
+    const [productList, setProductList] = useState<IPropsProductList[]>([])
     const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
     const [isLoading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string>("")
     const [categoryFilter, setCategoryFilter] = useState<string>("")
     const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
     const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
-    
+    const [categoryFilterByMultipleItem, setCategoryFilterByMultipleItem] = useState<Array<string>>([])
+
+    const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
+
+    const filterByNameChange = (e: string) => {
+        if (e.length <= 0) {
+            setCategoryFilterByName("")
+        } else {
+            setCategoryFilterByNameTrack(e)
+        }
+    }
+
+    const filterByName = () => {
+        setCategoryFilterByName(categoryFilterByNameTrack)
+    }
+
+    const setFilterbyMultipleItem = (val: string) => {
+        setCategoryFilter("")
+        if (categoryFilterByMultipleItem.includes(val)) {
+            setCategoryFilterByMultipleItem((prev) => prev.filter(item => item !== val));
+        } else {
+            setCategoryFilterByMultipleItem((prev) => [...prev, val]);
+        }
+    }
+
     useEffect(() => {
         (async function () {
             const verify = await userLoginVerify();
             if (verify.data.status === "Failed") {
                 nav("/user/login")
             } else {
-                getProductList()
+                const { _id, fullName, email } = verify.data.userData
+                setUserData({ _id, fullName, email })
+                getProductList(_id)
+                getCategoryList()
             }
         })();
     }, [])
 
-
-    const filterByNameChange = (e:string) => {        
-        setCategoryFilterByNameTrack(e)
-    }
-
-    const filterByName = () => {
-        if(!categoryFilterByNameTrack.length){
-            setCategoryFilterByName("")
-        }else{
-            setCategoryFilterByName(categoryFilterByNameTrack)        
-        }
-    }
-
-    const getProductList = async () => {
+    const getProductList = async (id: string) => {
         try {
             setLoading(true)
             const res = await userGetProducts();
             if (res.data.status === "Success") {
                 setError("")
-                setProductList(res.data.producList)
                 try {
-                    const prodCat = await userGetCategoryList();
-                    if (prodCat.data.status === "Success") {
-                        setProductCategory(prodCat.data.category)
+                    const getWishlist = await userGetWishList(id)
+                    const getcart = await userGetCart(id)
+                    if (getWishlist.data.status === "Success" && getcart.data.status === "Success") {
+                        var finalPL = res.data.producList
+                        var tempWL = getWishlist.data.wishlistData
+                        var tempCD = getcart.data.cartData
+                        finalPL.forEach((pl: IPropsProductList) => {
+                            const wlMatch = tempWL.some((wl: any) => pl._id === wl.productId);
+                            pl["wishlist"] = wlMatch;
+                        });
+                        finalPL.forEach((pl: IPropsProductList) => {
+                            const cdMatch = tempCD.some((cd: any) => pl._id === cd.productId);
+                            pl["cart"] = cdMatch;
+                        });
+                        setProductList(finalPL)
+                    } else {
+                        setError(res.data.message)
                     }
-                } catch (error) {
+                } catch (error: any) {
+                    setError(error.message)
                 }
             } else {
                 setError(res.data.message)
@@ -73,6 +110,35 @@ const Uproductlist = () => {
             setLoading(false)
         }
     }
+    const getCategoryList = async () => {
+        try {
+            const prodCat = await userGetCategoryList();
+            if (prodCat.data.status === "Success") {
+                setProductCategory(prodCat.data.category)
+            }
+        } catch (error) {
+        }
+    }
+
+    const addCartAndWishList = async (id: string, type: string) => {
+        try {
+            var res;
+            if (type === "wishlist") {
+                res = await userAddOrDeleteWishList(userData._id, id)
+            } else {
+                res = await userAddOrDeleteCart(userData._id, id)
+            }
+            if (res.data.status === "Success") {
+                getProductList(userData._id)
+            } else {
+                alert(res.data.message)
+            }
+        } catch (error: any) {
+            alert(error.message)
+        }
+    }
+
+
     return (
         <>
             <Helmet>
@@ -101,19 +167,19 @@ const Uproductlist = () => {
                                                     <span id="srch-category">Category</span> <i className="fa fa-angle-down"></i>
                                                 </button>
                                                 <ul className="dropdown-menu" id="it-category" role="menu" aria-labelledby="catDrop">
-                                                    <li key={0} className='p-2' onClick={()=>setCategoryFilter("")}>{"All"}</li>
+                                                    <li key={0} className={'p-2 ' + (categoryFilter.length === 0 && 'bg-dark text-light')} onClick={() => setCategoryFilter("")}>{"All"}</li>
                                                     {
                                                         productCategory.length > 0 ?
                                                             productCategory.map((cat, i) => {
                                                                 return (
-                                                                    <li key={i+1} className='p-2' onClick={()=>setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
+                                                                    <li key={i + 1} className={'p-2 ' + (categoryFilter === cat?.categoryName && 'bg-dark text-light')} onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
                                                                 )
                                                             }) : <li>Loading...</li>
                                                     }
                                                 </ul>
                                             </div>
                                             <input type="hidden" id="txt-category" />
-                                            <input type="text" id="txt-search" className="form-control" onChange={(e:ChangeEvent<HTMLInputElement>)=>filterByNameChange(e.target.value)} />
+                                            <input type="text" id="txt-search" className="form-control" onChange={(e: ChangeEvent<HTMLInputElement>) => filterByNameChange(e.target.value)} />
                                             <span className="input-group-btn">
                                                 <button id="btn-search" type="submit" className="btn btn-primary" onClick={filterByName}>
                                                     <i className="fa fa-search"></i>
@@ -185,57 +251,26 @@ const Uproductlist = () => {
 
                                             <ul className="list-group">
                                                 <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="All" id="all" />
+                                                    <input className="form-check-input me-1" disabled defaultChecked={categoryFilterByMultipleItem.length === 0 ? true : false} type="checkbox" aria-label="All" id="all" onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem("")} />
                                                     <label htmlFor="all">
                                                         <img src="../../src/asserts/images/all.png" alt="Allitems" />
                                                         All
                                                     </label>
-
                                                 </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Spices" id="spices" />
-                                                    <label htmlFor="spices">
-                                                        <img src="../../src/asserts/images/spices.png" alt="Spices" />
-                                                        Spices
-                                                    </label>
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Nuts" id="nuts" />
-                                                    <label htmlFor="nuts"><img src="../../src/asserts/images/cat3.png" alt="Nuts" />Nuts</label>
-
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Dates" id="dates" />
-                                                    <label htmlFor="dates"><img src="../../src/asserts/images/dates.png" alt="dates" />Dates</label>
-
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Dry Fruits" id="dryfruit" />
-                                                    <label htmlFor="dryfruit"><img src="../../src/asserts/images/dryfruits.png" alt="Dry fruits" />Dry
-                                                        Fruits</label>
-
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Candy" id="candy" />
-                                                    <label htmlFor="candy"><img src="../../src/asserts/images/candy.png" alt="Candy" />Candy</label>
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Seeds" id="seeds" />
-                                                    <label htmlFor="seeds"><img src="../../src/asserts/images/seeds.png" alt="seeds" />Seeds</label>
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <input className="form-check-input me-1" type="checkbox" defaultValue=""
-                                                        aria-label="Packed Items" id="packedItems" />
-                                                    <label htmlFor="packedItems"><img src="../../src/asserts/images/packedfoods.png"
-                                                        alt="packed Items" />Packed Items</label>
-                                                </li>
+                                                {
+                                                    productCategory.length > 0 ?
+                                                        productCategory.map((cat, i) => {
+                                                            return (
+                                                                <li key={i} className="list-group-item">
+                                                                    <input className="form-check-input me-1" defaultChecked={categoryFilterByNameTrack.includes(cat.categoryName)} type="checkbox" aria-label={cat.categoryName} id={cat.categoryName} onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem(cat.categoryName)} />
+                                                                    <label htmlFor={cat.categoryName}>
+                                                                        <img src={`../../src/asserts/images/${cat.categoryName.toLowerCase()}.png`} alt={cat.categoryName} />
+                                                                        {cat.categoryName}
+                                                                    </label>
+                                                                </li>
+                                                            )
+                                                        }) : <li className="list-group-item">Loading...</li>
+                                                }
                                             </ul>
                                         </div>
                                     </section>
@@ -292,35 +327,68 @@ const Uproductlist = () => {
                                         productList.length > 0 ?
                                             <>
                                                 {
-                                                    productList.filter(pc=>(pc.category.indexOf(categoryFilter)>-1))
-                                                    .filter(pc=>(pc.productName.indexOf(categoryFilterByName)>-1)).map((prod, i) => {
-                                                        return (
-                                                            <div key={i} className="col-md-3">
-                                                                <div className="product shadow">
-                                                                    <div className="actionBtn">
-                                                                        <button className="btn">
-                                                                            <i className="fa-regular fa-heart"></i>
-                                                                        </button>
-                                                                        <button className="btn">
-                                                                            <i className="fa-solid fa-cart-shopping"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                    <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                                                    <span className="title">{prod.productName}</span>
-                                                                    <span className="measure">{prod.productDescription}</span>
-                                                                    <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                                                    <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
+                                                    categoryFilterByMultipleItem.length > 0 ?
+                                                        productList.filter((pc: any) => (categoryFilterByMultipleItem.includes(pc.category)))
+                                                            .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                                            .map((prod, i) => {
+                                                                return (
+                                                                    <div key={i} className="col-md-3">
+                                                                        <div className="product shadow">
+                                                                            <div className="actionBtn">
+                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                                                                    {
+                                                                                        prod.wishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                                                                    }
+                                                                                </button>
+                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                                                                    {
+                                                                                        prod.cart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                                                                    }
+                                                                                </button>
+                                                                            </div>
+                                                                            <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                                                            <span className="title">{prod.productName}</span>
+                                                                            <span className="measure">{prod.productDescription}</span>
+                                                                            <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
+                                                                            <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
 
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    })
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        :
+                                                        productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
+                                                            .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                                            .map((prod, i) => {
+                                                                return (
+                                                                    <div key={i} className="col-md-3">
+                                                                        <div className="product shadow">
+                                                                            <div className="actionBtn">
+                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                                                                    {
+                                                                                        prod.wishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                                                                    }
+                                                                                </button>
+                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                                                                    {
+                                                                                        prod.cart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                                                                    }
+                                                                                </button>
+                                                                            </div>
+                                                                            <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                                                            <span className="title">{prod.productName}</span>
+                                                                            <span className="measure">{prod.productDescription}</span>
+                                                                            <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
+                                                                            <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
+
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            })
                                                 }
                                             </>
                                             :
-                                            isLoading ? <div>Loading...</div>
-                                                :
-                                                error.length > 0 ? <div>{error}</div> : <div>Product not found</div>
+                                            isLoading ? <div>Loading...</div> : <div>Product not found</div>
                                     }
                                 </div>
 

@@ -113,6 +113,7 @@ body {
 }
 
 #register {
+  padding: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,10 +137,12 @@ body {
 
 @media screen and (max-width: 550px) {
   #register {
+    padding: 0px;
     height: auto;
     background-color: #ff5901;
     background-image: none;
     padding-bottom: 20em;
+
   }
 
   #register::before {

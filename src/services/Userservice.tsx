@@ -24,3 +24,19 @@ export const userGetCategoryList = async() => {
     return await axiosInstance.get(`/user/productcategory`)
 }
 
+export const userAddOrDeleteWishList = async(userId:string,prodId:string) => {    
+    return await axiosInstance.get(`/user/addordeletewishlist/${userId}/${prodId}`)
+}
+
+export const userAddOrDeleteCart = async(userId:string,prodId:string) => {    
+    return await axiosInstance.get(`/user/addordeletecart/${userId}/${prodId}`)
+}
+
+export const userGetWishList = async(userId:string) => {    
+    return await axiosInstance.get(`/user/getwishlist/${userId}`)
+}
+
+export const userGetCart = async(userId:string) => {    
+    return await axiosInstance.get(`/user/getcart/${userId}`)
+}
+

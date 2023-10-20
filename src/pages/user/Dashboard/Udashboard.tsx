@@ -1,10 +1,11 @@
 import { ChangeEvent, useEffect, useState } from 'react'
-import { userGetCategoryList, userLoginVerify } from '@/services/Userservice';
+import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCart, userGetCategoryList, userGetWishList, userLoginVerify } from '@/services/Userservice';
 import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 
-interface IPropsProductLisst {
+interface IPropsProductList {
+  _id: string,
   productName: String,
   productDescription: String,
   category: String,
@@ -12,30 +13,39 @@ interface IPropsProductLisst {
   quantityAndType: Array<{ price: Number, quantity: String, type: String }>,
   minOrder: Number,
   image: String,
-  adminId: String
+  adminId: String,
+  wishlist?: boolean,
+  cart?: boolean
+}
+
+interface IPropsUserData {
+  _id: string,
+  fullName: string,
+  email: string
 }
 
 const Udashboard = () => {
   const nav = useNavigate()
 
-  const [productList, setProductList] = useState<IPropsProductLisst[]>([])
+  const [productList, setProductList] = useState<IPropsProductList[]>([])
   const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
   const [isLoading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const [categoryFilter, setCategoryFilter] = useState<string>("")
   const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
   const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
+  const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
 
   const filterByNameChange = (e: string) => {
-    setCategoryFilterByNameTrack(e)
+    if (e.length <= 0) {
+      setCategoryFilterByName("")
+    } else {
+      setCategoryFilterByNameTrack(e)
+    }
   }
 
   const filterByName = () => {
-    if (!categoryFilterByNameTrack.length) {
-      setCategoryFilterByName("")
-    } else {
-      setCategoryFilterByName(categoryFilterByNameTrack)     
-    }
+    setCategoryFilterByName(categoryFilterByNameTrack)
   }
 
   useEffect(() => {
@@ -44,24 +54,41 @@ const Udashboard = () => {
       if (verify.data.status === "Failed") {
         nav("/user/login")
       } else {
-        getProductList()
+        const { _id, fullName, email } = verify.data.userData
+        setUserData({ _id, fullName, email })
+        getCategoryList()
+        getProductList(_id)
       }
     })();
   }, [])
 
-  const getProductList = async () => {
+  const getProductList = async (id: string) => {
     try {
       setLoading(true)
       const res = await userGetProducts();
       if (res.data.status === "Success") {
         setError("")
-        setProductList(res.data.producList)
         try {
-          const prodCat = await userGetCategoryList();
-          if (prodCat.data.status === "Success") {
-            setProductCategory(prodCat.data.category)
+          const getWishlist = await userGetWishList(id)
+          const getcart = await userGetCart(id)
+          if (getWishlist.data.status === "Success") {
+            var finalPL = res.data.producList
+            var tempWL = getWishlist.data.wishlistData
+            var tempCD = getcart.data.cartData
+            finalPL.forEach((pl: IPropsProductList) => {
+              const wlMatch = tempWL.some((wl: any) => pl._id === wl.productId);
+              pl["wishlist"] = wlMatch;
+            });
+            finalPL.forEach((pl: IPropsProductList) => {
+              const cdMatch = tempCD.some((cd: any) => pl._id === cd.productId);
+              pl["cart"] = cdMatch;
+            });
+            setProductList(finalPL)
+          } else {
+            setError(res.data.message)
           }
-        } catch (error) {
+        } catch (error: any) {
+          setError(error.message)
         }
       } else {
         setError(res.data.message)
@@ -73,8 +100,32 @@ const Udashboard = () => {
     }
   }
 
-  const addCartAndWishList = (type: string) => {
+  const getCategoryList = async () => {
+    try {
+      const prodCat = await userGetCategoryList();
+      if (prodCat.data.status === "Success") {
+        setProductCategory(prodCat.data.category)
+      }
+    } catch (error) {
+    }
+  }
 
+  const addCartAndWishList = async (id: string, type: string) => {
+    try {
+      var res;
+      if (type === "wishlist") {
+        res = await userAddOrDeleteWishList(userData._id, id)
+      } else {
+        res = await userAddOrDeleteCart(userData._id, id)
+      }
+      if (res.data.status === "Success") {
+        getProductList(userData._id)
+      } else {
+        alert(res.data.message)
+      }
+    } catch (error: any) {
+      alert(error.message)
+    }
   }
 
   return (
@@ -101,7 +152,7 @@ const Udashboard = () => {
                   data-bs-toggle="dropdown" aria-expanded="false">
                   <span className="textWrap">
                     <span>Welcome</span>
-                    <span className="username">Lauren Cruz</span>
+                    <span className="username">{userData.fullName}</span>
                   </span>
 
                   <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32"
@@ -154,12 +205,12 @@ const Udashboard = () => {
                       <span id="srch-category">Category</span> <i className="fa fa-angle-down"></i>
                     </button>
                     <ul className="dropdown-menu" role="menu" aria-labelledby="catDrop" id="mnu-category">
-                      <li key={0} className='p-2' onClick={() => setCategoryFilter("")}>{"All"}</li>
+                      <li key={0} className={'p-2 ' + (categoryFilter.length === 0 && 'bg-dark text-light')} onClick={() => setCategoryFilter("")}>{"All"}</li>
                       {
                         productCategory.length > 0 ?
                           productCategory.map((cat, i) => {
                             return (
-                              <li key={i + 1} className='p-2' onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
+                              <li key={i + 1} className={'p-2 ' + (categoryFilter === cat?.categoryName && 'bg-dark text-light')} onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
                             )
                           }) : <li>Loading...</li>
                       }
@@ -272,11 +323,15 @@ const Udashboard = () => {
                                 return (<li key={i}>
                                   <div className="product shadow">
                                     <div className="actionBtn">
-                                      <button className="btn">
-                                        <i className="fa-regular fa-heart"></i>
+                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                        {
+                                          prod.wishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                        }
                                       </button>
-                                      <button className="btn">
-                                        <i className="fa-solid fa-cart-shopping"></i>
+                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                        {
+                                          prod.cart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                        }
                                       </button>
                                     </div>
                                     <img src={prod.image?.toString()} alt={`Product ${i}`} />
@@ -292,9 +347,7 @@ const Udashboard = () => {
                         </div>
                       </>
                       :
-                      isLoading ? <div>Loading...</div>
-                        :
-                        error.length > 0 ? <div>{error}</div> : <div>Product not found</div>
+                      isLoading ? <div>Loading...</div> : <div>Product not found</div>
                   }
                 </div>
                 <div className="tab-pane fade" id="avail" role="tabpanel" aria-labelledby="avail-tab">
@@ -353,7 +406,7 @@ const Udashboard = () => {
                           <ul className="prodList">
                             {
                               categoryFilter.length || categoryFilterByName.length ?
-                                  productList.filter(pc=>(pc.category.indexOf(categoryFilter)>-1))
+                                productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
                                   .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1)).map((prod, i) => {
                                     return (<li key={i}>
                                       <div className="product shadow">
@@ -378,12 +431,16 @@ const Udashboard = () => {
                                   return (<li key={i}>
                                     <div className="product shadow">
                                       <div className="actionBtn">
-                                        <button className="btn">
-                                          <i className="fa-regular fa-heart"></i>
-                                        </button>
-                                        <button className="btn">
-                                          <i className="fa-solid fa-cart-shopping"></i>
-                                        </button>
+                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                        {
+                                          prod.wishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                        }
+                                      </button>
+                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                        {
+                                          prod.cart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                        }
+                                      </button>
                                       </div>
                                       <img src={prod.image?.toString()} alt={`Product ${i}`} />
                                       <span className="title">{prod.productName}</span>
@@ -398,9 +455,7 @@ const Udashboard = () => {
                         </div>
                       </>
                       :
-                      isLoading ? <div>Loading...</div>
-                        :
-                        error.length > 0 ? <div>{error}</div> : <div>Product not found</div>
+                      isLoading ? <div>Loading...</div> : <div>Product not found</div>
                   }
                 </div>
               </div>
