@@ -120,8 +120,8 @@ const Uregister = () => {
                 </div>
                 <div className="form-group">
                   <div className="mb-3">
-                    <label htmlFor="rAddress" className="form-label text-bold">Password</label>
-                    <input type="text" {...register("password", { required: "Password is mandatory" })} className="form-control" id="rAddress" placeholder="********" />
+                    <label htmlFor="rPassword" className="form-label text-bold">Password</label>
+                    <input type="text" {...register("password", { required: "Password is mandatory" })} className="form-control" id="rPassword" placeholder="********" />
                     {Boolean(errors?.password) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.password && errors.password?.message?.toString() || ""}</small>}
                   </div>
                 </div>

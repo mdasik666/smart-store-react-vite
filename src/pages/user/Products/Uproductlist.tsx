@@ -4,20 +4,22 @@ import { useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
+import { IconButton } from '@mui/material';
+import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
 
 interface IPropsProductList {
     _id: string,
-    productName: String,
-    productDescription: String,
-    category: String,
-    title: String,
-    quantityAndType: Array<{ price: Number, quantity: String, type: String }>,
-    minOrder: Number,
-    image: String,
-    adminId: String,
-    wishlist?: boolean,
-    cart?: boolean
-}
+    productName: string,
+    productDescription: string,
+    category: string,
+    title: string,
+    quantityAndType: Array<{ price: number, quantity: string, type: string }>,
+    minOrder: number,
+    image: string,
+    adminId: string,
+    isWishlist?: boolean,
+    isCart?: boolean
+  }
 
 interface IPropsUserData {
     _id: string,
@@ -36,6 +38,9 @@ const Uproductlist = () => {
     const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
     const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
     const [categoryFilterByMultipleItem, setCategoryFilterByMultipleItem] = useState<Array<string>>([])
+    const [minPrice, setMinPrice] = useState<string>("0")
+    const [maxPrice, setMaxPrice] = useState<string>("1000")
+    const [changeMinMax, setChangeMinMax] = useState<string>("")
 
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
 
@@ -47,7 +52,23 @@ const Uproductlist = () => {
         }
     }
 
-    const filterByName = () => {
+    const getMinPrice = (e:string) => {
+        if(parseInt(e) >= parseInt(maxPrice)){
+            setMinPrice(String(parseInt(maxPrice)-10))
+        }else{
+            setMinPrice(e)
+        }
+    }
+
+    const getMaxPrice = (e:string) => {
+        if(parseInt(e) <= parseInt(minPrice)){
+            setMaxPrice(String(parseInt(minPrice)+10))
+        }else{
+            setMaxPrice(e)
+        }
+    }
+
+    const btnFilterByName = () => {
         setCategoryFilterByName(categoryFilterByNameTrack)
     }
 
@@ -167,7 +188,7 @@ const Uproductlist = () => {
                                             <input type="hidden" id="txt-category" />
                                             <input type="text" id="txt-search" className="form-control" onChange={(e: ChangeEvent<HTMLInputElement>) => filterByNameChange(e.target.value)} />
                                             <span className="input-group-btn">
-                                                <button id="btn-search" type="submit" className="btn btn-primary" onClick={filterByName}>
+                                                <button id="btn-search" type="submit" className="btn btn-primary" onClick={btnFilterByName}>
                                                     <i className="fa fa-search"></i>
                                                     Search
                                                 </button>
@@ -237,7 +258,7 @@ const Uproductlist = () => {
 
                                             <ul className="list-group">
                                                 <li className="list-group-item">
-                                                    <input className="form-check-input me-1" disabled defaultChecked={categoryFilterByMultipleItem.length === 0 ? true : false} type="checkbox" aria-label="All" id="all" onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem("")} />
+                                                    <input className="form-check-input me-1" disabled checked={categoryFilterByMultipleItem.length === 0 ? true : false} type="checkbox" aria-label="All" id="all" onChange={(_e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem("")} />
                                                     <label htmlFor="all">
                                                         <img src="../../src/asserts/images/all.png" alt="Allitems" />
                                                         All
@@ -248,7 +269,7 @@ const Uproductlist = () => {
                                                         productCategory.map((cat, i) => {
                                                             return (
                                                                 <li key={i} className="list-group-item">
-                                                                    <input className="form-check-input me-1" defaultChecked={categoryFilterByNameTrack.includes(cat.categoryName)} type="checkbox" aria-label={cat.categoryName} id={cat.categoryName} onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem(cat.categoryName)} />
+                                                                    <input className="form-check-input me-1" type="checkbox" aria-label={cat.categoryName} id={cat.categoryName} onChange={(_e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem(cat.categoryName)} />
                                                                     <label htmlFor={cat.categoryName}>
                                                                         <img src={`../../src/asserts/images/${cat.categoryName.toLowerCase()}.png`} alt={cat.categoryName} />
                                                                         {cat.categoryName}
@@ -264,8 +285,8 @@ const Uproductlist = () => {
                                     <section className="panel">
                                         <div className="panel-body">
                                             <h3>Min. order</h3>
-                                            <select defaultValue="1" className="form-select" aria-label="Default select example">
-                                                <option defaultValue="1">Max</option>
+                                            <select defaultValue={changeMinMax} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setChangeMinMax(e.target.value)} className="form-select" aria-label="Default select example">
+                                                <option value="">Max</option>
                                                 <option value="1">One</option>
                                                 <option value="2">Two</option>
                                                 <option value="3">Three</option>
@@ -280,22 +301,20 @@ const Uproductlist = () => {
                                                 <div className="price-input">
                                                     <div className="field">
                                                         <span>Min</span>
-                                                        <input type="number" className="input-min" defaultValue="700" />
+                                                        <input type="number" className="input-min" value={minPrice} onChange={(e:ChangeEvent<HTMLInputElement>)=>getMinPrice(e.target.value)} />
                                                     </div>
                                                     <div className="separator">-</div>
                                                     <div className="field">
-                                                        <input type="number" className="input-max" defaultValue="2300" />
+                                                        <input type="number" className="input-max" value={maxPrice} onChange={(e:ChangeEvent<HTMLInputElement>)=>getMaxPrice(e.target.value)} />
                                                         <span>Max</span>
                                                     </div>
                                                 </div>
                                                 <div className="slider">
-                                                    <div className="progress"></div>
+                                                    {/* <div className="progress"></div> */}
                                                 </div>
                                                 <div className="range-input">
-                                                    <input type="range" className="range-min" min="0" max="3000" defaultValue="700"
-                                                        step="100" />
-                                                    <input type="range" className="range-max" min="0" max="3000" defaultValue="2300"
-                                                        step="100" />
+                                                    <input type="range" className="range-min" min="0" max="3000" value={minPrice} step="10" onChange={(e:ChangeEvent<HTMLInputElement>)=>getMinPrice(e.target.value)} />
+                                                    <input type="range" className="range-max" min="0" max="3000" value={maxPrice} step="10" onChange={(e:ChangeEvent<HTMLInputElement>)=>getMaxPrice(e.target.value)} />
                                                 </div>
                                             </div>
                                         </div>
@@ -316,6 +335,8 @@ const Uproductlist = () => {
                                                     categoryFilterByMultipleItem.length > 0 ?
                                                         productList.filter((pc: any) => (categoryFilterByMultipleItem.includes(pc.category)))
                                                             .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                                            .filter(pc=> (pc.quantityAndType[0].price > parseInt(minPrice) && pc.quantityAndType[0].price < parseInt(maxPrice)))
+                                                            .filter(pc=> (String(pc.minOrder).includes(changeMinMax)))
                                                             .map((prod, i) => {
                                                                 return (
                                                                     <div key={i} className="col-md-3">
@@ -323,12 +344,12 @@ const Uproductlist = () => {
                                                                             <div className="actionBtn">
                                                                                 <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
                                                                                     {
-                                                                                        prod.wishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                                                                        prod.isWishlist ? <IconButton><Favorite sx={{color:'#ff666d'}} /></IconButton> : <IconButton><FavoriteBorder sx={{color:'#ff666d'}}/></IconButton>
                                                                                     }
                                                                                 </button>
                                                                                 <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
                                                                                     {
-                                                                                        prod.cart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                                                                        prod.isCart ? <IconButton><ShoppingCart sx={{color:'#ff666d'}}/></IconButton> : <IconButton><ShoppingCartOutlined sx={{color:'#ff666d'}}/></IconButton>
                                                                                     }
                                                                                 </button>
                                                                             </div>
@@ -345,6 +366,8 @@ const Uproductlist = () => {
                                                         :
                                                         productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
                                                             .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                                            .filter(pc=> (pc.quantityAndType[0].price > parseInt(minPrice) && pc.quantityAndType[0].price < parseInt(maxPrice)))
+                                                            .filter(pc=> (String(pc.minOrder).includes(changeMinMax)))
                                                             .map((prod, i) => {
                                                                 return (
                                                                     <div key={i} className="col-md-3">
@@ -352,12 +375,12 @@ const Uproductlist = () => {
                                                                             <div className="actionBtn">
                                                                                 <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
                                                                                     {
-                                                                                        prod.wishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                                                                        prod.isWishlist ? <IconButton><Favorite sx={{color:'#ff666d'}}/></IconButton> : <IconButton><FavoriteBorder sx={{color:'#ff666d'}}/></IconButton>
                                                                                     }
                                                                                 </button>
                                                                                 <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
                                                                                     {
-                                                                                        prod.cart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                                                                        prod.isCart ? <IconButton><ShoppingCart sx={{color:'#ff666d'}}/></IconButton> : <IconButton><ShoppingCartOutlined sx={{color:'#ff666d'}}/></IconButton>
                                                                                     }
                                                                                 </button>
                                                                             </div>

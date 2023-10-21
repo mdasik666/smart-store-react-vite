@@ -131,13 +131,21 @@ const Ucart = () => {
                                                     return (
                                                         <div key={i} className="cart-item shadow">
                                                             <div className="inputWrap">
-                                                                <input type="checkbox" id="cart1" />
-                                                                <label htmlFor="cart1">&nbsp;</label>
+                                                                <input type="checkbox" id={`cart${i}`} />
+                                                                <label htmlFor={`cart${i}`}>&nbsp;</label>
                                                             </div>
-                                                            <img src={cd.image.toString()} alt="Product 1" />
+                                                            <img src={cd.image.toString()} alt={`Product ${i}`} />
                                                             <div className="cart-detail">
                                                                 <span className="title">{cd.productName}</span>
-                                                                <span className="count"><b id="nos">10</b> x 500</span>
+                                                                <span className="count">
+                                                                    {
+                                                                        cd.quantityAndType.map((qtp,j)=>{
+                                                                            return (
+                                                                                <div key={j}><b id="nos">{qtp.quantity}</b> x {qtp.price.toString()}</div>
+                                                                            )                                                                            
+                                                                        })   
+                                                                    }
+                                                                </span>
                                                                 <span className="price">₹ {cd.quantityAndType[0].price.toString()}</span>
                                                             </div>
                                                         </div>)

@@ -40,3 +40,7 @@ export const userGetCart = async(userId:string) => {
     return await axiosInstance.get(`/user/getcart/${userId}`)
 }
 
+export const userProfileupdate = async(userId:string, data:any) => {    
+    return await axiosInstance.put(`/user/profileupdate/${userId}`, data)
+}
+
