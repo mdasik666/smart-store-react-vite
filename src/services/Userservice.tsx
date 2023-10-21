@@ -12,8 +12,8 @@ export const userLoginVerify = async() => {
     return await axiosInstance.get('/user/dashboard')
 }
 
-export const userGetProducts = async() => {    
-    return await axiosInstance.get('/user/getproducts')
+export const userGetProducts = async(userId:string) => {    
+    return await axiosInstance.get(`/user/getproducts/${userId}`)
 }
 
 export const userOTPVerify = async(email:string) => {    

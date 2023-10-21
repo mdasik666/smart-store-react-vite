@@ -4,7 +4,7 @@ import { userLogin, userLoginVerify } from "@/services/Userservice";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet";
-
+import Cookies from "js-cookie";
 
 interface IPropsError {
   open: boolean,
@@ -21,11 +21,13 @@ const Ulogin = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
-  useEffect(() => {
+  useEffect(() => {    
     (async function () {
-      const verify = await userLoginVerify();
-      if (verify.data.status === "Success") {
-        nav("/user/dashboard/")
+      if(Cookies.get("usertoken")){
+        const verify = await userLoginVerify();
+        if (verify.data.status === "Success") {
+          nav("/user/dashboard/")
+        }
       }
     })();
   }, [])

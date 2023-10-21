@@ -3,6 +3,18 @@ import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import { userGetCart, userLoginVerify } from "@/services/Userservice";
 import { useEffect, useState } from 'react'
+import Cookies from "js-cookie";
+
+interface IPropsProductList {
+    _id: string,
+    productName: String,
+    productDescription: String,
+    category: String,
+    title: String,
+    quantityAndType: Array<{ price: Number, quantity: String, type: String }>,
+    minOrder: Number,
+    image: String
+}
 
 interface IPropsUserData {
     _id: string,
@@ -13,29 +25,33 @@ interface IPropsUserData {
 const Ucart = () => {
     const nav = useNavigate()
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
-    const [cartData, setCartDate] = useState<Array<any>>([])
+    const [cartData, setCartDate] = useState<IPropsProductList[]>([])
     const [isLoading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         (async function () {
-            const verify = await userLoginVerify();
-            if (verify.data.status === "Failed") {
-                nav("/user/login")
-            } else {
-                const { _id, fullName, email } = verify.data.userData
-                try {
-                    setLoading(true)
-                    const getCart = await userGetCart(_id);
-                    if (getCart.data.status === "Success") {
-                        var cart = getCart.data.cartData
-                        setCartDate(cart)
-                    } else {
-                        alert(getCart.data.message)
+            if (Cookies.get("usertoken")) {
+                const verify = await userLoginVerify();
+                if (verify.data.status === "Failed") {
+                    nav("/user/login")
+                } else {
+                    const { _id } = verify.data.userData
+                    try {
+                        setLoading(true)
+                        const getCart = await userGetCart(_id);
+                        if (getCart.data.status === "Success") {
+                            var cart = getCart.data.cartData
+                            setCartDate(cart)
+                        } else {
+                            alert(getCart.data.message)
+                        }
+                        setLoading(false)
+                    } catch (error: any) {
+                        alert(error.message)
                     }
-                    setLoading(false)
-                } catch (error: any) {
-                    alert(error.message)
                 }
+            } else {
+                nav("/user/login")
             }
         })();
     }, [])
@@ -73,7 +89,7 @@ const Ucart = () => {
                                     <span>Orders</span>
                                 </button>
                                 <button id="cartAdd" className="transBtn">
-                                    <b>5</b>
+                                    <b>{cartData.length}</b>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     <span>Cart</span>
                                 </button>
@@ -103,7 +119,7 @@ const Ucart = () => {
                                 <div className="form-check rememberWrap">
                                     <input className="form-check-input" type="checkbox" value="" id="selectAllitems" />
                                     <label className="form-check-label" htmlFor="selectAllitems">
-                                        Select all 4 items
+                                        Select all {cartData.length} items
                                     </label>
                                 </div>
 
@@ -113,18 +129,18 @@ const Ucart = () => {
                                             cartData.length > 0 ?
                                                 cartData.map((cd, i) => {
                                                     return (
-                                                    <div key={i} className="cart-item shadow">
-                                                        <div className="inputWrap">
-                                                            <input type="checkbox" id="cart1" />
-                                                            <label htmlFor="cart1">&nbsp;</label>
-                                                        </div>
-                                                        <img src="../../src/asserts/images/prod2.jpg" alt="Product 1" />
-                                                        <div className="cart-detail">
-                                                            <span className="title">Ceylon CINNAMON Weight 100g Packing</span>
-                                                            <span className="count"><b id="nos">10</b> x 500</span>
-                                                            <span className="price">₹ 5000</span>
-                                                        </div>
-                                                    </div>)
+                                                        <div key={i} className="cart-item shadow">
+                                                            <div className="inputWrap">
+                                                                <input type="checkbox" id="cart1" />
+                                                                <label htmlFor="cart1">&nbsp;</label>
+                                                            </div>
+                                                            <img src={cd.image.toString()} alt="Product 1" />
+                                                            <div className="cart-detail">
+                                                                <span className="title">{cd.productName}</span>
+                                                                <span className="count"><b id="nos">10</b> x 500</span>
+                                                                <span className="price">₹ {cd.quantityAndType[0].price.toString()}</span>
+                                                            </div>
+                                                        </div>)
                                                 })
                                                 : isLoading ? <div>Loading...</div> : <div>Product not available on cart</div>
                                         }

@@ -1,8 +1,9 @@
 import { useEffect, useState, ChangeEvent } from 'react'
-import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCart, userGetCategoryList, userGetWishList, userLoginVerify } from '@/services/Userservice';
-import { Link, useNavigate } from 'react-router-dom';
+import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCategoryList, userLoginVerify } from '@/services/Userservice';
+import { useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
+import Cookies from 'js-cookie';
 
 interface IPropsProductList {
     _id: string,
@@ -61,14 +62,18 @@ const Uproductlist = () => {
 
     useEffect(() => {
         (async function () {
-            const verify = await userLoginVerify();
-            if (verify.data.status === "Failed") {
+            if(Cookies.get("usertoken")){
+                const verify = await userLoginVerify();
+                if (verify.data.status === "Failed") {
+                    nav("/user/login")
+                } else {
+                    const { _id, fullName, email } = verify.data.userData
+                    setUserData({ _id, fullName, email })
+                    getProductList(_id)
+                    getCategoryList()
+                }
+            }else{
                 nav("/user/login")
-            } else {
-                const { _id, fullName, email } = verify.data.userData
-                setUserData({ _id, fullName, email })
-                getProductList(_id)
-                getCategoryList()
             }
         })();
     }, [])
@@ -76,31 +81,11 @@ const Uproductlist = () => {
     const getProductList = async (id: string) => {
         try {
             setLoading(true)
-            const res = await userGetProducts();
+            const res = await userGetProducts(id);
             if (res.data.status === "Success") {
                 setError("")
-                try {
-                    const getWishlist = await userGetWishList(id)
-                    const getcart = await userGetCart(id)
-                    if (getWishlist.data.status === "Success" && getcart.data.status === "Success") {
-                        var finalPL = res.data.producList
-                        var tempWL = getWishlist.data.wishlistData
-                        var tempCD = getcart.data.cartData
-                        finalPL.forEach((pl: IPropsProductList) => {
-                            const wlMatch = tempWL.some((wl: any) => pl._id === wl.productId);
-                            pl["wishlist"] = wlMatch;
-                        });
-                        finalPL.forEach((pl: IPropsProductList) => {
-                            const cdMatch = tempCD.some((cd: any) => pl._id === cd.productId);
-                            pl["cart"] = cdMatch;
-                        });
-                        setProductList(finalPL)
-                    } else {
-                        setError(res.data.message)
-                    }
-                } catch (error: any) {
-                    setError(error.message)
-                }
+                var finalPL = res.data.producList
+                setProductList(finalPL)
             } else {
                 setError(res.data.message)
             }
@@ -110,6 +95,7 @@ const Uproductlist = () => {
             setLoading(false)
         }
     }
+
     const getCategoryList = async () => {
         try {
             const prodCat = await userGetCategoryList();

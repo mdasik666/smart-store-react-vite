@@ -1,6 +1,8 @@
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 
 const Uprofile = () => {
+    const nav = useNavigate()
     return (
         <>
             <Helmet>
@@ -33,7 +35,7 @@ const Uprofile = () => {
                                     <i className="fa-regular fa-file-lines"></i>
                                     <span>Orders</span>
                                 </button>
-                                <button id="cartAdd" className="transBtn">
+                                <button id="cartAdd" className="transBtn" onClick={() => nav("/user/dashboard/cart")}>
                                     <b>5</b>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     <span>Cart</span>
