@@ -605,6 +605,7 @@ body {
   margin: 0px 30px 0px 0px;
   max-height: 150px;
   object-fit: contain;
+  padding-left: 12px;
 }
 
 #wrapper #plWrap .cart-item span {
@@ -627,6 +628,82 @@ body {
   color: #911406;
   font-size: 1.75em;
   font-family: "Fils-heavy";
+}
+
+#wrapper #plWrap .cart-item ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#wrapper #plWrap .cart-item ul li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#wrapper #plWrap .cart-item ul li span {
+  font-weight: bold;
+}
+
+#wrapper #plWrap .cart-item ul li span.measure {
+  min-width: fit-content;
+  margin-right: 10px;
+}
+
+#wrapper #plWrap .cart-item ul li span.measure:after {
+  content: ":";
+  margin: 0px 2px;
+}
+
+#wrapper #plWrap .cart-item ul li span.amount {
+  margin-right: 10px;
+}
+
+#wrapper #plWrap .cart-item ul li span.amount:before {
+  content: "\20B9";
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+#wrapper #plWrap .cart-item ul li span.amount:after {
+  content: "\00D7";
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#wrapper #plWrap .cart-item ul li .input-group {
+  align-items: center;
+}
+
+#wrapper #plWrap .cart-item ul li .input-group .input-group-btn {
+  font-size: 1em;
+}
+
+#wrapper #plWrap .cart-item ul li .input-group .input-group-btn button {
+  border: none;
+  font-size: 0.8em;
+  padding: 0;
+  margin: 0;
+}
+
+#wrapper #plWrap .cart-item ul li .input-group .input-group-btn button:hover {
+  color: #ff5901;
+}
+
+#wrapper #plWrap .cart-item ul li .input-group input {
+  max-width: 30px;
+  margin: 0px 7px;
+  padding: 2px 5px;
+  text-align: center;
+  box-shadow: none !important;
+}
+
+#wrapper #plWrap .cart-item ul li .input-group input:focus,
+#wrapper #plWrap .cart-item ul li .input-group input:active {
+  border-color: #ff5901;
 }
 
 #wrapper ul.prodList {
@@ -762,7 +839,8 @@ body {
     align-items: center;
   }
 
-  .mobiBar>.btn {
+  .mobiBar>.btn,
+  .mobiBar>.dropdown {
     display: none;
   }
 

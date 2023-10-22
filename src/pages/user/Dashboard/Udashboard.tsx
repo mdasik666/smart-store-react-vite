@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
+import { IconButton } from '@mui/material';
+import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
 
 interface IPropsProductList {
   _id: string,
@@ -11,7 +13,7 @@ interface IPropsProductList {
   productDescription: String,
   category: String,
   title: String,
-  quantityAndType: Array<{ price: Number, quantity: String, type: String }>,
+  quantityAndTypeAndPrice: Array<{ price: Number, quantity: String, type: String }>,
   minOrder: Number,
   image: String,
   adminId: String,
@@ -51,7 +53,7 @@ const Udashboard = () => {
 
   useEffect(() => {
     (async function () {
-      if(Cookies.get("usertoken")){
+      if (Cookies.get("usertoken")) {
         const verify = await userLoginVerify();
         if (verify.data.status === "Failed") {
           nav("/user/login")
@@ -61,7 +63,7 @@ const Udashboard = () => {
           getCategoryList()
           getProductList(_id)
         }
-      }else{
+      } else {
         nav("/user/login")
       }
     })();
@@ -150,7 +152,7 @@ const Udashboard = () => {
                 </a>
                 <ul className="dropdown-menu text-small" id="profDrop" aria-labelledby="profileDrop">
                   <li><Link to={"/user/dashboard/cart"} className="dropdown-item">Checkout</Link></li>
-                  <li><Link to={"/user/dashboard/profile"} className="dropdown-item">Profile</Link></li>                  
+                  <li><Link to={"/user/dashboard/profile"} className="dropdown-item">Profile</Link></li>
                   <li>
                     <hr className="dropdown-divider" />
                   </li>
@@ -315,20 +317,20 @@ const Udashboard = () => {
                                     <div className="actionBtn">
                                       <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
                                         {
-                                          prod.isWishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                          prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
                                         }
                                       </button>
                                       <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
                                         {
-                                          prod.isCart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                          prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
                                         }
                                       </button>
                                     </div>
                                     <img src={prod.image?.toString()} alt={`Product ${i}`} />
                                     <span className="title">{prod.productName}</span>
                                     <span className="measure">{prod.productDescription}</span>
-                                    <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                    <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
+                                    <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
+                                    <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
                                   </div>
                                 </li>)
                               })
@@ -394,49 +396,30 @@ const Udashboard = () => {
                         </div>
                         <div className="tabContent">
                           <ul className="prodList">
-                            {
-                              categoryFilter.length || categoryFilterByName.length ?
-                                productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
-                                  .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1)).map((prod, i) => {
-                                    return (<li key={i}>
-                                      <div className="product shadow">
-                                        <div className="actionBtn">
-                                          <button className="btn">
-                                            <i className="fa-regular fa-heart"></i>
-                                          </button>
-                                          <button className="btn">
-                                            <i className="fa-solid fa-cart-shopping"></i>
-                                          </button>
-                                        </div>
-                                        <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                        <span className="title">{prod.productName}</span>
-                                        <span className="measure">{prod.productDescription}</span>
-                                        <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                        <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
-                                      </div>
-                                    </li>)
-                                  })
-                                :
-                                productList.slice(0, 11).map((prod, i) => {
+                            {                              
+                                productList.slice(0, (categoryFilter.length || categoryFilterByName.length ? productList.length:11))
+                                .filter(pc => (pc.category.indexOf(categoryFilter) > -1))
+                                .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                .map((prod, i) => {
                                   return (<li key={i}>
                                     <div className="product shadow">
                                       <div className="actionBtn">
                                         <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
                                           {
-                                            prod.isWishlist ? <i className="fa-solid fa-heart"></i> : <i className="fa-regular fa-heart"></i>
+                                            prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
                                           }
                                         </button>
                                         <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
                                           {
-                                            prod.isCart ? <i className="fa-solid fa-cart-shopping"></i> : <i className="fa-regular fa-cart-shopping"></i>
+                                            prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
                                           }
                                         </button>
                                       </div>
                                       <img src={prod.image?.toString()} alt={`Product ${i}`} />
                                       <span className="title">{prod.productName}</span>
                                       <span className="measure">{prod.productDescription}</span>
-                                      <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                      <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
+                                      <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
+                                      <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
                                     </div>
                                   </li>)
                                 })

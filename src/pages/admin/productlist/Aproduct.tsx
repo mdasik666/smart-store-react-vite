@@ -13,6 +13,7 @@ import { adminAddProduct, adminGetProduct, adminLoginVerify, adminUpdateProductB
 import { useNavigate } from "react-router-dom";
 import { Add, Delete, Update } from "@mui/icons-material";
 import ModalDialog from "@/components/Dialog/Dialog";
+import Cookies from "js-cookie";
 
 interface IPropsError {
   open: boolean,
@@ -22,15 +23,15 @@ interface IPropsError {
 
 interface IPropsProductData {
   productName: string,
-  productDescription: string,  
+  productDescription: string,
   category: string,
   title: string,
-  quantityAndType: Array<{ price: number, quantity: string; type: string }>,
+  quantityAndTypeAndPrice: Array<{ price: number, quantity: string; type: string }>,
   minOrder: number
 }
 
 const Aproduct = () => {
-  const [productCategory, setProductCategory] = useState<{categoryName:string}[]>([]);
+  const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([]);
   const quantityTypes = ["KG", "Piece"]
 
   const nav = useNavigate()
@@ -49,7 +50,7 @@ const Aproduct = () => {
   const [adminId, setAdminId] = useState<string>("");
   const [productList, setProductList] = useState<any>([]);
   const [productKey, setProductKey] = useState<any>([]);
-  const [updateProductId, setUpdateProductId] = useState<string>("");  
+  const [updateProductId, setUpdateProductId] = useState<string>("");
   const [qtArray, setQTArray] = useState<Array<any>>([1]);
 
 
@@ -76,44 +77,41 @@ const Aproduct = () => {
 
   useEffect(() => {
     (async function () {
-      setLoading(true)
-      try {
-        const verify = await adminLoginVerify();
-        if (verify.data.status === "Failed") {
-          nav("/admin/login")
-        } else {
-          setAdminId(verify.data.data._id)
-          try {
+      if(Cookies.get("admintoken")){
+        try {
+          setLoading(true)
+          const verify = await adminLoginVerify();
+          if (verify.data.status === "Failed") {
+            nav("/admin/login")
+          } else {
+            setAdminId(verify.data.data._id)
             const getProduct = await adminGetProduct(verify.data.data._id)
-            if (getProduct.data.status === "Failed") {
-              setSnackOpen({ open: true, severity: "error", message: getProduct.data.message })
-            } else {
+            if (getProduct.data.status === "Success") {
               setProductList(getProduct.data.producList)
-              const { productName, productDescription, price, category, minOrder, image } = getProduct.data.producList[0]
-              setProductKey(Object.keys({ productName, productDescription, price, category, minOrder, image }))
-              try {
-                const prodCat = await adminGetCategoryList();
-                if(prodCat.data.status === "Success"){
-                  setProductCategory(prodCat.data.category)
-                }else{
-                  setSnackOpen({ open: true, severity: "error", message: prodCat.data.message })
-                }
-              } catch (error:any) {
-                setSnackOpen({ open: true, severity: "info", message: error?.messsage })
+              const prodCat = await adminGetCategoryList();
+              if (prodCat.data.status === "Success") {
+                setProductCategory(prodCat.data.category)
+                const { productName, productDescription, price, category, minOrder, image } = getProduct.data.producList[0]
+                setProductKey(Object.keys({ productName, productDescription, price, category, minOrder, image }))
+              } else {
+                setSnackOpen({ open: true, severity: "error", message: prodCat.data.message })
               }
+            } else {
+              setSnackOpen({ open: true, severity: "error", message: getProduct.data.message })
             }
-          } catch (error: any) {
-            setSnackOpen({ open: true, severity: "info", message: error?.messsage })
           }
+          setLoading(false)
+        } catch (err: any) {
+          setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+          setLoading(false)
         }
-      } catch (err: any) {
-        setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+      }else{
+        nav("/admin/login")
       }
-      setLoading(false)
     })();
   }, [])
 
-  const addOrUpdateProduct = async (data: any) => {    
+  const addOrUpdateProduct = async (data: any) => {
     try {
       setButtonLoading(true)
       var res;
@@ -135,22 +133,18 @@ const Aproduct = () => {
       } else {
         setSnackOpen({ open: true, severity: "success", message: res.data.message })
         if (updateProductId.length > 0) {
-          setUpdateProductId("")          
+          setUpdateProductId("")
           setModalOpen(false)
           resetForm()
         } else {
           resetForm()
         }
-        try {
-          const getProduct = await adminGetProduct(adminId)
-          if (getProduct.data.status === "Failed") {
-            setSnackOpen({ open: true, severity: "error", message: getProduct.data.message })
-          } else {
-            setProductList(getProduct.data.producList)
-          }
-        } catch (error: any) {
-          setSnackOpen({ open: false, severity: "info", message: error?.messsage })
-        }
+        const getProduct = await adminGetProduct(adminId)
+        if (getProduct.data.status === "Failed") {
+          setSnackOpen({ open: true, severity: "error", message: getProduct.data.message })
+        } else {
+          setProductList(getProduct.data.producList)
+        }        
       }
       setButtonLoading(false)
     } catch (err: any) {
@@ -177,12 +171,12 @@ const Aproduct = () => {
     const productdata = productList.filter((data: any) => id == data._id)
     const updateData: IPropsProductData = productdata[0]
     setValue("productName", updateData.productName)
-    setValue("productDescription", updateData.productDescription)    
+    setValue("productDescription", updateData.productDescription)
     setChangeCategory(updateData.category)
     setValue("category", updateData.category)
     setValue("title", updateData.title)
-    setQTArray(updateData.quantityAndType)
-    setValue("quantityAndType", updateData.quantityAndType)    
+    setQTArray(updateData.quantityAndTypeAndPrice)
+    setValue("quantityAndTypeAndPrice", updateData.quantityAndTypeAndPrice)
     setValue("minOrder", updateData.minOrder)
     setModalOpen(true)
   }
@@ -231,13 +225,13 @@ const Aproduct = () => {
       setDeleteLoading(false)
       handleCloseDialog()
     }
-  }; 
+  };
 
-  const setQT =  (e:string) => {
+  const setQT = (e: string) => {
     if (e === 'add') {
-      setQTArray((c) => [...c, 1]); 
+      setQTArray((c) => [...c, 1]);
     } else if (e === 'delete' && qtArray.length > 0) {
-      setQTArray((c) => c.slice(0, -1)); 
+      setQTArray((c) => c.slice(0, -1));
     }
   }
 
@@ -319,10 +313,10 @@ const Aproduct = () => {
                   <TextField fullWidth error={Boolean(errors?.productName)} helperText={errors?.productName && errors.productName?.message?.toString() || ""} size="small" {...register("productName", { required: "Product Name is mandatory" })} variant="outlined" type="text" label="Product Name"></TextField>
                   <TextField fullWidth size="small" {...register("productDescription")} variant="outlined" type="text" label="Product Description"></TextField>
                 </Stack>
-                <Stack spacing={2} direction="row" width={"100%"}>                  
+                <Stack spacing={2} direction="row" width={"100%"}>
                   <FormControl fullWidth size="small" error={Boolean(errors?.category)}>
                     <InputLabel id="category">Category</InputLabel>
-                    <Select labelId="category" {...register("category", { required: "Category is mandatory" })} onChange={handleCategoryChange} defaultValue={changeCategory} label="Category">
+                    <Select labelId="category" {...register("category", { required: "Category is mandatory" })} onChange={handleCategoryChange} value={changeCategory} label="Category">
                       {
                         productCategory.length &&
                         productCategory.map((cat, i) => {
@@ -337,27 +331,27 @@ const Aproduct = () => {
                   <TextField fullWidth size="small" {...register("title")} variant="outlined" type="text" label="Title"></TextField>
                 </Stack>
 
-                {qtArray.map((_, index:number) => (
+                {qtArray.map((_, index: number) => (
                   <Stack width={"100%"} key={index} direction="row" spacing={1}>
-                    <TextField fullWidth {...register(`quantityAndType[${index}].price`,{required:"Price is mandatory"})} error={Boolean((errors as any)?.quantityAndType?.[index]?.price)} helperText={(errors as any)?.quantityAndType?.[index]?.price && (errors as any).quantityAndType?.[index].price?.message?.toString() || ""} size="small" variant="outlined" type="number" label="Price"></TextField>                    
-                    <TextField fullWidth {...register(`quantityAndType[${index}].quantity`,{
-                        pattern: {
-                          value: /^[0-9]*\.?[0-9]*$/,
-                          message: "Enter a valid number",
-                        },
-                      })} size="small" variant="outlined" type="text" label="Quantity"></TextField>                   
+                    <TextField fullWidth {...register(`quantityAndTypeAndPrice[${index}].price`, { required: "Price is mandatory" })} error={Boolean((errors as any)?.quantityAndTypeAndPrice?.[index]?.price)} helperText={(errors as any)?.quantityAndTypeAndPrice?.[index]?.price && (errors as any).quantityAndTypeAndPrice?.[index].price?.message?.toString() || ""} size="small" variant="outlined" type="number" label="Price"></TextField>
+                    <TextField fullWidth {...register(`quantityAndTypeAndPrice[${index}].quantity`, {
+                      pattern: {
+                        value: /^[0-9]*\.?[0-9]*$/,
+                        message: "Enter a valid number",
+                      },
+                    })} size="small" variant="outlined" type="text" label="Quantity"></TextField>
                     <FormControl fullWidth size="small">
                       <InputLabel id="qtype">Type</InputLabel>
-                      <Select labelId="qtype" {...register(`quantityAndType[${index}].type`)} defaultValue={getValues(`quantityAndType[${index}].type`) || ""} label="Type">
+                      <Select labelId="qtype" {...register(`quantityAndTypeAndPrice[${index}].type`)} defaultValue={getValues(`quantityAndTypeAndPrice[${index}].type`) || ""} label="Type">
                         {
                           quantityTypes.map((qtype, i) => {
                             return (<MenuItem value={qtype} key={i}>{qtype}</MenuItem>)
                           })
                         }
                       </Select>
-                    </FormControl>                    
+                    </FormControl>
                     <Button variant="outlined" onClick={() => setQT('add')}><Add /></Button>
-                    <Button disabled={index===0} variant="outlined" onClick={() => setQT('delete')}><Delete /></Button>
+                    <Button disabled={index === 0} variant="outlined" onClick={() => setQT('delete')}><Delete /></Button>
                   </Stack>
                 ))}
                 <Stack spacing={2} direction="row" width={"100%"}>

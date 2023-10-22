@@ -35,8 +35,7 @@ const Uprofile = () => {
     useEffect(() => {
         (async function () {
             if (Cookies.get("usertoken")) {
-                const verify = await userLoginVerify();
-                console.log(verify)
+                const verify = await userLoginVerify();                
                 if (verify.data.status === "Failed") {
                     nav("/user/login")
                 } else {
@@ -61,8 +60,7 @@ const Uprofile = () => {
         setSnackOpen({ open: false, severity: undefined, message: "" });
     };
 
-    const updateProfileData = async (data: any) => {
-        console.log(data)
+    const updateProfileData = async (data: any) => {        
         try {
             setLoading(true)
             var res;
@@ -169,12 +167,14 @@ const Uprofile = () => {
                                                         <div className="square position-relative display-2 mb-3">
                                                             {
                                                                 profileImage.length > 0 ?
+                                                                <label htmlFor="customFile">
                                                                     <img src={profileImage.toString()} className="position-absolute top-50 start-50 translate-middle text-secondary" width={"60px"} height={"auto"} style={{ border: "1px solid", borderRadius: "100px" }} />
+                                                                </label>
                                                                     :
                                                                     <i className="fas fa-fw fa-user position-absolute top-50 start-50 translate-middle text-secondary"></i>
                                                             }
                                                         </div>
-                                                        <input type="file" id="customFile" accept=".jpg,.jpeg,.png" {...register("image", {
+                                                        <input hidden type="file" id="customFile" accept=".jpg,.jpeg,.png" {...register("image", {
                                                             validate: {
                                                                 isImage: (file) => {
                                                                     if (file.length === 0) return true;
@@ -187,15 +187,14 @@ const Uprofile = () => {
                                                                 },
                                                             },
                                                         })} />
-                                                        {Boolean(errors?.image) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.image && errors.image?.message?.toString() || ""}</small>}
-                                                        <label className="btn btn-success-soft btn-block" htmlFor="customFile">Upload</label>
+                                                        {Boolean(errors?.image) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.image && errors.image?.message?.toString() || ""}</small>}                                                        
                                                         <button type="button" className="btn btn-danger-soft">Remove</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="gap-3 d-md-flex justify-content-md-end text-center">
+                                    <div className="gap-3 m-3 d-md-flex justify-content-md-end text-center">
                                         <button disabled={!isValid || isLoading} type="submit" className="btn btn-primary ">Update</button>
                                     </div>
                                 </form>

@@ -13,13 +13,13 @@ interface IPropsProductList {
     productDescription: string,
     category: string,
     title: string,
-    quantityAndType: Array<{ price: number, quantity: string, type: string }>,
+    quantityAndTypeAndPrice: Array<{ price: number, quantity: string, type: string }>,
     minOrder: number,
     image: string,
     adminId: string,
     isWishlist?: boolean,
     isCart?: boolean
-  }
+}
 
 interface IPropsUserData {
     _id: string,
@@ -44,6 +44,19 @@ const Uproductlist = () => {
 
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
 
+    const getCategoryFilter = (e: string) => {
+        setCategoryFilter(e)
+        setCategoryFilterByMultipleItem(() => [])
+    }
+
+    const getFilterbyMultipleItem = (e: string) => {        
+        if (e.length === 0) {
+            setCategoryFilterByMultipleItem(() => [])
+        }else{
+            setFilterbyMultipleItem(e)
+        }
+    }
+
     const filterByNameChange = (e: string) => {
         if (e.length <= 0) {
             setCategoryFilterByName("")
@@ -52,18 +65,18 @@ const Uproductlist = () => {
         }
     }
 
-    const getMinPrice = (e:string) => {
-        if(parseInt(e) >= parseInt(maxPrice)){
-            setMinPrice(String(parseInt(maxPrice)-10))
-        }else{
+    const getMinPrice = (e: string) => {
+        if (parseInt(e) >= parseInt(maxPrice)) {
+            setMinPrice(String(parseInt(maxPrice) - 10))
+        } else {
             setMinPrice(e)
         }
     }
 
-    const getMaxPrice = (e:string) => {
-        if(parseInt(e) <= parseInt(minPrice)){
-            setMaxPrice(String(parseInt(minPrice)+10))
-        }else{
+    const getMaxPrice = (e: string) => {
+        if (parseInt(e) <= parseInt(minPrice)) {
+            setMaxPrice(String(parseInt(minPrice) + 10))
+        } else {
             setMaxPrice(e)
         }
     }
@@ -83,7 +96,7 @@ const Uproductlist = () => {
 
     useEffect(() => {
         (async function () {
-            if(Cookies.get("usertoken")){
+            if (Cookies.get("usertoken")) {
                 const verify = await userLoginVerify();
                 if (verify.data.status === "Failed") {
                     nav("/user/login")
@@ -93,7 +106,7 @@ const Uproductlist = () => {
                     getProductList(_id)
                     getCategoryList()
                 }
-            }else{
+            } else {
                 nav("/user/login")
             }
         })();
@@ -174,12 +187,12 @@ const Uproductlist = () => {
                                                     <span id="srch-category">Category</span> <i className="fa fa-angle-down"></i>
                                                 </button>
                                                 <ul className="dropdown-menu" id="it-category" role="menu" aria-labelledby="catDrop">
-                                                    <li key={0} className={'p-2 ' + (categoryFilter.length === 0 && 'bg-dark text-light')} onClick={() => setCategoryFilter("")}>{"All"}</li>
+                                                    <li key={0} className={'p-2 ' + (categoryFilter.length === 0 && 'bg-dark text-light')} onClick={() => getCategoryFilter("")}>{"All"}</li>
                                                     {
                                                         productCategory.length > 0 ?
                                                             productCategory.map((cat, i) => {
                                                                 return (
-                                                                    <li key={i + 1} className={'p-2 ' + (categoryFilter === cat?.categoryName && 'bg-dark text-light')} onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
+                                                                    <li key={i + 1} className={'p-2 ' + (categoryFilter === cat?.categoryName && 'bg-dark text-light')} onClick={() => getCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
                                                                 )
                                                             }) : <li>Loading...</li>
                                                     }
@@ -229,7 +242,6 @@ const Uproductlist = () => {
                         <hr />
                         <div className="freqWrap">
                             <p>Frequently Searched for:</p>
-
                             <ul>
                                 <li>Packed Items</li>
                                 <li>Spices</li>
@@ -258,7 +270,7 @@ const Uproductlist = () => {
 
                                             <ul className="list-group">
                                                 <li className="list-group-item">
-                                                    <input className="form-check-input me-1" disabled checked={categoryFilterByMultipleItem.length === 0 ? true : false} type="checkbox" aria-label="All" id="all" onChange={(_e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem("")} />
+                                                    <input className="form-check-input me-1" disabled={categoryFilterByMultipleItem.length === 0} checked={categoryFilterByMultipleItem.length === 0 ? true : false} type="checkbox" aria-label="All" id="all" onChange={(_e: ChangeEvent<HTMLInputElement>) => getFilterbyMultipleItem("")} />
                                                     <label htmlFor="all">
                                                         <img src="../../src/asserts/images/all.png" alt="Allitems" />
                                                         All
@@ -269,7 +281,7 @@ const Uproductlist = () => {
                                                         productCategory.map((cat, i) => {
                                                             return (
                                                                 <li key={i} className="list-group-item">
-                                                                    <input className="form-check-input me-1" type="checkbox" aria-label={cat.categoryName} id={cat.categoryName} onChange={(_e: ChangeEvent<HTMLInputElement>) => setFilterbyMultipleItem(cat.categoryName)} />
+                                                                    <input className="form-check-input me-1" type="checkbox" aria-label={cat.categoryName} id={cat.categoryName} checked={categoryFilterByMultipleItem.includes(cat.categoryName)} onChange={(_e: ChangeEvent<HTMLInputElement>) => getFilterbyMultipleItem(cat.categoryName)} />
                                                                     <label htmlFor={cat.categoryName}>
                                                                         <img src={`../../src/asserts/images/${cat.categoryName.toLowerCase()}.png`} alt={cat.categoryName} />
                                                                         {cat.categoryName}
@@ -285,7 +297,7 @@ const Uproductlist = () => {
                                     <section className="panel">
                                         <div className="panel-body">
                                             <h3>Min. order</h3>
-                                            <select defaultValue={changeMinMax} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setChangeMinMax(e.target.value)} className="form-select" aria-label="Default select example">
+                                            <select defaultValue={changeMinMax} onChange={(e: ChangeEvent<HTMLSelectElement>) => setChangeMinMax(e.target.value)} className="form-select" aria-label="Default select example">
                                                 <option value="">Max</option>
                                                 <option value="1">One</option>
                                                 <option value="2">Two</option>
@@ -301,11 +313,11 @@ const Uproductlist = () => {
                                                 <div className="price-input">
                                                     <div className="field">
                                                         <span>Min</span>
-                                                        <input type="number" className="input-min" value={minPrice} onChange={(e:ChangeEvent<HTMLInputElement>)=>getMinPrice(e.target.value)} />
+                                                        <input type="number" className="input-min" value={minPrice} onChange={(e: ChangeEvent<HTMLInputElement>) => getMinPrice(e.target.value)} />
                                                     </div>
                                                     <div className="separator">-</div>
                                                     <div className="field">
-                                                        <input type="number" className="input-max" value={maxPrice} onChange={(e:ChangeEvent<HTMLInputElement>)=>getMaxPrice(e.target.value)} />
+                                                        <input type="number" className="input-max" value={maxPrice} onChange={(e: ChangeEvent<HTMLInputElement>) => getMaxPrice(e.target.value)} />
                                                         <span>Max</span>
                                                     </div>
                                                 </div>
@@ -313,8 +325,8 @@ const Uproductlist = () => {
                                                     {/* <div className="progress"></div> */}
                                                 </div>
                                                 <div className="range-input">
-                                                    <input type="range" className="range-min" min="0" max="3000" value={minPrice} step="10" onChange={(e:ChangeEvent<HTMLInputElement>)=>getMinPrice(e.target.value)} />
-                                                    <input type="range" className="range-max" min="0" max="3000" value={maxPrice} step="10" onChange={(e:ChangeEvent<HTMLInputElement>)=>getMaxPrice(e.target.value)} />
+                                                    <input type="range" className="range-min" min="0" max="3000" value={minPrice} step="10" onChange={(e: ChangeEvent<HTMLInputElement>) => getMinPrice(e.target.value)} />
+                                                    <input type="range" className="range-max" min="0" max="3000" value={maxPrice} step="10" onChange={(e: ChangeEvent<HTMLInputElement>) => getMaxPrice(e.target.value)} />
                                                 </div>
                                             </div>
                                         </div>
@@ -332,72 +344,39 @@ const Uproductlist = () => {
                                         productList.length > 0 ?
                                             <>
                                                 {
-                                                    categoryFilterByMultipleItem.length > 0 ?
-                                                        productList.filter((pc: any) => (categoryFilterByMultipleItem.includes(pc.category)))
-                                                            .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
-                                                            .filter(pc=> (pc.quantityAndType[0].price > parseInt(minPrice) && pc.quantityAndType[0].price < parseInt(maxPrice)))
-                                                            .filter(pc=> (String(pc.minOrder).includes(changeMinMax)))
-                                                            .map((prod, i) => {
-                                                                return (
-                                                                    <div key={i} className="col-md-3">
-                                                                        <div className="product shadow">
-                                                                            <div className="actionBtn">
-                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
-                                                                                    {
-                                                                                        prod.isWishlist ? <IconButton><Favorite sx={{color:'#ff666d'}} /></IconButton> : <IconButton><FavoriteBorder sx={{color:'#ff666d'}}/></IconButton>
-                                                                                    }
-                                                                                </button>
-                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
-                                                                                    {
-                                                                                        prod.isCart ? <IconButton><ShoppingCart sx={{color:'#ff666d'}}/></IconButton> : <IconButton><ShoppingCartOutlined sx={{color:'#ff666d'}}/></IconButton>
-                                                                                    }
-                                                                                </button>
-                                                                            </div>
-                                                                            <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                                                            <span className="title">{prod.productName}</span>
-                                                                            <span className="measure">{prod.productDescription}</span>
-                                                                            <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                                                            <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
-
+                                                    productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
+                                                        .filter((pc: any) => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.indexOf(pc.category) > -1).includes(pc.category)) : (pc.category.indexOf(categoryFilter) > -1)))
+                                                        .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                                        .filter(pc => (pc.quantityAndTypeAndPrice[0].price > parseInt(minPrice) && pc.quantityAndTypeAndPrice[0].price < parseInt(maxPrice)))
+                                                        .filter(pc => (changeMinMax.length ? pc?.minOrder?.toString() === (changeMinMax) : pc?.minOrder?.toString().indexOf("") > -1))
+                                                        .map((prod, i) => {
+                                                            return (
+                                                                <div key={i} className="col-md-3">
+                                                                    <div className="product shadow">
+                                                                        <div className="actionBtn">
+                                                                            <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                                                                {
+                                                                                    prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
+                                                                                }
+                                                                            </button>
+                                                                            <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                                                                {
+                                                                                    prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
+                                                                                }
+                                                                            </button>
                                                                         </div>
+                                                                        <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                                                        <span className="title">{prod.productName}</span>
+                                                                        <span className="measure">{prod.productDescription}</span>
+                                                                        <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
+                                                                        <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
                                                                     </div>
-                                                                )
-                                                            })
-                                                        :
-                                                        productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
-                                                            .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
-                                                            .filter(pc=> (pc.quantityAndType[0].price > parseInt(minPrice) && pc.quantityAndType[0].price < parseInt(maxPrice)))
-                                                            .filter(pc=> (String(pc.minOrder).includes(changeMinMax)))
-                                                            .map((prod, i) => {
-                                                                return (
-                                                                    <div key={i} className="col-md-3">
-                                                                        <div className="product shadow">
-                                                                            <div className="actionBtn">
-                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
-                                                                                    {
-                                                                                        prod.isWishlist ? <IconButton><Favorite sx={{color:'#ff666d'}}/></IconButton> : <IconButton><FavoriteBorder sx={{color:'#ff666d'}}/></IconButton>
-                                                                                    }
-                                                                                </button>
-                                                                                <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
-                                                                                    {
-                                                                                        prod.isCart ? <IconButton><ShoppingCart sx={{color:'#ff666d'}}/></IconButton> : <IconButton><ShoppingCartOutlined sx={{color:'#ff666d'}}/></IconButton>
-                                                                                    }
-                                                                                </button>
-                                                                            </div>
-                                                                            <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                                                            <span className="title">{prod.productName}</span>
-                                                                            <span className="measure">{prod.productDescription}</span>
-                                                                            <span className="price">₹ {prod.quantityAndType[0].price.toString()}</span>
-                                                                            <span className="stock">Min. Order: {prod.minOrder.toString()} pieces</span>
-
-                                                                        </div>
-                                                                    </div>
-                                                                )
-                                                            })
+                                                                </div>
+                                                            )
+                                                        })
                                                 }
                                             </>
-                                            :
-                                            isLoading ? <div>Loading...</div> : <div>Product not found</div>
+                                            : isLoading ? <div>Loading...</div> : <div>Product not found</div>
                                     }
                                 </div>
 
