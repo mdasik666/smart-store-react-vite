@@ -44,3 +44,15 @@ export const userProfileupdate = async(userId:string, data:any) => {
     return await axiosInstance.put(`/user/profileupdate/${userId}`, data)
 }
 
+export const userPostCheckOut = async(userId:string, data:any) => {    
+    return await axiosInstance.post(`/user/checkout/${userId}`, data)
+}
+
+export const userGetCheckOut = async(userId:string) => {    
+    return await axiosInstance.get(`/user/checkout/${userId}`)
+}
+
+export const userGetCountryList = async() => {    
+    return await axiosInstance.get(`https://restcountries.com/v3.1/all`)
+}
+

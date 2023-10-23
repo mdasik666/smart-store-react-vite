@@ -20,8 +20,8 @@ const Userroute = () => {
             <Route path="reset" element={<Ureset />} />
             <Route path="register" element={<Uregister />} />
             <Route path="dashboard" element={<Udashboard />} />            
-            <Route path="dashboard/checkout" element={<Ucheckout />} />
             <Route path="dashboard/cart" element={<Ucart />} />
+            <Route path="dashboard/checkout" element={<Ucheckout />} />
             <Route path="dashboard/products" element={<Uproductlist />} />
             <Route path="dashboard/profile" element={<Uprofile />} />
             <Route path="*" element={<UserNotfound />} />      

@@ -24,7 +24,8 @@ interface IPropsProductList {
 interface IPropsUserData {
   _id: string,
   fullName: string,
-  email: string
+  email: string,
+  image: string
 }
 
 const Udashboard = () => {
@@ -37,7 +38,7 @@ const Udashboard = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("")
   const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
   const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
-  const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
+  const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "", image: "" })
 
   const filterByNameChange = (e: string) => {
     if (e.length <= 0) {
@@ -58,8 +59,8 @@ const Udashboard = () => {
         if (verify.data.status === "Failed") {
           nav("/user/login")
         } else {
-          const { _id, fullName, email } = verify.data.userData
-          setUserData({ _id, fullName, email })
+          const { _id, fullName, email, image } = verify.data.userData
+          setUserData({ _id, fullName, email, image })
           getCategoryList()
           getProductList(_id)
         }
@@ -147,7 +148,7 @@ const Udashboard = () => {
                     <span className="username">{userData.fullName}</span>
                   </span>
 
-                  <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32"
+                  <img src={userData.image.toString()} alt="mdo" width="32" height="32"
                     className="rounded-circle" />
                 </a>
                 <ul className="dropdown-menu text-small" id="profDrop" aria-labelledby="profileDrop">
@@ -396,8 +397,8 @@ const Udashboard = () => {
                         </div>
                         <div className="tabContent">
                           <ul className="prodList">
-                            {                              
-                                productList.slice(0, (categoryFilter.length || categoryFilterByName.length ? productList.length:11))
+                            {
+                              productList.slice(0, (categoryFilter.length || categoryFilterByName.length ? productList.length : 11))
                                 .filter(pc => (pc.category.indexOf(categoryFilter) > -1))
                                 .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
                                 .map((prod, i) => {

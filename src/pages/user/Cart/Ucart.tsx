@@ -1,7 +1,7 @@
 
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
-import { userGetCart, userLoginVerify } from "@/services/Userservice";
+import { userGetCart, userGetCheckOut, userLoginVerify, userPostCheckOut } from "@/services/Userservice";
 import { useEffect, useState } from 'react'
 import Cookies from "js-cookie";
 
@@ -41,19 +41,12 @@ interface IPropsUserData {
     email: string
 }
 
-interface IPropsTotal {
-    pid: string,
-    total: number
-}
-
 const Ucart = () => {
     const nav = useNavigate()
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
-    const [cartData, setCartDate] = useState<IPropsProductList[]>([])
     const [orderCartData, setOrderCartData] = useState<IPropsProductOrderList[]>([])
     const [orderCartDataSelected, setOrderCartDataSelected] = useState<IPropsProductOrderList[]>([])
     const [isLoading, setLoading] = useState<boolean>(false)
-    const [totalPrice, setTotalPrice] = useState<IPropsTotal[]>([])
     const [shippingFee, setShippingFee] = useState<number>(500)
 
     useEffect(() => {
@@ -63,20 +56,37 @@ const Ucart = () => {
                 if (verify.data.status === "Failed") {
                     nav("/user/login")
                 } else {
-                    const { _id } = verify.data.userData
+                    const { _id, fullName, email } = verify.data.userData
+                    setUserData({ _id, fullName, email })
                     try {
                         setLoading(true)
                         const getCart = await userGetCart(_id);
                         if (getCart.data.status === "Success") {
+                            const getLastCheckout = await userGetCheckOut(_id);
                             var cart = getCart.data.cartData
-                            setCartDate(cart)
-                            var clonedCartData = JSON.parse(JSON.stringify(cart));
-                            clonedCartData?.forEach((ct: any) => {
+                            cart?.forEach((ct: any) => {
                                 ct.quantityAndTypeAndPrice?.forEach((qt: any) => {
-                                    qt.userQuantity = 1
+                                    qt.userQuantity = 0
                                 })
                             });
-                            setOrderCartData(clonedCartData)
+                            if (getLastCheckout.data.status === "Success") {
+                                var lastCheckout = getLastCheckout.data.lastCheckoutProducts.lastCheckout;
+                                if (lastCheckout.length) {
+                                    setOrderCartDataSelected(lastCheckout)
+                                    cart?.forEach((ct: IPropsProductOrderList) => {
+                                        var lcp = lastCheckout.filter((lco: IPropsProductOrderList) => (lco._id === ct._id))[0]
+                                        if (lcp) {
+                                            ct.quantityAndTypeAndPrice = lcp.quantityAndTypeAndPrice
+                                            ct.isSelect = lcp.isSelect
+                                        }
+                                    })
+                                    setOrderCartData(cart)
+                                } else {
+                                    setOrderCartData(cart)
+                                }
+                            } else {
+                                alert(getCart.data.message)
+                            }
                         } else {
                             alert(getCart.data.message)
                         }
@@ -102,26 +112,7 @@ const Ucart = () => {
             }
             return cd
         })
-        
         setOrderCartData(addOrder)
-
-        var orderState = addOrder.filter((tp: IPropsProductOrderList) => tp._id === cart._id)[0]
-        var total = 0;
-        orderState.quantityAndTypeAndPrice.forEach((qtp: IPropsQTP) => {
-            if ((qtp.userQuantity as number) > 0) {
-                total += qtp.price * (qtp.userQuantity as number);
-            }
-        })
-        var totalState = totalPrice.filter((tp) => tp.pid === cart._id)
-        if (totalState.length) {
-            var newTotal = totalPrice.map((tp: IPropsTotal) => {
-                if (tp.pid === cart._id) {
-                    tp.total = total
-                }
-                return tp;
-            })
-            setTotalPrice(newTotal)
-        }
     }
 
     const selectProduct = (id: string) => {
@@ -132,25 +123,12 @@ const Ucart = () => {
             return od;
         })
         setOrderCartData(orderData)
-        var orderState = orderData.filter((od) => (od._id === id))[0]
-        var total = 0;
-        orderState.quantityAndTypeAndPrice.forEach((qtp: IPropsQTP) => {
-            if ((qtp.userQuantity as number) > 0) {
-                total += qtp.price * (qtp.userQuantity as number);
-            }
-        })
-        if (orderState.isSelect) {
-            setOrderCartDataSelected((prevOrder) => [...prevOrder, orderState])
-            setTotalPrice((prevTotal: any) => [...prevTotal, { pid: orderState._id, total }])
-        } else {
-            setOrderCartDataSelected((prevOrder) => prevOrder.filter(od => od._id !== id))
-            setTotalPrice((prevTotal) => prevTotal.filter((pt) => pt.pid !== orderState._id))
-        }
+        var data = orderData.filter((od: IPropsProductOrderList) => od.isSelect)
+        setOrderCartDataSelected(data)
     }
 
 
     const selectAllItem = () => {
-        setTotalPrice(() => [])
         var orderData;
         if (orderCartData.length === orderCartDataSelected.length) {
             orderData = orderCartData.map((od) => {
@@ -164,17 +142,58 @@ const Ucart = () => {
                 return od;
             })
             setOrderCartDataSelected(orderData)
-            orderData.forEach((ocd: IPropsProductOrderList) => {
-                var total = 0;
-                ocd.quantityAndTypeAndPrice.forEach((qtp: IPropsQTP) => {
-                    if ((qtp.userQuantity as number) > 0) {
-                        total += qtp.price * (qtp.userQuantity as number);
-                    }
-                })
-                setTotalPrice((prevTotal: any) => [...prevTotal, { pid: ocd._id, total }])
-            })
         }
         setOrderCartData(orderData)
+    }
+
+    const checkOut = async () => {
+        var orderDataClone = JSON.parse(JSON.stringify(orderCartDataSelected))
+        if (orderDataClone.length) {
+            var filterUserQuantity = orderDataClone.map((ocd: IPropsProductOrderList) => {
+                ocd.quantityAndTypeAndPrice = ocd.quantityAndTypeAndPrice.filter((qtp) => (qtp.userQuantity as number) > 0);
+                return ocd;
+            });
+            var selectedWithEmptyQuantity = filterUserQuantity.filter((ocd: IPropsProductOrderList) => ocd.quantityAndTypeAndPrice.length === 0);
+            if (selectedWithEmptyQuantity.length) {
+                alert("Chceck checkout list select items quantity is 0")
+            } else {
+                var finalOrderListData = filterUserQuantity.filter((ocd: IPropsProductOrderList) => ocd.quantityAndTypeAndPrice.length > 0);
+                if (finalOrderListData.length) {
+                    try {
+                        setLoading(true)
+                        const resOrder = await userPostCheckOut(userData._id, {
+                            userId: userData._id,
+                            checkOutProducts: finalOrderListData,
+                            lastCheckout: orderCartDataSelected,
+                            totalPrice: getTotalPrice(),
+                            shippingFee: shippingFee
+                        })
+                        if (resOrder.data.status === "Success") {
+                            nav('/user/dashboard/checkout')
+                        } else {
+                            alert(resOrder.data)
+                        }
+                        setLoading(false)
+                    } catch (error: any) {
+                        alert(error.message)
+                        setLoading(false)
+                    }
+                } else {
+                    alert("Select any one product")
+                }
+            }
+        } else {
+            alert("No selected data")
+        }
+    }
+
+    const getTotalPrice = () => {
+        var finalPrice = orderCartData.reduce((total: number, ocd: IPropsProductOrderList) => {
+            return total + (ocd.isSelect ? ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
+                return stotal + (qtp.userQuantity as number) * qtp.price
+            }, 0) : 0)
+        }, 0)
+        return finalPrice;
     }
 
     return (
@@ -194,7 +213,7 @@ const Ucart = () => {
                                     <Link to={"/user/dashboard"}
                                         className="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
                                         <span><i className="fa-solid fa-arrow-left"></i> Shopping Cart</span>
-                                        <span> (<span id="cartItem">{cartData.length}</span> Items In Cart)</span>
+                                        <span> (<span id="cartItem">{orderCartData.length}</span> Items In Cart)</span>
                                     </Link>
                                 </h1>
                             </div>
@@ -211,7 +230,7 @@ const Ucart = () => {
                                     <span>Orders</span>
                                 </button>
                                 <button id="cartAdd" className="transBtn">
-                                    <b>{cartData.length}</b>
+                                    <b>{orderCartData.length}</b>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     <span>Cart</span>
                                 </button>
@@ -241,7 +260,7 @@ const Ucart = () => {
                                 <div className="form-check rememberWrap">
                                     <input className="form-check-input" type="checkbox" checked={orderCartData.length === orderCartDataSelected.length ? true : false} onChange={selectAllItem} id="selectAllitems" />
                                     <label className="form-check-label" htmlFor="selectAllitems">
-                                        Select all {cartData.length} items
+                                        Select all {orderCartData.length} items
                                     </label>
                                 </div>
 
@@ -270,15 +289,15 @@ const Ucart = () => {
                                                                                         <div className="input-group">
                                                                                             <span className="input-group-btn">
                                                                                                 <button type="button" onClick={() => addOrRemoveQuantity("-", cd, j)} className="btn btn-default btn-number"
-                                                                                                    disabled={qtp.userQuantity === 1} data-type="minus"
-                                                                                                    data-field="quant[1]">
+                                                                                                    disabled={qtp.userQuantity === 0} data-type="minus"
+                                                                                                    data-field={`quant[${j}]`}>
                                                                                                     <span className="fa fa-minus"></span>
                                                                                                 </button>
                                                                                             </span>
-                                                                                            <input type="text" name="quant[1]" className="form-control input-number" disabled value={qtp.userQuantity} />
+                                                                                            <input type="text" name={`quant[${j}]`} className="form-control input-number" disabled value={qtp.userQuantity} />
                                                                                             <span className="input-group-btn">
                                                                                                 <button onClick={() => addOrRemoveQuantity("+", cd, j)} type="button" className="btn btn-default btn-number"
-                                                                                                    data-type="plus" data-field="quant[1]">
+                                                                                                    data-type="plus" data-field={`quant[${j}]`}>
                                                                                                     <span className="fa fa-plus"></span>
                                                                                                 </button>
                                                                                             </span>
@@ -289,7 +308,11 @@ const Ucart = () => {
                                                                         }
                                                                     </ul>
                                                                 </div>
-                                                                <span className="price">₹ {(cd.quantityAndTypeAndPrice[0].userQuantity !== undefined ? (cd.quantityAndTypeAndPrice[0].price * cd.quantityAndTypeAndPrice[0].userQuantity).toString() : 0)}</span>
+                                                                <span className="price">₹ {
+                                                                    cd.quantityAndTypeAndPrice.reduce((acc, qtp) => {
+                                                                        return acc + (qtp.price * (qtp.userQuantity as number))
+                                                                    }, 0)
+                                                                }</span>
                                                             </div>
 
                                                         </div>
@@ -312,7 +335,7 @@ const Ucart = () => {
                                             <ul>
                                                 <li>
                                                     <span>Item(s) total</span>
-                                                    <span>₹ {totalPrice.reduce((acc: any, tot: any) => { return acc + tot.total }, 0)}</span>
+                                                    <span>₹ {getTotalPrice()}</span>
                                                 </li>
                                                 <li>
                                                     <span>Shipping fee</span>
@@ -321,15 +344,13 @@ const Ucart = () => {
 
                                                 <li>
                                                     <span>Cart Total</span>
-                                                    <span>₹ {totalPrice.reduce((acc: any, tot: any) => { return acc + tot.total }, 0) + shippingFee}</span>
+                                                    <span>₹ {getTotalPrice() + shippingFee}</span>
                                                 </li>
                                             </ul>
-
                                         </div>
                                     </section>
                                     <div className="d-flex justify-content-center">
-                                        <a href="#" className="btn btn-primary">Checkout {orderCartDataSelected.length} items
-                                        </a>
+                                        <button onClick={checkOut} className="btn btn-primary">Checkout {orderCartDataSelected.length > 0 ? orderCartDataSelected.length : 0} items</button>
                                     </div>
                                 </section>
                             </div>

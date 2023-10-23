@@ -1,4 +1,4 @@
-import { userLoginVerify } from "@/services/Userservice";
+import { userGetCart, userLoginVerify } from "@/services/Userservice";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +31,7 @@ const Uprofile = () => {
 
     const [isLoading, setLoading] = useState<boolean>(false)
     const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
+    const [cartData, setCartDate] = useState<Array<{}>>([])
 
     useEffect(() => {
         (async function () {
@@ -45,13 +46,26 @@ const Uprofile = () => {
                     unregister("image")
                     setValue("fullName", fullName)
                     setValue("email", email)
-                    setValue("phoneNumber", phoneNumber)
+                    setValue("phoneNumber", phoneNumber)                    
+                    getCartDate(_id)
                 }
             } else {
                 nav("/user/login")
             }
         })();
     }, [])
+
+    const getCartDate = async(id:string) => {
+        try {
+            const getCart = await userGetCart(id);
+            if (getCart.data.status === "Success") {
+                var cart = getCart.data.cartData
+                setCartDate(cart)
+            }
+        } catch (error) {
+            
+        }
+    }
 
     const snackHandleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
@@ -116,7 +130,7 @@ const Uprofile = () => {
                                     <span>Orders</span>
                                 </button>
                                 <button id="cartAdd" className="transBtn" onClick={() => nav("/user/dashboard/cart")}>
-                                    <b>5</b>
+                                    <b>{cartData.length}</b>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     <span>Cart</span>
                                 </button>

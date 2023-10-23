@@ -1,5 +1,5 @@
 import { useEffect, useState, ChangeEvent } from 'react'
-import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCategoryList, userLoginVerify } from '@/services/Userservice';
+import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCart, userGetCategoryList, userLoginVerify } from '@/services/Userservice';
 import { useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
@@ -41,7 +41,7 @@ const Uproductlist = () => {
     const [minPrice, setMinPrice] = useState<string>("0")
     const [maxPrice, setMaxPrice] = useState<string>("1000")
     const [changeMinMax, setChangeMinMax] = useState<string>("")
-
+    const [cartDate, setCartDate] = useState<IPropsProductList[]>([])
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
 
     const getCategoryFilter = (e: string) => {
@@ -104,7 +104,7 @@ const Uproductlist = () => {
                     const { _id, fullName, email } = verify.data.userData
                     setUserData({ _id, fullName, email })
                     getProductList(_id)
-                    getCategoryList()
+                    getCategoryList(_id)                                        
                 }
             } else {
                 nav("/user/login")
@@ -130,11 +130,16 @@ const Uproductlist = () => {
         }
     }
 
-    const getCategoryList = async () => {
+    const getCategoryList = async (id:string) => {
         try {
             const prodCat = await userGetCategoryList();
             if (prodCat.data.status === "Success") {
                 setProductCategory(prodCat.data.category)
+            }
+            const getCart = await userGetCart(id);
+            if (getCart.data.status === "Success") {
+                var cart = getCart.data.cartData
+                setCartDate(cart)
             }
         } catch (error) {
         }
@@ -150,12 +155,23 @@ const Uproductlist = () => {
             }
             if (res.data.status === "Success") {
                 getProductList(userData._id)
+                getCategoryList(userData._id)
             } else {
                 alert(res.data.message)
             }
         } catch (error: any) {
             alert(error.message)
         }
+    }
+
+    const resetFilter = () => {
+        setCategoryFilter("")
+        setCategoryFilterByName("")
+        setCategoryFilterByNameTrack("")
+        setChangeMinMax("")
+        setMinPrice("0")
+        setMaxPrice("1000")
+        setCategoryFilterByMultipleItem(() => [])
     }
 
 
@@ -199,7 +215,7 @@ const Uproductlist = () => {
                                                 </ul>
                                             </div>
                                             <input type="hidden" id="txt-category" />
-                                            <input type="text" id="txt-search" className="form-control" onChange={(e: ChangeEvent<HTMLInputElement>) => filterByNameChange(e.target.value)} />
+                                            <input type="text" id="txt-search" value={categoryFilterByNameTrack} className="form-control" onChange={(e: ChangeEvent<HTMLInputElement>) => filterByNameChange(e.target.value)} />
                                             <span className="input-group-btn">
                                                 <button id="btn-search" type="submit" className="btn btn-primary" onClick={btnFilterByName}>
                                                     <i className="fa fa-search"></i>
@@ -223,7 +239,7 @@ const Uproductlist = () => {
                                     <span>Orders</span>
                                 </button>
                                 <button id="cartAdd" className="transBtn" onClick={() => nav("/user/dashboard/cart")}>
-                                    <b>5</b>
+                                    <b>{cartDate.length}</b>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     <span>Cart</span>
                                 </button>
@@ -297,7 +313,7 @@ const Uproductlist = () => {
                                     <section className="panel">
                                         <div className="panel-body">
                                             <h3>Min. order</h3>
-                                            <select defaultValue={changeMinMax} onChange={(e: ChangeEvent<HTMLSelectElement>) => setChangeMinMax(e.target.value)} className="form-select" aria-label="Default select example">
+                                            <select value={changeMinMax} onChange={(e: ChangeEvent<HTMLSelectElement>) => setChangeMinMax(e.target.value)} className="form-select" aria-label="Default select example">
                                                 <option value="">Max</option>
                                                 <option value="1">One</option>
                                                 <option value="2">Two</option>
@@ -332,8 +348,8 @@ const Uproductlist = () => {
                                         </div>
                                     </section>
                                     <div className="d-flex justify-content-around">
-                                        <a href="register.html" className="btn btn-secondary">Reset</a>
-                                        <button type="button" id="loginBrn" className="btn btn-primary">Apply</button>
+                                        <button className="btn btn-secondary" onClick={resetFilter}>Reset</button>
+                                        {/* <button type="button" id="loginBrn" className="btn btn-primary">Apply</button> */}
                                     </div>
                                 </section>
                             </div>
