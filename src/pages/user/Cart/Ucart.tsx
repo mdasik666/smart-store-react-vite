@@ -12,16 +12,6 @@ interface IPropsQTP {
     userQuantity?: number
 }
 
-interface IPropsProductList {
-    _id: string,
-    productName: string,
-    productDescription: string,
-    category: string,
-    title: string,
-    quantityAndTypeAndPrice: Array<IPropsQTP>,
-    minOrder: number,
-    image: string
-}
 
 interface IPropsProductOrderList {
     _id: string,
@@ -62,13 +52,13 @@ const Ucart = () => {
                         setLoading(true)
                         const getCart = await userGetCart(_id);
                         if (getCart.data.status === "Success") {
-                            const getLastCheckout = await userGetCheckOut(_id);
                             var cart = getCart.data.cartData
                             cart?.forEach((ct: any) => {
                                 ct.quantityAndTypeAndPrice?.forEach((qt: any) => {
                                     qt.userQuantity = 0
                                 })
                             });
+                            const getLastCheckout = await userGetCheckOut(_id);
                             if (getLastCheckout.data.status === "Success") {
                                 var lastCheckout = getLastCheckout.data.lastCheckoutProducts.lastCheckout;
                                 if (lastCheckout.length) {
@@ -85,7 +75,11 @@ const Ucart = () => {
                                     setOrderCartData(cart)
                                 }
                             } else {
-                                alert(getCart.data.message)
+                                if(getLastCheckout.data.message.indexOf("not found")>-1){
+                                    setOrderCartData(cart)
+                                }else{
+                                    alert(getCart.data.message)
+                                }
                             }
                         } else {
                             alert(getCart.data.message)

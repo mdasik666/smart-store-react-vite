@@ -1,8 +1,11 @@
-import { userGetCategoryList, userGetCountryList, userLoginVerify } from "@/services/Userservice";
+import { userGetCheckOut, userGetCountryList, userGetShippingAddress, userLoginVerify, userPostShippingAddress } from "@/services/Userservice";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useForm } from 'react-hook-form'
+import { EditNoteSharp } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 
 interface IPropsUserData {
   _id: string,
@@ -10,10 +13,37 @@ interface IPropsUserData {
   email: string
 }
 
+interface IPropsQTP {
+  price: number,
+  quantity: string,
+  type: string,
+  userQuantity?: number
+}
+
+interface IPropsProductOrderList {
+  _id: string,
+  productName: string,
+  productDescription: string,
+  category: string,
+  title: string,
+  quantityAndTypeAndPrice: Array<IPropsQTP>,
+  minOrder: number,
+  image: string,
+  isSelect?: boolean
+}
+
 const Ucheckout = () => {
   const nav = useNavigate()
+  const { register, handleSubmit, formState: { errors, isValid }, setError, reset, getValues, setValue } = useForm({
+    mode: "onChange"
+  })
   const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
   const [countryData, setCountryData] = useState<Array<any>>([])
+  const [shippingAddressList, setShippingAddressList] = useState<Array<any>>([])
+  const [updateState, setUpdateState] = useState<boolean>(false)
+  const [updateId, setUpdateId] = useState<string>("")
+  const [checkoutList, setCheckoutList] = useState<IPropsProductOrderList[]>([])
+
   useEffect(() => {
     (async function () {
       if (Cookies.get("usertoken")) {
@@ -24,10 +54,24 @@ const Ucheckout = () => {
           } else {
             const { _id, fullName, email } = verify.data.userData
             setUserData({ _id, fullName, email })
-            const countryList = await userGetCountryList()            
-            var country = countryList.data.sort((a:any, b:any) => a.name.common.localeCompare(b.name.common)).filter((c:any)=>c.name.common.toLowerCase() === "india");
-            if(country.length){
+            const countryList = await userGetCountryList()
+            var country = countryList.data.sort((a: any, b: any) => a.name.common.localeCompare(b.name.common)).filter((c: any) => c.name.common.toLowerCase() === "india");
+            if (country.length) {
               setCountryData(country)
+            }
+            const shippingData = await userGetShippingAddress(_id)
+            if (shippingData.data.status === "Success") {
+              var addressList = shippingData.data.shippingAddress
+              setShippingAddressList(addressList)
+            } else {
+              console.log(shippingData.data.message)
+            }
+            const getCheckout = await userGetCheckOut(_id)
+            if (getCheckout.data.status === "Success") {
+              var checkout = getCheckout.data.lastCheckoutProducts.lastCheckout;
+              setCheckoutList(checkout)
+            } else {
+
             }
           }
         } catch (error: any) {
@@ -36,6 +80,55 @@ const Ucheckout = () => {
       }
     })();
   }, [])
+
+  const addOrUpdateAddress = async (data: any) => {
+    try {
+      var finalAddress;
+      if (updateState) {
+        const newShipping = shippingAddressList.map((sa) => {
+          if (sa._id === updateId) {
+            return { ...sa, ...data }
+          } else {
+            return sa;
+          }
+        })
+        console.log(newShipping)
+        finalAddress = {
+          userId: userData._id,
+          shippingAddress: newShipping
+        }
+      } else {
+        finalAddress = {
+          userId: userData._id,
+          shippingAddress: [...shippingAddressList, data]
+        }
+      }
+      var addShippingAddress = await userPostShippingAddress(userData._id, finalAddress)
+      if (addShippingAddress.data.status === "Success") {
+        setShippingAddressList(addShippingAddress.data.shippingAddress)
+        setUpdateState(false)
+      } else {
+        console.log(addShippingAddress.data.message)
+      }
+    } catch (error: any) {
+      console.log(error.message)
+    }
+  }
+
+  const updateShippingAddress = (id: string) => {
+    setUpdateState(true)
+    setUpdateId(id)
+    const { fullName, phoneNumber, houseNoOrBuildingName, areaOrColony, country, city, zipOrPostalCode } = shippingAddressList.filter((a) => a._id === updateId)[0]
+    setValue("fullName", fullName)
+    setValue("phoneNumber", phoneNumber)
+    setValue("houseNoOrBuildingName", houseNoOrBuildingName)
+    setValue("areaOrColony", areaOrColony)
+    setValue("country", country)
+    setValue("city", city)
+    setValue("zipOrPostalCode", zipOrPostalCode)
+  }
+
+
   return (
     <>
       <Helmet>
@@ -111,81 +204,72 @@ const Ucheckout = () => {
                             <h5 className="font-size-16 mb-1">Billing Info</h5>
 
                             <div className="mb-3">
-                              <form>
+                              <form onSubmit={handleSubmit(addOrUpdateAddress)}>
                                 <div>
                                   <div className="row">
-                                    <div className="col-lg-4">
+                                    <div className="col-lg-6">
                                       <div className="mb-3">
-                                        <label className="form-label"
-                                          htmlFor="billing-name">Name</label>
-                                        <input type="text" className="form-control"
-                                          id="billing-name" placeholder="Enter name" />
+                                        <label className="form-label" htmlFor="billing-name">Name</label>
+                                        <input {...register("fullName", { required: "Name is mandatory" })} type="text" className="form-control" id="billing-name" placeholder="Enter name" />
+                                        {Boolean(errors?.fullName) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.fullName && errors.fullName?.message?.toString() || ""}</small>}
                                       </div>
                                     </div>
-                                    <div className="col-lg-4">
+                                    <div className="col-lg-6">
                                       <div className="mb-3">
-                                        <label className="form-label"
-                                          htmlFor="billing-email-address">Email
-                                          Address</label>
-                                        <input type="email" className="form-control"
-                                          id="billing-email-address"
-                                          placeholder="Enter email" />
+                                        <label className="form-label" htmlFor="billing-phone">Phone</label>
+                                        <input {...register("phoneNumber", { required: "Phone Number is mandatory", minLength: { value: 10, message: "Phone Number must be exactly 10 characters" }, maxLength: { value: 10, message: "Phone Number must be exactly 10 characters" } })} type="number" className="form-control" id="billing-phone" placeholder="Enter Phone no." />
+                                        {Boolean(errors?.phoneNumber) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.phoneNumber && errors.phoneNumber?.message?.toString() || ""}</small>}
                                       </div>
                                     </div>
-                                    <div className="col-lg-4">
+                                    <div className="col-lg-6">
                                       <div className="mb-3">
-                                        <label className="form-label"
-                                          htmlFor="billing-phone">Phone</label>
-                                        <input type="text" className="form-control"
-                                          id="billing-phone"
-                                          placeholder="Enter Phone no." />
+                                        <label className="form-label" htmlFor="billing-houseno-building-name">House No., Building Name</label>
+                                        <input {...register("houseNoOrBuildingName", { required: "House No Or Building Name is mandatory" })} type="text" className="form-control" id="billing-houseno-building-name" placeholder="Enter House No.,Building Name" />
+                                        {Boolean(errors?.houseNoOrBuildingName) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.houseNoOrBuildingName && errors.houseNoOrBuildingName?.message?.toString() || ""}</small>}
                                       </div>
                                     </div>
-                                  </div>
-
-                                  <div className="mb-3">
-                                    <label className="form-label"
-                                      htmlFor="billing-address">Address</label>
-                                    <textarea className="form-control" id="billing-address" rows={3} placeholder="Enter full address"></textarea>
-                                  </div>
-
-                                  <div className="row">
-                                    <div className="col-lg-4">
-                                      <div className="mb-4 mb-lg-0">
+                                    <div className="col-lg-6">
+                                      <div className="mb-3">
+                                        <label className="form-label" htmlFor="billing-area-colony">Area, Colony</label>
+                                        <input {...register("areaOrColony", { required: "Area Or Colony is mandatory" })} type="text" className="form-control" id="billing-area-colony" placeholder="Enter Area, Colony" />
+                                        {Boolean(errors?.areaOrColony) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.areaOrColony && errors.areaOrColony?.message?.toString() || ""}</small>}
+                                      </div>
+                                    </div>
+                                    <div className="col-lg-6">
+                                      <div className="mb-4 mb-lg-3">
                                         <label className="form-label">Country</label>
-                                        <select className="form-control form-select"
-                                          title="Country">
-                                          <option value="0">Select Country</option>
+                                        <select value={getValues("country") || "India"} {...register("country", { required: "Country is mandatory" })} className="form-control form-select" title="Country">
+                                          <option value="">Select Country</option>
                                           {
-                                            countryData.length && 
-                                            countryData.map((country,i)=>{
-                                              return (
-                                                <option value={country.flag} key={i}>{country.name.common}</option>
-                                              )
-                                            })
+                                            countryData.length ?
+                                              countryData.map((country, i) => {
+                                                return (
+                                                  <option value={country.name.common} key={i}>{country.name.common}</option>
+                                                )
+                                              }) : <option>Loading...</option>
                                           }
                                         </select>
+                                        {Boolean(errors?.country) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.country && errors.country?.message?.toString() || ""}</small>}
                                       </div>
                                     </div>
 
-                                    <div className="col-lg-4">
-                                      <div className="mb-4 mb-lg-0">
-                                        <label className="form-label"
-                                          htmlFor="billing-city">City</label>
-                                        <input type="text" className="form-control"
-                                          id="billing-city" placeholder="Enter City" />
+                                    <div className="col-lg-6">
+                                      <div className="mb-4 mb-lg-3">
+                                        <label className="form-label" htmlFor="billing-city">City</label>
+                                        <input {...register("city", { required: "City is mandatory" })} type="text" className="form-control" id="billing-city" placeholder="Enter City" />
+                                        {Boolean(errors?.city) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.city && errors.city?.message?.toString() || ""}</small>}
                                       </div>
                                     </div>
 
-                                    <div className="col-lg-4">
-                                      <div className="mb-0">
-                                        <label className="form-label" htmlFor="zip-code">Zip /
-                                          Postal
-                                          code</label>
-                                        <input type="text" className="form-control"
-                                          id="zip-code"
-                                          placeholder="Enter Postal code" />
+                                    <div className="col-lg-12">
+                                      <div className="mb-4 mb-lg-3">
+                                        <label className="form-label" htmlFor="zip-code">Zip / Postal code</label>
+                                        <input {...register("zipOrPostalCode", { required: "City is mandatory" })} type="number" className="form-control" id="zip-code" placeholder="Enter Postal code" />
+                                        {Boolean(errors?.zipOrPostalCode) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.zipOrPostalCode && errors.zipOrPostalCode?.message?.toString() || ""}</small>}
                                       </div>
+                                    </div>
+                                    <div className="col-lg-12 mb-4">
+                                      <button style={{ width: "100%" }} className="btn btn-primary">{!updateState ? "Add Address" : "Update Address"}{updateState}</button>
                                     </div>
                                   </div>
                                 </div>
@@ -205,58 +289,28 @@ const Ucheckout = () => {
                             <h5 className="font-size-16 mb-1">Shipping Info</h5>
                             <div className="mb-3">
                               <div className="row">
-                                <div className="col-lg-4 col-sm-6">
-                                  <div data-bs-toggle="collapse">
-                                    <label className="card-radio-label mb-4">
-                                      <input type="radio" name="address"
-                                        id="info-address1" className="card-radio-input"
-                                        defaultChecked />
-                                      <div className="card-radio text-truncate p-3">
-                                        <span className="fs-14 mb-4 d-block">Address 1</span>
-                                        <span className="fs-14 mb-2 d-block">Bradley McMillian</span>
-                                        <span className="text-muted fw-normal text-wrap mb-1 d-block">109 Clarksburg Park Road Show Low, AZ 85901</span>
-                                        <span className="text-muted fw-normal d-block">Mo. 012-345-6789</span>
-                                      </div>
-                                    </label>
-                                    <div className="edit-btn bg-light  rounded">
-                                      <a href="#" data-bs-toggle="tooltip"
-                                        data-placement="top" title=""
-                                        data-bs-original-title="Edit">
-                                        <i
-                                          className="fa-solid fa-pen-to-square font-size-16"></i>
-                                      </a>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-4 col-sm-6">
-                                  <div>
-                                    <label className="card-radio-label mb-4">
-                                      <input type="radio" name="address"
-                                        id="info-address2" className="card-radio-input" />
-                                      <div className="card-radio text-truncate p-3">
-                                        <span className="fs-14 mb-4 d-block">Address
-                                          2</span>
-                                        <span className="fs-14 mb-2 d-block">Bradley
-                                          McMillian</span>
-                                        <span
-                                          className="text-muted fw-normal text-wrap mb-1 d-block">109
-                                          Clarksburg Park Road Show Low, AZ
-                                          85901</span>
-                                        <span className="text-muted fw-normal d-block">Mo.
-                                          012-345-6789</span>
-                                      </div>
-                                    </label>
-                                    <div className="edit-btn bg-light  rounded">
-                                      <a href="#" data-bs-toggle="tooltip"
-                                        data-placement="top" title=""
-                                        data-bs-original-title="Edit">
-                                        <i
-                                          className="fa-solid fa-pen-to-square font-size-16"></i>
-                                      </a>
-                                    </div>
-                                  </div>
-                                </div>
+                                {
+                                  shippingAddressList.length ?
+                                    shippingAddressList.map((sa, i) => {
+                                      return (
+                                        <div key={i} className="col-lg-4 col-md-6">
+                                          <div data-bs-toggle="collapse">
+                                            <label className="card-radio-label mb-4">
+                                              <input type="radio" name="address" id="info-address1" className="card-radio-input" />
+                                              <div className="card-radio text-truncate p-3">
+                                                <span className="fs-14 mb-4 d-block">Address {i + 1}</span>
+                                                <span className="fs-14 mb-2 d-block">{sa.fullName}</span>
+                                                <span className="text-muted fw-normal text-wrap mb-1 d-block">{sa.houseNoOrBuildingName} {sa.areaOrColony} {sa.zipOrPostalCode}</span>
+                                                <span className="text-muted fw-normal d-block">Mo. {sa.phoneNumber}</span>
+                                                <div className="text-end" onClick={() => updateShippingAddress(sa._id)}><IconButton><EditNoteSharp color="info" /></IconButton></div>
+                                              </div>
+                                            </label>
+                                          </div>
+                                        </div>
+                                      )
+                                    })
+                                    : shippingAddressList.length === 0 ? <div>Adress Not Found</div> : <div>Loading...</div>
+                                }
                               </div>
                             </div>
                           </div>
@@ -342,47 +396,52 @@ const Ucheckout = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th scope="row"><img src="images/prod4.jpg" alt="product-img"
-                              title="product-img" className="avatar-lg rounded" />
-                            </th>
-                            <td>
-                              <h5 className="font-size-16 text-truncate"><a href="#"
-                                className="text-dark">Tata Sampann Spice</a></h5>
-                              <p className="text-muted mb-0">
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star-half text-warning"></i>
-                              </p>
-                              <p className="text-muted mb-0 mt-1">&#8377; 260 x 2</p>
-                            </td>
-                            <td>&#8377; 520</td>
-                          </tr>
-                          <tr>
-                            <th scope="row"><img src="images/prod2.jpg" alt="product-img"
-                              title="product-img" className="avatar-lg rounded" />
-                            </th>
-                            <td>
-                              <h5 className="font-size-16 text-truncate"><a href="#"
-                                className="text-dark">Ceylon CINNAMON</a></h5>
-                              <p className="text-muted mb-0">
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star text-warning"></i>
-                                <i className="bx bxs-star text-warning"></i>
-                              </p>
-                              <p className="text-muted mb-0 mt-1">&#8377; 260 x 1</p>
-                            </td>
-                            <td>&#8377; 260</td>
-                          </tr>
+                          {
+                            checkoutList.length ?
+                              checkoutList.map((cl, i) => {
+                                return (
+                                <tr key={i}>
+                                  <th scope="row"><img src={cl.image.toString()} alt="product-img"
+                                    title="product-img" className="avatar-lg rounded" />
+                                  </th>
+                                  <td>
+                                    <h5 className="font-size-16 text-truncate"><a href="#"
+                                      className="text-dark">{cl.productName}</a></h5>
+                                    <p className="text-muted mb-0">
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star-half text-warning"></i>
+                                    </p>
+                                    <p className="text-muted mb-0 mt-1">&#8377; {
+                                      cl.quantityAndTypeAndPrice.map((qtp:IPropsQTP,i:number)=>{
+                                        return (
+                                          <span key={i} className="measure">{qtp.price} x {qtp.userQuantity}</span>                                          
+                                        )
+                                      })
+                                    }</p>
+                                  </td>
+                                  <td>&#8377; {
+                                    cl.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
+                                      return stotal + (qtp.userQuantity as number) * qtp.price
+                                  }, 0)
+                                    }</td>
+                                </tr>)
+                              }) : <div>Loading...</div>
+                          }
                           <tr>
                             <td colSpan={2}>
                               <h5 className="font-size-14 m-0">Sub Total :</h5>
                             </td>
                             <td>
-                              &#8377; 780
+                              &#8377; {
+                                checkoutList.reduce((total: number, ocd: IPropsProductOrderList) => {
+                                  return total + (ocd.isSelect ? ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
+                                      return stotal + (qtp.userQuantity as number) * qtp.price
+                                  }, 0) : 0)
+                              }, 0)
+                              }
                             </td>
                           </tr>
                           <tr>
@@ -399,7 +458,7 @@ const Ucheckout = () => {
                               <h5 className="font-size-14 m-0">Shipping Charge :</h5>
                             </td>
                             <td>
-                              &#8377; 25
+                              &#8377; 500
                             </td>
                           </tr>
                           <tr>

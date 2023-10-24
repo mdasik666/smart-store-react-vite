@@ -148,7 +148,7 @@ const Udashboard = () => {
                     <span className="username">{userData.fullName}</span>
                   </span>
 
-                  <img src={userData.image.toString()} alt="mdo" width="32" height="32"
+                  <img src={userData?.image?.toString()} alt="mdo" width="32" height="32"
                     className="rounded-circle" />
                 </a>
                 <ul className="dropdown-menu text-small" id="profDrop" aria-labelledby="profileDrop">
