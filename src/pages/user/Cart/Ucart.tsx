@@ -215,7 +215,7 @@ const Ucart = () => {
                                 <button className="btn btn-primary">
                                     <i className="fa-regular fa-compass"></i> Explore
                                 </button>
-                                <button id="userProf" className="transBtn">
+                                <button id="userProf" className="transBtn" onClick={()=>nav('/user/dashboard/profile')}>
                                     <i className="fa-regular fa-user"></i>
                                     <span>Profile</span>
                                 </button>

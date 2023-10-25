@@ -1,5 +1,5 @@
 import { userGetCart, userLoginVerify } from "@/services/Userservice";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -25,7 +25,7 @@ const Uprofile = () => {
     const nav = useNavigate()
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "", phoneNumber: "", image: "" })
     const [profileImage, setProfileImage] = useState<string>("")
-    const { register, handleSubmit, formState: { errors, isValid }, unregister, setValue } = useForm({
+    const { register, handleSubmit, formState: { errors, isValid }, unregister, setValue, getValues } = useForm({
         mode: "onChange"
     })
 
@@ -36,7 +36,7 @@ const Uprofile = () => {
     useEffect(() => {
         (async function () {
             if (Cookies.get("usertoken")) {
-                const verify = await userLoginVerify();                
+                const verify = await userLoginVerify();
                 if (verify.data.status === "Failed") {
                     nav("/user/login")
                 } else {
@@ -46,7 +46,7 @@ const Uprofile = () => {
                     unregister("image")
                     setValue("fullName", fullName)
                     setValue("email", email)
-                    setValue("phoneNumber", phoneNumber)                    
+                    setValue("phoneNumber", phoneNumber)
                     getCartDate(_id)
                 }
             } else {
@@ -55,7 +55,7 @@ const Uprofile = () => {
         })();
     }, [])
 
-    const getCartDate = async(id:string) => {
+    const getCartDate = async (id: string) => {
         try {
             const getCart = await userGetCart(id);
             if (getCart.data.status === "Success") {
@@ -63,7 +63,7 @@ const Uprofile = () => {
                 setCartDate(cart)
             }
         } catch (error) {
-            
+
         }
     }
 
@@ -74,7 +74,7 @@ const Uprofile = () => {
         setSnackOpen({ open: false, severity: undefined, message: "" });
     };
 
-    const updateProfileData = async (data: any) => {        
+    const updateProfileData = async (data: any) => {
         try {
             setLoading(true)
             var res;
@@ -121,7 +121,7 @@ const Uprofile = () => {
                                 <button className="btn btn-primary">
                                     <i className="fa-regular fa-compass"></i> Explore
                                 </button>
-                                <button id="userProf" className="transBtn">
+                                <button id="userProf" className="transBtn" onClick={()=>nav('/user/dashboard/profile')}>
                                     <i className="fa-regular fa-user"></i>
                                     <span>Profile</span>
                                 </button>
@@ -179,21 +179,23 @@ const Uprofile = () => {
                                                     <h4 className="mb-4 mt-0">Upload your profile photo</h4>
                                                     <div className="text-center">
                                                         <div className="square position-relative display-2 mb-3">
-                                                            {
-                                                                profileImage.length > 0 ?
-                                                                <label htmlFor="customFile">
-                                                                    <img src={profileImage.toString()} className="position-absolute top-50 start-50 translate-middle text-secondary" width={"60px"} height={"auto"} style={{ border: "1px solid", borderRadius: "100px" }} />
-                                                                </label>
-                                                                    :
-                                                                    <i className="fas fa-fw fa-user position-absolute top-50 start-50 translate-middle text-secondary"></i>
-                                                            }
+                                                            <label htmlFor="customFile">
+                                                                {
+                                                                    profileImage.length > 0 ?
+                                                                        <img src={profileImage.toString()} className="position-absolute top-50 start-50 translate-middle text-secondary" width={"60px"} height={"auto"} style={{ border: "1px solid", borderRadius: "100px" }} />
+                                                                        :
+                                                                        <i className="fas fa-fw fa-user position-absolute top-50 start-50 translate-middle text-secondary"></i>
+                                                                }
+                                                            </label>
                                                         </div>
                                                         <input hidden type="file" id="customFile" accept=".jpg,.jpeg,.png" {...register("image", {
                                                             validate: {
-                                                                isImage: (file) => {
+                                                                isImage: async(file) => {
                                                                     if (file.length === 0) return true;
                                                                     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                                                                    if (allowedTypes.includes(file[0].type)) {
+                                                                    if (allowedTypes.includes(file[0].type)) {                                                                        
+                                                                        var con:any = await convertToBase64(file[0])                                                                        
+                                                                        setProfileImage(con)
                                                                         return true;
                                                                     } else {
                                                                         return 'Please upload a PNG or JPG image';
@@ -201,7 +203,7 @@ const Uprofile = () => {
                                                                 },
                                                             },
                                                         })} />
-                                                        {Boolean(errors?.image) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.image && errors.image?.message?.toString() || ""}</small>}                                                        
+                                                        {Boolean(errors?.image) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.image && errors.image?.message?.toString() || ""}</small>}
                                                         <button type="button" className="btn btn-danger-soft">Remove</button>
                                                     </div>
                                                 </div>

@@ -1,4 +1,4 @@
-import { userGetCheckOut, userGetCountryList, userGetShippingAddress, userLoginVerify, userPaymentOrders, userPaymentVerify, userPostShippingAddress } from "@/services/Userservice";
+import { userGetCart, userGetCheckOut, userGetCountryList, userGetShippingAddress, userLoginVerify, userPaymentOrders, userPaymentVerify, userPostShippingAddress } from "@/services/Userservice";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
@@ -42,10 +42,11 @@ const Ucheckout = () => {
   const [shippingAddressList, setShippingAddressList] = useState<Array<any>>([])
   const [updateState, setUpdateState] = useState<boolean>(false)
   const [updateId, setUpdateId] = useState<string>("")
+  const [orderCartData, setOrderCartData] = useState<IPropsProductOrderList[]>([])
   const [checkoutList, setCheckoutList] = useState<IPropsProductOrderList[]>([])
   const [checkoutListWithTotal, setCheckoutListWithTotal] = useState<any>({})
   const [selectedAddress, setSelectedAddress] = useState<Array<any>>([])
-  const [paymentOption, setPaymentOption] = useState<string>("")
+  const [paymentOption, setPaymentOption] = useState<string>("razorpay")
 
   useEffect(() => {
     (async function () {
@@ -62,6 +63,13 @@ const Ucheckout = () => {
             if (country.length) {
               setCountryData(country)
             }
+            const getCart = await userGetCart(_id);
+            if (getCart.data.status === "Success") {
+              var cart = getCart.data.cartData
+              setOrderCartData(cart)
+            } else {
+              console.log(getCart.data.message)
+            }
             const shippingData = await userGetShippingAddress(_id)
             if (shippingData.data.status === "Success") {
               var addressList = shippingData.data.shippingAddress
@@ -72,10 +80,10 @@ const Ucheckout = () => {
             const getCheckout = await userGetCheckOut(_id)
             if (getCheckout.data.status === "Success") {
               var checkout = getCheckout.data.lastCheckoutProducts;
-              if(getCheckout.data.lastCheckoutProducts.checkOutProducts.length){
+              if (getCheckout.data.lastCheckoutProducts.checkOutProducts.length) {
                 setCheckoutList(checkout.checkOutProducts)
                 setCheckoutListWithTotal(checkout)
-              }else{
+              } else {
                 nav('/user/dashboard/cart')
               }
             } else {
@@ -134,7 +142,6 @@ const Ucheckout = () => {
     setValue("country", country)
     setValue("city", city)
     setValue("zipOrPostalCode", zipOrPostalCode)
-    reset()
   }
 
   const chooseAddress = (id: string) => {
@@ -147,11 +154,10 @@ const Ucheckout = () => {
   }
 
   const placeOrder = async () => {
-    if (selectedAddress.length) {      
+    if (selectedAddress.length) {
       if (paymentOption === 'razorpay') {
         try {
           const resOrder = await userPaymentOrders(checkoutListWithTotal)
-          console.log(resOrder)
           if (resOrder.data.status === "Success") {
             var options = {
               "key": "rzp_test_hIjVUMXvTlfQ1Z",
@@ -163,9 +169,10 @@ const Ucheckout = () => {
               "order_id": resOrder.data.order.id,
               "handler": async function (response: any) {
                 try {
-                  const resVerify = await userPaymentVerify(userData._id, response)
+                  const resVerify = await userPaymentVerify(userData._id, { ...response, checkoutList, ...{ paymentType: 'razorpay' } })
                   if (resVerify.data.status === "Success") {
                     console.log(resVerify.data)
+                    nav('/user/dashboard/products')
                   }
                 } catch (error: any) {
                   console.log(error.message)
@@ -230,7 +237,7 @@ const Ucheckout = () => {
                 <button className="btn btn-primary">
                   <i className="fa-regular fa-compass"></i> Explore
                 </button>
-                <button id="userProf" className="transBtn">
+                <button id="userProf" className="transBtn" onClick={() => nav('/user/dashboard/profile')}>
                   <i className="fa-regular fa-user"></i>
                   <span>Profile</span>
                 </button>
@@ -238,8 +245,8 @@ const Ucheckout = () => {
                   <i className="fa-regular fa-file-lines"></i>
                   <span>Orders</span>
                 </button>
-                <button id="cartAdd" className="transBtn">
-                  <b>5</b>
+                <button id="cartAdd" className="transBtn" onClick={() => nav('/user/dashboard/cart')}>
+                  <b>{orderCartData.length}</b>
                   <i className="fa-solid fa-cart-shopping"></i>
                   <span>Cart</span>
                 </button>
@@ -280,7 +287,6 @@ const Ucheckout = () => {
                         <div className="feed-item-list">
                           <div>
                             <h5 className="font-size-16 mb-1">Billing Info</h5>
-
                             <div className="mb-3">
                               <form onSubmit={handleSubmit(addOrUpdateAddress)}>
                                 <div>
@@ -346,8 +352,11 @@ const Ucheckout = () => {
                                         {Boolean(errors?.zipOrPostalCode) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.zipOrPostalCode && errors.zipOrPostalCode?.message?.toString() || ""}</small>}
                                       </div>
                                     </div>
-                                    <div className="col-lg-12 mb-4">
-                                      <button style={{ width: "100%" }} className="btn btn-primary">{!updateState ? "Add Address" : "Update Address"}{updateState}</button>
+                                    <div className="col-sm-12 col-md-6 mb-4">
+                                      <button style={{ width: "100%" }} type="submit" className="btn btn-primary">{!updateState ? "Add Address" : "Update Address"}{updateState}</button>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6 mb-4">
+                                      <button style={{ width: "100%" }} className="btn btn-primary" type="reset" onClick={() => setUpdateState(false)}>Reset</button>
                                     </div>
                                   </div>
                                 </div>
@@ -356,7 +365,7 @@ const Ucheckout = () => {
                           </div>
                         </div>
                       </li>
-                      <li className="checkout-item">
+                      <li className="checkout-item" style={{ borderLeft: "2px solid #ff5901" }}>
                         <div className="avatar checkout-icon p-1">
                           <div className="avatar-title rounded-circle bg-primary">
                             <i className="fa-solid fa-truck-plane"></i>
@@ -407,11 +416,10 @@ const Ucheckout = () => {
                           <div>
                             <h5 className="font-size-14 mb-3">Payment method :</h5>
                             <div className="row">
-                              <div className="col-lg-3 col-sm-6" onClick={() => choosePayment('razorpay')}>
+                              <div className="col-sm-12 col-md-6" onClick={() => choosePayment('razorpay')}>
                                 <div data-bs-toggle="collapse">
                                   <label className="card-radio-label mb-3">
-                                    <input type="radio" name="pay-method"
-                                      id="pay-methodoption1" className="card-radio-input" />
+                                    <input type="radio" name="pay-method" defaultChecked id="pay-methodoption1" className="card-radio-input" />
                                     <span className="card-radio py-3 text-center text-truncate">
                                       <i
                                         className=" fa-regular fa-credit-card d-block h2 mb-3"></i>
@@ -421,17 +429,17 @@ const Ucheckout = () => {
                                 </div>
                               </div>
 
-                              <div className="col-lg-3 col-sm-6" onClick={() => choosePayment('cod')}>
+                              {/* <div className="col-lg-3 col-sm-6" onClick={() => choosePayment('cod')}>
                                 <div>
                                   <label className="card-radio-label">
-                                    <input type="radio" name="pay-method" id="pay-methodoption3" className="card-radio-input" defaultChecked />
+                                    <input type="radio" name="pay-method" id="pay-methodoption3" className="card-radio-input" />
                                     <span className="card-radio py-3 text-center text-truncate">
                                       <i className="fa-solid fa-money-bill d-block h2 mb-3"></i>
                                       <span>Cash on Delivery</span>
                                     </span>
                                   </label>
                                 </div>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -518,14 +526,6 @@ const Ucheckout = () => {
                               }
                             </td>
                           </tr>
-                          <tr>
-                            <td colSpan={2}>
-                              <h5 className="font-size-14 m-0">Discount :</h5>
-                            </td>
-                            <td>
-                              - &#8377; 78
-                            </td>
-                          </tr>
 
                           <tr>
                             <td colSpan={2}>
@@ -535,21 +535,19 @@ const Ucheckout = () => {
                               &#8377; 500
                             </td>
                           </tr>
-                          <tr>
-                            <td colSpan={2}>
-                              <h5 className="font-size-14 m-0">Estimated Tax :</h5>
-                            </td>
-                            <td>
-                              &#8377; 18.20
-                            </td>
-                          </tr>
 
                           <tr className="bg-light">
                             <td colSpan={2}>
                               <h5 className="font-size-14 m-0">Total:</h5>
                             </td>
                             <td>
-                              &#8377; 745.2
+                              &#8377; {
+                                checkoutList.reduce((total: number, ocd: IPropsProductOrderList) => {
+                                  return total + (ocd.isSelect ? ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
+                                    return stotal + (qtp.userQuantity as number) * qtp.price
+                                  }, 0) : 0)
+                                }, 0) + 500
+                              }
                             </td>
                           </tr>
                         </tbody>

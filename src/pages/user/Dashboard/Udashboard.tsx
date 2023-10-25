@@ -51,23 +51,23 @@ const Udashboard = () => {
   const filterByName = () => {
     setCategoryFilterByName(categoryFilterByNameTrack)
   }
-
+  
   useEffect(() => {
     (async function () {
-      if (Cookies.get("usertoken")) {
-        const verify = await userLoginVerify();
-        if (verify.data.status === "Failed") {
-          nav("/user/login")
+        if (Cookies.get("usertoken")) {
+          const verify = await userLoginVerify();
+          if (verify.data.status === "Failed") {
+            nav("/user/login")
+          } else {
+            const { _id, fullName, email, image } = verify.data.userData
+            setUserData({ _id, fullName, email, image })
+            getCategoryList()
+            getProductList(_id)
+          }
         } else {
-          const { _id, fullName, email, image } = verify.data.userData
-          setUserData({ _id, fullName, email, image })
-          getCategoryList()
-          getProductList(_id)
+          nav("/user/login")
         }
-      } else {
-        nav("/user/login")
-      }
-    })();
+      })();
   }, [])
 
   const getProductList = async (id: string) => {
@@ -132,7 +132,7 @@ const Udashboard = () => {
       <section id="wrapper">
         <header className="mb-3 ">
           <div className="container">
-            <div className="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-between">
+            <div className="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-between">              
               <h1>
                 <a href="/" className="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
                   <span className="logo_ic"></span>
