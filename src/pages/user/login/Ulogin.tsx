@@ -43,13 +43,13 @@ const Ulogin = () => {
     try {
       setLoading(true)
       const res = await userLogin(data)
-      setLoading(false)
-      if (res.data.status === "Failed") {
-        setSnackOpen({ open: true, severity: "error", message: res.data.message })
-      } else {
+      if (res.data.status === "Success") {
         setSnackOpen({ open: true, severity: "success", message: res.data.message })
         nav("/user/dashboard/")
+      } else {
+        setSnackOpen({ open: true, severity: "error", message: res.data.message })
       }
+      setLoading(false)
     } catch (err: any) {
       setSnackOpen({ open: true, severity: "info", message: err?.messsage })
       setLoading(false)

@@ -107,7 +107,7 @@ const Udashboard = () => {
         res = await userAddOrDeleteCart(userData._id, id)
       }
       if (res.data.status === "Success") {
-        getProductList(userData._id)
+        setProductList(res.data.productList)
       } else {
         alert(res.data.message)
       }

@@ -64,3 +64,11 @@ export const userPostShippingAddress = async (userId: string, data:any) => {
     return await axiosInstance.post(`/user/shipping/${userId}`,data)
 }
 
+export const userPaymentOrders = async (data:any) => {
+    return await axiosInstance.post(`/user/payment/orders`,data)
+}
+
+export const userPaymentVerify = async (userId: string, data:any) => {
+    return await axiosInstance.post(`/user/payment/verify/${userId}`,data)
+}
+
