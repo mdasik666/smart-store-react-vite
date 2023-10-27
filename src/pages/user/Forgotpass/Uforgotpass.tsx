@@ -1,39 +1,77 @@
-import {Helmet} from "react-helmet";
+import SnackbarAlert from "@/custom/components/SnackbarAlert";
+import { userForgotPassword } from "@/services/Userservice";
+import { AlertColor } from "@mui/material";
+import { useState } from "react";
+import { Helmet } from "react-helmet";
+import { useForm } from 'react-hook-form'
+import { useNavigate } from "react-router-dom";
 
+interface IPropsError {
+  open: boolean,
+  severity: AlertColor | undefined,
+  message: string
+}
 
 const Uforgotpassword = () => {
-    return (
-      <>
+  const nav = useNavigate()
+  const { handleSubmit, register, formState: { errors, isValid } } = useForm({
+    mode: "onChange",
+  })
+
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
+  const forgotPassword = async (data: any) => {
+    try {
+      setLoading(true)
+      const forgot = await userForgotPassword(data.email)
+      if (forgot.data.status === "Success") {
+        setSnackOpen({ open: true, severity: "success", message: forgot.data.message })
+        nav("/user/reset")
+      } else {
+        setSnackOpen({ open: true, severity: "error", message: forgot.data.message })
+        console.log(forgot.data.message)
+      }
+      setLoading(false)
+    } catch (error: any) {
+      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
       <Helmet>
         <link rel="icon" type="image/svg+xml" href="/vite.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Forgot Password</title>
         <link rel="stylesheet" type="text/css" href="../src/pages/User/Forgotpass/Forgotpass.css" />
       </Helmet>
-        <section id="login">
-            <div className="logWrapper">                
-                <div className="login-wrap pt-5 pb-3">
-                    <div className="img d-flex align-items-center justify-content-center"
-                        style={{backgroundImage: 'url("images/logo.png")'}}></div>
-                    <h1 className="text-left mb-0">Forgot Password</h1>
-                    <form action="home.html" className="login-form">
-                        <div className="Wrap_white">
-                            <div className="form-group">
-                                <div className="mb-3">
-                                    <label htmlFor="forgotMail" className="form-label text-bold">Email</label>
-                                    <input type="email" className="form-control" id="forgotMail" placeholder="Enter your Email"/>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+      <section id="login">
+        <div className="logWrapper">
+          <div className="login-wrap pt-5 pb-3">
+            <div className="img d-flex align-items-center justify-content-center"
+              style={{ backgroundImage: 'url("images/logo.png")' }}></div>
+            <h1 className="text-left mb-0">Forgot Password</h1>
+            <form onSubmit={handleSubmit(forgotPassword)} className="login-form">
+              <div className="Wrap_white">
+                <div className="form-group">
+                  <div className="mb-3">
+                    <label htmlFor="forgotMail" className="form-label text-bold">Email</label>
+                    <input type="email" {...register('email', { required: 'Email is mandatory' })} className="form-control" id="forgotMail" placeholder="Enter your Email" />
+                    {Boolean(errors?.email) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.email && errors.email?.message?.toString() || ""}</small>}
+                  </div>
+                  <div className="d-flex justify-content-center align-items-center mt-4 pt-2" id="btnsWrap">
+                    <button type="submit" disabled={!isValid || isLoading} className="btn btn-primary btn-lg">Submit</button>
+                  </div>
                 </div>
-                <div className="d-flex justify-content-center align-items-center mt-4 pt-2" id="btnsWrap">
-                    <a href="r.html" className="btn btn-primary btn-lg">Submit</a>
-                </div>
-            </div>
-        </section>
-      </>
-    )
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+      <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
+    </>
+  )
 }
 
 export default Uforgotpassword;

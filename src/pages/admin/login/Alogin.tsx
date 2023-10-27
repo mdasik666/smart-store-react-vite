@@ -56,7 +56,7 @@ const Alogin = () => {
         nav("/admin/dashboard/sspanel")
       }
     } catch (err: any) {
-      setSnackOpen({ open: true, severity: "info", message: err?.messsage })
+      setSnackOpen({ open: true, severity: "warning", message: err?.messsage })
       setLoading(false)
     }
   }

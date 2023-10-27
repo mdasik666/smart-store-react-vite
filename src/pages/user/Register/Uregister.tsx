@@ -1,9 +1,10 @@
-import { Alert, AlertColor, Snackbar, CircularProgress } from "@mui/material";
-import React, { useState } from 'react';
+import { AlertColor } from "@mui/material";
+import { useState } from 'react';
 import { userOTPVerify, userRegister } from "@/services/Userservice";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
+import SnackbarAlert from "@/custom/components/SnackbarAlert";
 
 interface IPropsError {
   open: boolean,
@@ -19,14 +20,7 @@ const Uregister = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
-  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackOpen({ open: false, severity: undefined, message: "" });
-  };
-
-  const registerValidate = async (data: any) => {    
+  const registerValidate = async (data: any) => {
     try {
       setLoading(true)
       var res = await userRegister(data)
@@ -39,26 +33,26 @@ const Uregister = () => {
       }
       setLoading(false)
     } catch (err: any) {
-      setSnackOpen({ open: true, severity: "info", message: err?.messsage })
+      setSnackOpen({ open: true, severity: "warning", message: err?.messsage })
       setLoading(false)
     }
   }
 
   const [otpVerified, setOtpVerified] = useState<boolean>(false)
-  const sendOTP = async() => {
+  const sendOTP = async () => {
     try {
       setLoading(true)
       const res = await userOTPVerify(getValues("email"))
-      if(res.data.status === "Success"){
+      if (res.data.status === "Success") {
         setOtpVerified(true)
-        setSnackOpen({ open: true, severity: "success", message: res.data.message })        
-      }else{
+        setSnackOpen({ open: true, severity: "success", message: res.data.message })
+      } else {
         setOtpVerified(false)
         setSnackOpen({ open: true, severity: "error", message: res.data.message })
       }
       setLoading(false)
-    } catch (err:any) {
-      setSnackOpen({ open: true, severity: "info", message: err?.message })
+    } catch (err: any) {
+      setSnackOpen({ open: true, severity: "warning", message: err?.message })
       setOtpVerified(false)
       setLoading(false)
     }
@@ -66,7 +60,7 @@ const Uregister = () => {
 
   return (
     <>
-    <Helmet>
+      <Helmet>
         <link rel="icon" type="image/svg+xml" href="/vite.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Register</title>
@@ -96,17 +90,17 @@ const Uregister = () => {
                     <label htmlFor="rEmail" className="form-label text-bold">Email</label>
                     <input type="email" {...register("email", { required: "Email is mandatory" })} className="form-control" id="rEmail" placeholder="youremail@mail.com" />
                     {Boolean(errors?.email) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.email && errors.email?.message?.toString() || ""}</small>}
-                  </div>                                      
+                  </div>
                   <div className="ps-2 mb-3">
                     <button type="button" className="btn btn-secondary btn-lg" onClick={sendOTP}>OTP</button>
-                  </div>                  
+                  </div>
                 </div>
                 {
                   otpVerified &&
                   <div className="form-group">
                     <div className="mb-3">
                       <label htmlFor="otpEmail" className="form-label text-bold">OTP</label>
-                      <input type="text" {...register("otp", { required: "OTP is mandatory"})} className="form-control" id="otpEmail" placeholder="xxxxxx" />
+                      <input type="text" {...register("otp", { required: "OTP is mandatory" })} className="form-control" id="otpEmail" placeholder="xxxxxx" />
                       {Boolean(errors?.otp) && <small className="form-text text-danger" style={{ color: "red !important" }}>{errors?.otp && errors.otp?.message?.toString() || ""}</small>}
                     </div>
                   </div>
@@ -134,11 +128,7 @@ const Uregister = () => {
           </div>
         </div>
       </section>
-      {snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-        <Alert onClose={handleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
-          {snackopen.message}
-        </Alert>
-      </Snackbar>}
+      <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
     </>
   )
 }

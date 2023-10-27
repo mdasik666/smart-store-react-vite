@@ -1,10 +1,11 @@
-import { Alert, AlertColor, Snackbar } from "@mui/material";
-import React, { useState, useEffect } from 'react';
+import { AlertColor } from "@mui/material";
+import { useState, useEffect } from 'react';
 import { userLogin, userLoginVerify } from "@/services/Userservice";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet";
 import Cookies from "js-cookie";
+import SnackbarAlert from "@/custom/components/SnackbarAlert";
 
 interface IPropsError {
   open: boolean,
@@ -21,9 +22,9 @@ const Ulogin = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
-  useEffect(() => {    
+  useEffect(() => {
     (async function () {
-      if(Cookies.get("usertoken")){
+      if (Cookies.get("usertoken")) {
         const verify = await userLoginVerify();
         if (verify.data.status === "Success") {
           nav("/user/dashboard/")
@@ -32,12 +33,7 @@ const Ulogin = () => {
     })();
   }, [])
 
-  const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackOpen({ open: false, severity: undefined, message: "" });
-  };
+  
 
   const loginValidate = async (data: any) => {
     try {
@@ -51,7 +47,7 @@ const Ulogin = () => {
       }
       setLoading(false)
     } catch (err: any) {
-      setSnackOpen({ open: true, severity: "info", message: err?.messsage })
+      setSnackOpen({ open: true, severity: "warning", message: err?.messsage })
       setLoading(false)
     }
   }
@@ -106,12 +102,8 @@ const Ulogin = () => {
             </form>
           </div>
         </div>
-        {snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-          <Alert onClose={handleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
-            {snackopen.message}
-          </Alert>
-        </Snackbar>}
       </section>
+      <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
     </>
   )
 }

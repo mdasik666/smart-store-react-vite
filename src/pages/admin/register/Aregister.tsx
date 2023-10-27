@@ -54,7 +54,7 @@ const Aregister = () => {
         reset();
       }
     } catch (err: any) {
-      setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+      setSnackOpen({ open: false, severity: "warning", message: err?.messsage })
       setLoading(false)
     }
   }

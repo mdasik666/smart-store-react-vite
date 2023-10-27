@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { userGetCart, userGetCheckOut, userLoginVerify, userPostCheckOut } from "@/services/Userservice";
 import { useEffect, useState } from 'react'
 import Cookies from "js-cookie";
+import SnackbarAlert from "@/custom/components/SnackbarAlert";
+import { AlertColor } from "@mui/material";
 
 interface IPropsQTP {
     price: number,
@@ -31,24 +33,31 @@ interface IPropsUserData {
     email: string
 }
 
+interface IPropsError {
+    open: boolean,
+    severity: AlertColor | undefined,
+    message: string
+}
+
 const Ucart = () => {
     const nav = useNavigate()
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
     const [orderCartData, setOrderCartData] = useState<IPropsProductOrderList[]>([])
     const [orderCartDataSelected, setOrderCartDataSelected] = useState<IPropsProductOrderList[]>([])
     const [isLoading, setLoading] = useState<boolean>(false)
-    const [shippingFee, setShippingFee] = useState<number>(500)
+    const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
+    const [shippingFee] = useState<number>(500)
 
     useEffect(() => {
         (async function () {
             if (Cookies.get("usertoken")) {
+                try {
                 const verify = await userLoginVerify();
                 if (verify.data.status === "Failed") {
                     nav("/user/login")
                 } else {
                     const { _id, fullName, email } = verify.data.userData
                     setUserData({ _id, fullName, email })
-                    try {
                         setLoading(true)
                         const getCart = await userGetCart(_id);
                         if (getCart.data.status === "Success") {
@@ -75,19 +84,19 @@ const Ucart = () => {
                                     setOrderCartData(cart)
                                 }
                             } else {
-                                if(getLastCheckout.data.message.indexOf("not found")>-1){
+                                if (getLastCheckout.data.message.indexOf("not found") > -1) {
                                     setOrderCartData(cart)
-                                }else{
-                                    alert(getCart.data.message)
+                                } else {
+                                    setSnackOpen({ open: true, severity: "error", message: getCart.data.message })
                                 }
                             }
                         } else {
-                            alert(getCart.data.message)
+                            setSnackOpen({ open: true, severity: "error", message: getCart.data.message })
                         }
                         setLoading(false)
-                    } catch (error: any) {
-                        alert(error.message)
                     }
+                } catch (error: any) {
+                    setSnackOpen({ open: true, severity: "warning", message: error.message })
                 }
             } else {
                 nav("/user/login")
@@ -165,19 +174,19 @@ const Ucart = () => {
                         if (resOrder.data.status === "Success") {
                             nav('/user/dashboard/checkout')
                         } else {
-                            alert(resOrder.data)
+                            setSnackOpen({ open: true, severity: "error", message: resOrder.data.message })                            
                         }
                         setLoading(false)
                     } catch (error: any) {
-                        alert(error.message)
                         setLoading(false)
+                        setSnackOpen({ open: true, severity: "warning", message: error.message })                                                    
                     }
                 } else {
-                    alert("Select any one product")
+                    setSnackOpen({ open: true, severity: "warning", message: "Select any one product" })                                                                        
                 }
             }
         } else {
-            alert("No selected data")
+            setSnackOpen({ open: true, severity: "warning", message: "Select minimum one cart data" })                                                                                    
         }
     }
 
@@ -215,7 +224,7 @@ const Ucart = () => {
                                 <button className="btn btn-primary">
                                     <i className="fa-regular fa-compass"></i> Explore
                                 </button>
-                                <button id="userProf" className="transBtn" onClick={()=>nav('/user/dashboard/profile')}>
+                                <button id="userProf" className="transBtn" onClick={() => nav('/user/dashboard/profile')}>
                                     <i className="fa-regular fa-user"></i>
                                     <span>Profile</span>
                                 </button>
@@ -365,6 +374,7 @@ const Ucart = () => {
                     </div>
                 </section>
             </section>
+            <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
         </>
     )
 }

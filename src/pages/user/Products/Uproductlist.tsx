@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
-import { IconButton } from '@mui/material';
+import { AlertColor, IconButton } from '@mui/material';
 import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
+import SnackbarAlert from '@/custom/components/SnackbarAlert';
 
 interface IPropsProductList {
     _id: string,
@@ -27,13 +28,19 @@ interface IPropsUserData {
     email: string
 }
 
+interface IPropsError {
+    open: boolean,
+    severity: AlertColor | undefined,
+    message: string
+}
+
 const Uproductlist = () => {
     const nav = useNavigate()
 
     const [productList, setProductList] = useState<IPropsProductList[]>([])
     const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
     const [isLoading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string>("")
+    const [_isError, setError] = useState<string>("")
     const [categoryFilter, setCategoryFilter] = useState<string>("")
     const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
     const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
@@ -43,16 +50,17 @@ const Uproductlist = () => {
     const [changeMinMax, setChangeMinMax] = useState<string>("")
     const [cartDate, setCartDate] = useState<IPropsProductList[]>([])
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
+    const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
     const getCategoryFilter = (e: string) => {
         setCategoryFilter(e)
         setCategoryFilterByMultipleItem(() => [])
     }
 
-    const getFilterbyMultipleItem = (e: string) => {        
+    const getFilterbyMultipleItem = (e: string) => {
         if (e.length === 0) {
             setCategoryFilterByMultipleItem(() => [])
-        }else{
+        } else {
             setFilterbyMultipleItem(e)
         }
     }
@@ -97,14 +105,18 @@ const Uproductlist = () => {
     useEffect(() => {
         (async function () {
             if (Cookies.get("usertoken")) {
-                const verify = await userLoginVerify();
-                if (verify.data.status === "Failed") {
-                    nav("/user/login")
-                } else {
-                    const { _id, fullName, email } = verify.data.userData
-                    setUserData({ _id, fullName, email })
-                    getProductList(_id)
-                    getCategoryList(_id)                                        
+                try {
+                    const verify = await userLoginVerify();
+                    if (verify.data.status === "Failed") {
+                        nav("/user/login")
+                    } else {
+                        const { _id, fullName, email } = verify.data.userData
+                        setUserData({ _id, fullName, email })
+                        getProductList(_id)
+                        getCategoryList(_id)
+                    }
+                } catch (error: any) {
+                    setSnackOpen({ open: true, severity: "error", message: error.message })
                 }
             } else {
                 nav("/user/login")
@@ -124,13 +136,13 @@ const Uproductlist = () => {
                 setError(res.data.message)
             }
             setLoading(false)
-        } catch (err: any) {
-            setError(err.message)
+        } catch (error: any) {
             setLoading(false)
+            setSnackOpen({ open: true, severity: "error", message: error.message })
         }
     }
 
-    const getCategoryList = async (id:string) => {
+    const getCategoryList = async (id: string) => {
         try {
             const prodCat = await userGetCategoryList();
             if (prodCat.data.status === "Success") {
@@ -141,25 +153,29 @@ const Uproductlist = () => {
                 var cart = getCart.data.cartData
                 setCartDate(cart)
             }
-        } catch (error) {
+        } catch (error: any) {
+            setSnackOpen({ open: true, severity: "error", message: error.message })
         }
     }
 
     const addCartAndWishList = async (id: string, type: string) => {
         try {
             var res;
+            setLoading(true)
             if (type === "wishlist") {
                 res = await userAddOrDeleteWishList(userData._id, id)
             } else {
                 res = await userAddOrDeleteCart(userData._id, id)
             }
             if (res.data.status === "Success") {
-              setProductList(res.data.productList)
+                setProductList(res.data.productList)
             } else {
-              alert(res.data.message)
+                setSnackOpen({ open: true, severity: "error", message: res.data.message })
             }
+            setLoading(false)
         } catch (error: any) {
-            alert(error.message)
+            setLoading(false)
+            setSnackOpen({ open: true, severity: "error", message: error.message })
         }
     }
 
@@ -390,8 +406,7 @@ const Uproductlist = () => {
                                                             )
                                                         })
                                                 }
-                                            </>
-                                            : isLoading ? <div>Loading...</div> : <div>Product not found</div>
+                                            </> : isLoading ? <div>Loading...</div> : <div>Product Not Found</div> 
                                     }
                                 </div>
 
@@ -439,6 +454,7 @@ const Uproductlist = () => {
                     </div>
                 </section>
             </section>
+            <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
         </>
     )
 }

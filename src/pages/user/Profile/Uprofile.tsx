@@ -1,11 +1,12 @@
 import { userGetCart, userLoginVerify } from "@/services/Userservice";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { userProfileupdate } from "@/services/Userservice";
 import { useForm } from "react-hook-form";
-import { Alert, AlertColor, Snackbar } from "@mui/material";
+import { AlertColor } from "@mui/material";
+import SnackbarAlert from "@/custom/components/SnackbarAlert";
 
 interface IPropsUserData {
     _id: string,
@@ -25,7 +26,7 @@ const Uprofile = () => {
     const nav = useNavigate()
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "", phoneNumber: "", image: "" })
     const [profileImage, setProfileImage] = useState<string>("")
-    const { register, handleSubmit, formState: { errors, isValid }, unregister, setValue, getValues } = useForm({
+    const { register, handleSubmit, formState: { errors, isValid }, unregister, setValue } = useForm({
         mode: "onChange"
     })
 
@@ -36,18 +37,22 @@ const Uprofile = () => {
     useEffect(() => {
         (async function () {
             if (Cookies.get("usertoken")) {
-                const verify = await userLoginVerify();
-                if (verify.data.status === "Failed") {
-                    nav("/user/login")
-                } else {
-                    const { _id, fullName, email, phoneNumber, image } = verify.data.userData
-                    setProfileImage(image)
-                    setUserData({ _id, fullName, email, phoneNumber, image })
-                    unregister("image")
-                    setValue("fullName", fullName)
-                    setValue("email", email)
-                    setValue("phoneNumber", phoneNumber)
-                    getCartDate(_id)
+                try {
+                    const verify = await userLoginVerify();
+                    if (verify.data.status === "Failed") {
+                        nav("/user/login")
+                    } else {
+                        const { _id, fullName, email, phoneNumber, image } = verify.data.userData
+                        setProfileImage(image)
+                        setUserData({ _id, fullName, email, phoneNumber, image })
+                        unregister("image")
+                        setValue("fullName", fullName)
+                        setValue("email", email)
+                        setValue("phoneNumber", phoneNumber)
+                        getCartDate(_id)
+                    }
+                } catch (error: any) {
+                    setSnackOpen({ open: true, severity: "warning", message: error.messsage })
                 }
             } else {
                 nav("/user/login")
@@ -62,17 +67,10 @@ const Uprofile = () => {
                 var cart = getCart.data.cartData
                 setCartDate(cart)
             }
-        } catch (error) {
-
+        } catch (error: any) {
+            setSnackOpen({ open: true, severity: "warning", message: error.messsage })
         }
     }
-
-    const snackHandleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setSnackOpen({ open: false, severity: undefined, message: "" });
-    };
 
     const updateProfileData = async (data: any) => {
         try {
@@ -92,7 +90,7 @@ const Uprofile = () => {
             }
             setLoading(false)
         } catch (err: any) {
-            setSnackOpen({ open: true, severity: "info", message: err?.messsage })
+            setSnackOpen({ open: true, severity: "warning", message: err?.messsage })
             setLoading(false)
         }
     }
@@ -121,7 +119,7 @@ const Uprofile = () => {
                                 <button className="btn btn-primary">
                                     <i className="fa-regular fa-compass"></i> Explore
                                 </button>
-                                <button id="userProf" className="transBtn" onClick={()=>nav('/user/dashboard/profile')}>
+                                <button id="userProf" className="transBtn" onClick={() => nav('/user/dashboard/profile')}>
                                     <i className="fa-regular fa-user"></i>
                                     <span>Profile</span>
                                 </button>
@@ -190,11 +188,11 @@ const Uprofile = () => {
                                                         </div>
                                                         <input hidden type="file" id="customFile" accept=".jpg,.jpeg,.png" {...register("image", {
                                                             validate: {
-                                                                isImage: async(file) => {
+                                                                isImage: async (file) => {
                                                                     if (file.length === 0) return true;
                                                                     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                                                                    if (allowedTypes.includes(file[0].type)) {                                                                        
-                                                                        var con:any = await convertToBase64(file[0])                                                                        
+                                                                    if (allowedTypes.includes(file[0].type)) {
+                                                                        var con: any = await convertToBase64(file[0])
                                                                         setProfileImage(con)
                                                                         return true;
                                                                     } else {
@@ -231,13 +229,7 @@ const Uprofile = () => {
                     </div>
                 </section>
             </section>
-            {
-                snackopen.open && <Snackbar open={snackopen.open} autoHideDuration={6000} onClose={snackHandleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                    <Alert onClose={snackHandleClose} severity={snackopen.severity} sx={{ width: '100%' }}>
-                        {snackopen.message}
-                    </Alert>
-                </Snackbar>
-            }
+            <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
         </>
     )
 }

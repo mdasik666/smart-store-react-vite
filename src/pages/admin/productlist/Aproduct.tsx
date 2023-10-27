@@ -102,7 +102,7 @@ const Aproduct = () => {
           }
           setLoading(false)
         } catch (err: any) {
-          setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+          setSnackOpen({ open: false, severity: "warning", message: err?.messsage })
           setLoading(false)
         }
       }else{
@@ -148,7 +148,7 @@ const Aproduct = () => {
       }
       setButtonLoading(false)
     } catch (err: any) {
-      setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+      setSnackOpen({ open: false, severity: "warning", message: err?.messsage })
       setButtonLoading(false)
     }
   }
@@ -215,13 +215,13 @@ const Aproduct = () => {
             setProductList(getProduct.data.producList)
           }
         } catch (error: any) {
-          setSnackOpen({ open: false, severity: "info", message: error?.messsage })
+          setSnackOpen({ open: false, severity: "warning", message: error?.messsage })
         }
       }
       setDeleteLoading(false)
       handleCloseDialog()
     } catch (err: any) {
-      setSnackOpen({ open: false, severity: "info", message: err?.messsage })
+      setSnackOpen({ open: false, severity: "warning", message: err?.messsage })
       setDeleteLoading(false)
       handleCloseDialog()
     }

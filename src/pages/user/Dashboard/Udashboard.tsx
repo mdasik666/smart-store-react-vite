@@ -4,8 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
-import { IconButton } from '@mui/material';
+import { AlertColor, IconButton } from '@mui/material';
 import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
+import SnackbarAlert from '@/custom/components/SnackbarAlert';
 
 interface IPropsProductList {
   _id: string,
@@ -28,17 +29,24 @@ interface IPropsUserData {
   image: string
 }
 
+interface IPropsError {
+  open: boolean,
+  severity: AlertColor | undefined,
+  message: string
+}
+
 const Udashboard = () => {
   const nav = useNavigate()
 
   const [productList, setProductList] = useState<IPropsProductList[]>([])
   const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
-  const [isLoading, setLoading] = useState<boolean>(false)
   const [_error, setError] = useState<string>("")
   const [categoryFilter, setCategoryFilter] = useState<string>("")
   const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
   const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
   const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "", image: "" })
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
   const filterByNameChange = (e: string) => {
     if (e.length <= 0) {
@@ -51,10 +59,11 @@ const Udashboard = () => {
   const filterByName = () => {
     setCategoryFilterByName(categoryFilterByNameTrack)
   }
-  
+
   useEffect(() => {
     (async function () {
-        if (Cookies.get("usertoken")) {
+      if (Cookies.get("usertoken")) {
+        try {
           const verify = await userLoginVerify();
           if (verify.data.status === "Failed") {
             nav("/user/login")
@@ -64,10 +73,13 @@ const Udashboard = () => {
             getCategoryList()
             getProductList(_id)
           }
-        } else {
-          nav("/user/login")
+        } catch (error: any) {
+          setSnackOpen({ open: true, severity: "warning", message: error.message })
         }
-      })();
+      } else {
+        nav("/user/login")
+      }
+    })();
   }, [])
 
   const getProductList = async (id: string) => {
@@ -82,9 +94,10 @@ const Udashboard = () => {
         setError(res.data.message)
       }
       setLoading(false)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (error: any) {
+      setError(error.message)
       setLoading(false)
+      setSnackOpen({ open: true, severity: "warning", message: error.message })
     }
   }
 
@@ -94,13 +107,15 @@ const Udashboard = () => {
       if (prodCat.data.status === "Success") {
         setProductCategory(prodCat.data.category)
       }
-    } catch (error) {
+    } catch (error: any) {
+      setSnackOpen({ open: true, severity: "warning", message: error.message })
     }
   }
 
   const addCartAndWishList = async (id: string, type: string) => {
     try {
       var res;
+      setLoading(true)
       if (type === "wishlist") {
         res = await userAddOrDeleteWishList(userData._id, id)
       } else {
@@ -109,10 +124,13 @@ const Udashboard = () => {
       if (res.data.status === "Success") {
         setProductList(res.data.productList)
       } else {
-        alert(res.data.message)
+        setSnackOpen({ open: true, severity: "error", message: res.data.message })
+
       }
+      setLoading(false)
     } catch (error: any) {
-      alert(error.message)
+      setLoading(false)
+      setSnackOpen({ open: true, severity: "warning", message: error.message })
     }
   }
 
@@ -132,7 +150,7 @@ const Udashboard = () => {
       <section id="wrapper">
         <header className="mb-3 ">
           <div className="container">
-            <div className="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-between">              
+            <div className="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-between">
               <h1>
                 <a href="/" className="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
                   <span className="logo_ic"></span>
@@ -157,7 +175,7 @@ const Udashboard = () => {
                   <li>
                     <hr className="dropdown-divider" />
                   </li>
-                  <li><a className="dropdown-item" onClick={userSignOut}>Sign out</a></li>
+                  <li><a style={{ cursor: "pointer" }} className="dropdown-item text-center" onClick={userSignOut}>Sign out</a></li>
                 </ul>
               </div>
             </div>
@@ -339,8 +357,7 @@ const Udashboard = () => {
                           </ul>
                         </div>
                       </>
-                      :
-                      isLoading ? <div>Loading...</div> : <div>Product not found</div>
+                      : isLoading ? <div>Loading...</div> : <div>Product Not Found</div>
                   }
                 </div>
                 <div className="tab-pane fade" id="avail" role="tabpanel" aria-labelledby="avail-tab">
@@ -428,8 +445,7 @@ const Udashboard = () => {
                           </ul>
                         </div>
                       </>
-                      :
-                      isLoading ? <div>Loading...</div> : <div>Product not found</div>
+                      : isLoading ? <div>Loading...</div> : <div>Product Not Found</div>
                   }
                 </div>
               </div>
@@ -463,6 +479,8 @@ const Udashboard = () => {
           </div>
         </section>
       </section>
+      <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
+
     </>
   )
 }

@@ -5,7 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useForm } from 'react-hook-form'
 import { EditNoteSharp } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { AlertColor, IconButton } from "@mui/material";
+import SnackbarAlert from "@/custom/components/SnackbarAlert";
 
 interface IPropsUserData {
   _id: string,
@@ -32,9 +33,15 @@ interface IPropsProductOrderList {
   isSelect?: boolean
 }
 
+interface IPropsError {
+  open: boolean,
+  severity: AlertColor | undefined,
+  message: string
+}
+
 const Ucheckout = () => {
   const nav = useNavigate()
-  const { register, handleSubmit, formState: { errors, isValid }, setError, reset, getValues, setValue } = useForm({
+  const { register, handleSubmit, formState: { errors, isValid }, reset, getValues, setValue } = useForm({
     mode: "onChange"
   })
   const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
@@ -47,6 +54,8 @@ const Ucheckout = () => {
   const [checkoutListWithTotal, setCheckoutListWithTotal] = useState<any>({})
   const [selectedAddress, setSelectedAddress] = useState<Array<any>>([])
   const [paymentOption, setPaymentOption] = useState<string>("razorpay")
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
   useEffect(() => {
     (async function () {
@@ -63,19 +72,16 @@ const Ucheckout = () => {
             if (country.length) {
               setCountryData(country)
             }
+            setLoading(true)
             const getCart = await userGetCart(_id);
             if (getCart.data.status === "Success") {
               var cart = getCart.data.cartData
               setOrderCartData(cart)
-            } else {
-              console.log(getCart.data.message)
             }
             const shippingData = await userGetShippingAddress(_id)
             if (shippingData.data.status === "Success") {
               var addressList = shippingData.data.shippingAddress
               setShippingAddressList(addressList)
-            } else {
-              console.log(shippingData.data.message)
             }
             const getCheckout = await userGetCheckOut(_id)
             if (getCheckout.data.status === "Success") {
@@ -89,9 +95,11 @@ const Ucheckout = () => {
             } else {
               nav('/user/dashboard/cart')
             }
+            setLoading(false)
           }
         } catch (error: any) {
-          alert(error.message)
+          setLoading(false)
+          setSnackOpen({ open: true, severity: "warning", message: error.message })
         }
       }
     })();
@@ -118,16 +126,19 @@ const Ucheckout = () => {
           shippingAddress: [...shippingAddressList, data]
         }
       }
+      setLoading(true)
       var addShippingAddress = await userPostShippingAddress(userData._id, finalAddress)
       if (addShippingAddress.data.status === "Success") {
         setShippingAddressList(addShippingAddress.data.shippingAddress)
         setUpdateState(false)
         reset()
       } else {
-        console.log(addShippingAddress.data.message)
+        setSnackOpen({ open: true, severity: "error", message: addShippingAddress.data.message })
       }
+      setLoading(false)
     } catch (error: any) {
-      console.log(error.message)
+      setLoading(false)
+      setSnackOpen({ open: true, severity: "warning", message: error.message })
     }
   }
 
@@ -157,6 +168,7 @@ const Ucheckout = () => {
     if (selectedAddress.length) {
       if (paymentOption === 'razorpay') {
         try {
+          setLoading(true)
           const resOrder = await userPaymentOrders(checkoutListWithTotal)
           if (resOrder.data.status === "Success") {
             var options = {
@@ -191,25 +203,20 @@ const Ucheckout = () => {
               }
             };
             var rzp1 = new (window as any).Razorpay(options);
-            //   rzp1.on('payment.failed', function (response:any){
-            //     alert(response.error.code);
-            //     alert(response.error.description);
-            //     alert(response.error.source);
-            //     alert(response.error.step);
-            //     alert(response.error.reason);
-            //     alert(response.error.metadata.order_id);
-            //     alert(response.error.metadata.payment_id);
-            // });
+            rzp1.on('payment.failed', function (response: any) {
+              setSnackOpen({ open: true, severity: "error", message: response.error.reason })
+            });
             rzp1.open();
+            setLoading(false)
           }
-        } catch (error) {
-
+        } catch (error: any) {
+          setLoading(false)
+          setSnackOpen({ open: true, severity: "warning", message: error.message })
         }
       } else {
-
       }
     } else {
-      console.log("select your address")
+      setSnackOpen({ open: true, severity: "warning", message: "Select delivery address" })
     }
   }
 
@@ -353,10 +360,10 @@ const Ucheckout = () => {
                                       </div>
                                     </div>
                                     <div className="col-sm-12 col-md-6 mb-4">
-                                      <button style={{ width: "100%" }} type="submit" className="btn btn-primary">{!updateState ? "Add Address" : "Update Address"}{updateState}</button>
+                                      <button style={{ width: "100%" }} disabled={!isValid || isLoading} type="submit" className="btn btn-primary">{!updateState ? "Add Address" : "Update Address"}{updateState}</button>
                                     </div>
                                     <div className="col-sm-12 col-md-6 mb-4">
-                                      <button style={{ width: "100%" }} className="btn btn-primary" type="reset" onClick={() => setUpdateState(false)}>Reset</button>
+                                      <button style={{ width: "100%" }} disabled={!isValid || isLoading} className="btn btn-primary" type="reset" onClick={() => setUpdateState(false)}>Reset</button>
                                     </div>
                                   </div>
                                 </div>
@@ -389,14 +396,14 @@ const Ucheckout = () => {
                                                 <span className="fs-14 mb-2 d-block">{sa.fullName}</span>
                                                 <span className="text-muted fw-normal text-wrap mb-1 d-block">{sa.houseNoOrBuildingName} {sa.areaOrColony} {sa.zipOrPostalCode}</span>
                                                 <span className="text-muted fw-normal d-block">Mo. {sa.phoneNumber}</span>
-                                                <div className="text-end" onClick={() => updateShippingAddress(sa._id)}><IconButton><EditNoteSharp color="info" /></IconButton></div>
+                                                <div className="text-end" onClick={() => updateShippingAddress(sa._id)}><IconButton><EditNoteSharp color="warning" /></IconButton></div>
                                               </div>
                                             </label>
                                           </div>
                                         </div>
                                       )
                                     })
-                                    : shippingAddressList.length === 0 ? <div>Address Not Found</div> : <div>Loading...</div>
+                                    : isLoading ? <div>Loading...</div> : <div>Address Not Found</div> 
                                 }
                               </div>
                             </div>
@@ -576,6 +583,7 @@ const Ucheckout = () => {
           </div>
         </section>
       </section>
+      <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
     </>
 
   )

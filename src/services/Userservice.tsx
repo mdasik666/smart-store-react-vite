@@ -72,3 +72,15 @@ export const userPaymentVerify = async (userId: string, data:any) => {
     return await axiosInstance.post(`/user/payment/verify/${userId}`,data)
 }
 
+export const userForgotPassword = async (userEmail: string) => {
+    return await axiosInstance.get(`/user/forgotpassword/${userEmail}`)
+}
+
+export const userVerifyForgotPassword = async () => {
+    return await axiosInstance.get(`/user/verifyforgotpassword/`)
+}
+
+export const userUpdatePassword = async (data:any) => {
+    return await axiosInstance.post(`/user/updatepassword/`, data)
+}
+
