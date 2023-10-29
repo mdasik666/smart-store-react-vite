@@ -51,6 +51,30 @@ const Uproductlist = () => {
     const [cartDate, setCartDate] = useState<IPropsProductList[]>([])
     const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
     const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
+    
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const itemsPerPage = 10
+    const totalPages = Math.ceil(productList.length / itemsPerPage);
+    
+    const nextPage = () => {
+        if(currentPage < totalPages){
+            setCurrentPage(p=> p+1)
+        }
+    }
+
+    const prevPage = () => {        
+        if(currentPage !== 1){
+            setCurrentPage(p=>p-1)
+        }
+    }
+
+    const firstNextPage = () => {                
+        setCurrentPage(1)
+    }
+
+    const lastNextPage = () => {                
+        setCurrentPage(totalPages)
+    }
 
     const getCategoryFilter = (e: string) => {
         setCategoryFilter(e)
@@ -66,7 +90,9 @@ const Uproductlist = () => {
     }
 
     const filterByNameChange = (e: string) => {
+        console.log(e.length)
         if (e.length <= 0) {
+            setCategoryFilterByNameTrack("")
             setCategoryFilterByName("")
         } else {
             setCategoryFilterByNameTrack(e)
@@ -116,7 +142,7 @@ const Uproductlist = () => {
                         getCategoryList(_id)
                     }
                 } catch (error: any) {
-                    setSnackOpen({ open: true, severity: "error", message: error.message })
+                    setSnackOpen({ open: true, severity: "warning", message: error.message })
                 }
             } else {
                 nav("/user/login")
@@ -138,7 +164,7 @@ const Uproductlist = () => {
             setLoading(false)
         } catch (error: any) {
             setLoading(false)
-            setSnackOpen({ open: true, severity: "error", message: error.message })
+            setSnackOpen({ open: true, severity: "warning", message: error.message })
         }
     }
 
@@ -154,7 +180,7 @@ const Uproductlist = () => {
                 setCartDate(cart)
             }
         } catch (error: any) {
-            setSnackOpen({ open: true, severity: "error", message: error.message })
+            setSnackOpen({ open: true, severity: "warning", message: error.message })
         }
     }
 
@@ -175,7 +201,7 @@ const Uproductlist = () => {
             setLoading(false)
         } catch (error: any) {
             setLoading(false)
-            setSnackOpen({ open: true, severity: "error", message: error.message })
+            setSnackOpen({ open: true, severity: "warning", message: error.message })
         }
     }
 
@@ -295,8 +321,8 @@ const Uproductlist = () => {
                                         </div>
                                         <div className="panel-body">
                                             <div className="form-group has-search catSearch">
-                                                <input type="text" className="form-control" placeholder="Search" />
-                                                <span className="fa fa-search"></span>
+                                                <input type="text" className="form-control" value={categoryFilterByNameTrack} placeholder="Search" onChange={(e: ChangeEvent<HTMLInputElement>) => filterByNameChange(e.target.value)} />
+                                                <span className="fa fa-search" onClick={btnFilterByName}></span>
                                             </div>
 
                                             <ul className="list-group">
@@ -375,9 +401,10 @@ const Uproductlist = () => {
                                         productList.length > 0 ?
                                             <>
                                                 {
-                                                    productList.filter(pc => (pc.category.indexOf(categoryFilter) > -1))
-                                                        .filter((pc: any) => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.indexOf(pc.category) > -1).includes(pc.category)) : (pc.category.indexOf(categoryFilter) > -1)))
-                                                        .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                                                    productList.slice((currentPage - 1) * itemsPerPage,  ((currentPage - 1) * itemsPerPage)+itemsPerPage)
+                                                    .filter(pc => (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1))
+                                                        .filter((pc: any) => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.toLowerCase().indexOf(pc.category.toLowerCase()) > -1).includes(pc.category.toLowerCase())) : (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1)))
+                                                        .filter(pc => (pc.productName.toLowerCase().indexOf(categoryFilterByName.toLowerCase()) > -1))
                                                         .filter(pc => (pc.quantityAndTypeAndPrice[0].price > parseInt(minPrice) && pc.quantityAndTypeAndPrice[0].price < parseInt(maxPrice)))
                                                         .filter(pc => (changeMinMax.length ? pc?.minOrder?.toString() === (changeMinMax) : pc?.minOrder?.toString().indexOf("") > -1))
                                                         .map((prod, i) => {
@@ -412,25 +439,25 @@ const Uproductlist = () => {
 
                                 <div className="d-flex justify-content-between align-items-center b-pagination">
                                     <p className="page_left">
-                                        <span id="noItems">1330</span> items in <span id="totalItems">130</span> Pages.
+                                        <span id="noItems">{productList.length}</span> items in <span id="totalItems">{totalPages}</span> Pages.
                                     </p>
 
                                     <div className="pagination">
-                                        <button className="first">
+                                        <button className="first" onClick={firstNextPage}>
                                             &nbsp;
                                         </button>
-                                        <button className="prev">
+                                        <button className="prev" onClick={prevPage}>
                                             &nbsp;
                                             <span>Previous</span>
                                         </button>
                                         <div className="pager">
-                                            <input type="text" id="number" defaultValue="1" />
-                                            of <span id="totalPage">13</span>
+                                            <input type="text" id="number" value={currentPage} disabled />
+                                            of <span id="totalPage">{totalPages}</span>
                                         </div>
-                                        <button className="next">
+                                        <button className="next" onClick={nextPage}>
                                             <span>Next</span>&nbsp;
                                         </button>
-                                        <button className="last">
+                                        <button className="last" onClick={lastNextPage}>
                                             &nbsp;
                                         </button>
                                     </div>

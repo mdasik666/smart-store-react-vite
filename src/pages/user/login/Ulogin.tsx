@@ -47,7 +47,7 @@ const Ulogin = () => {
       }
       setLoading(false)
     } catch (err: any) {
-      setSnackOpen({ open: true, severity: "warning", message: err?.messsage })
+      setSnackOpen({ open: true, severity: "warning", message: err.messsage })
       setLoading(false)
     }
   }

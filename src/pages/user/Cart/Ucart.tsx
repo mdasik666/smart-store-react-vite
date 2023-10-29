@@ -158,7 +158,7 @@ const Ucart = () => {
             });
             var selectedWithEmptyQuantity = filterUserQuantity.filter((ocd: IPropsProductOrderList) => ocd.quantityAndTypeAndPrice.length === 0);
             if (selectedWithEmptyQuantity.length) {
-                alert("Chceck checkout list select items quantity is 0")
+                setSnackOpen({ open: true, severity: "warning", message: "Selected items quantity is 0. Check cart list" })                
             } else {
                 var finalOrderListData = filterUserQuantity.filter((ocd: IPropsProductOrderList) => ocd.quantityAndTypeAndPrice.length > 0);
                 if (finalOrderListData.length) {
@@ -186,7 +186,7 @@ const Ucart = () => {
                 }
             }
         } else {
-            setSnackOpen({ open: true, severity: "warning", message: "Select minimum one cart data" })                                                                                    
+            setSnackOpen({ open: true, severity: "warning", message: "Select minimum one item from cart" })                                                                                    
         }
     }
 
