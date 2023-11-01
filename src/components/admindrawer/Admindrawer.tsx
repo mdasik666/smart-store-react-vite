@@ -22,6 +22,7 @@ import { Avatar, ListItemAvatar, ListItemButton } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Cookies from 'js-cookie';
+import { Home, ListAlt, PriceChange, VerifiedUser } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -62,7 +63,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export function Admindrawer(props: { adminDate: any; }) {
   const { adminDate } = props
   const nav = useNavigate()
-  const drawerpath = [{ name: 'Home', path: 'sspanel' }, { name: 'Product', path: 'product' }, { name: 'Orders', path: 'orderlist' }, { name: 'Users', path: 'userlist' }]
+  const drawerpath = [{ name: 'Home', path: 'sspanel', icon:<Home/> }, { name: 'Product', path: 'product',icon:<PriceChange/> }, { name: 'Orders', path: 'orderlist',icon:<ListAlt/> }, { name: 'Users', path: 'userlist',icon:<VerifiedUser/> }]
   const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => {
@@ -147,11 +148,7 @@ export function Admindrawer(props: { adminDate: any; }) {
               <ListItem key={index} component={StyledNavLink} to={text.path} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <InboxIcon />
-                      </Avatar>
-                    </ListItemAvatar>
+                    {text.icon}
                   </ListItemIcon>
                   <ListItemText primary={text.name} />
                 </ListItemButton>

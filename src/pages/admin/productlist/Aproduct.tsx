@@ -22,12 +22,14 @@ interface IPropsError {
 }
 
 interface IPropsProductData {
+  _id: string,
   productName: string,
   productDescription: string,
   category: string,
   title: string,
   quantityAndTypeAndPrice: Array<{ price: number, quantity: string; type: string }>,
-  minOrder: number
+  minOrder: number,
+  image: string
 }
 
 const Aproduct = () => {
@@ -48,8 +50,8 @@ const Aproduct = () => {
   const [modalopen, setModalOpen] = useState(false);
   const [changeCategory, setChangeCategory] = useState<string>("");
   const [adminId, setAdminId] = useState<string>("");
-  const [productList, setProductList] = useState<any>([]);
-  const [productKey, setProductKey] = useState<any>([]);
+  const [productList, setProductList] = useState<IPropsProductData[]>([]);
+  const [productKey, setProductKey] = useState<Array<any>>([]);
   const [updateProductId, setUpdateProductId] = useState<string>("");
   const [qtArray, setQTArray] = useState<Array<any>>([1]);
 
@@ -77,7 +79,7 @@ const Aproduct = () => {
 
   useEffect(() => {
     (async function () {
-      if(Cookies.get("admintoken")){
+      if (Cookies.get("admintoken")) {
         try {
           setLoading(true)
           const verify = await adminLoginVerify();
@@ -91,8 +93,9 @@ const Aproduct = () => {
               const prodCat = await adminGetCategoryList();
               if (prodCat.data.status === "Success") {
                 setProductCategory(prodCat.data.category)
-                const { productName, productDescription, price, category, minOrder, image } = getProduct.data.producList[0]
-                setProductKey(Object.keys({ productName, productDescription, price, category, minOrder, image }))
+                const { _id, productName, productDescription, category, title, quantityAndTypeAndPrice, minOrder, image } = getProduct.data.producList[0]
+                console.log(Object.keys({ _id, productName, productDescription, category, title, quantityAndTypeAndPrice, minOrder, image }))
+                setProductKey(Object.keys({ _id, productName, productDescription, category, title, quantityAndTypeAndPrice, minOrder, image }))
               } else {
                 setSnackOpen({ open: true, severity: "error", message: prodCat.data.message })
               }
@@ -105,7 +108,7 @@ const Aproduct = () => {
           setSnackOpen({ open: false, severity: "warning", message: err?.messsage })
           setLoading(false)
         }
-      }else{
+      } else {
         nav("/admin/login")
       }
     })();
@@ -144,7 +147,7 @@ const Aproduct = () => {
           setSnackOpen({ open: true, severity: "error", message: getProduct.data.message })
         } else {
           setProductList(getProduct.data.producList)
-        }        
+        }
       }
       setButtonLoading(false)
     } catch (err: any) {
@@ -247,24 +250,44 @@ const Aproduct = () => {
             isLoading ? <div>Loading...</div> :
               productList.length ?
                 (<Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                  <TableContainer sx={{ maxHeight: 440 }}>
+                  <TableContainer >
                     <Table stickyHeader aria-label="sticky table">
                       <TableHead>
                         <TableRow>
-                          {productKey?.map((plKey: any, i: number) => (
-                            <TableCell key={i} align={"center"}>{plKey}</TableCell>
+                          {productKey?.map((plKey: keyof IPropsProductData, i: number) => (
+                            plKey !== "_id" &&
+                            <TableCell key={i} align={"center"} sx={{ textTransform: "capitalize" }}>{plKey.replace(/([A-Z])/g, ' $1')}</TableCell>
                           ))}
                           <TableCell key={productKey.length} align={"center"}>{"Actions"}</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {productList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((prodList: any) => {
+                        {productList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((prodList: IPropsProductData) => {
                           return (
                             <TableRow hover role="checkbox" tabIndex={-1} key={prodList._id}>
-                              {productKey?.map((plKey: any, i: number) => {
-                                const value = prodList[plKey];
+                              {productKey?.map((plKey: keyof IPropsProductData, i: number) => {
                                 return (
-                                  String(value)?.startsWith("data:image") ? <TableCell key={i} align={"center"}><Avatar src={value} alt="image" /></TableCell> : <TableCell key={i} align={"center"}>{value}</TableCell>
+                                  plKey !== "_id" &&
+                                  (plKey === "quantityAndTypeAndPrice" ?
+                                    <TableCell key={i} align={"center"}>
+                                      <Stack direction={"column"} alignItems={"center"} justifyContent={"center"}>
+                                        {
+                                          prodList.quantityAndTypeAndPrice.map(({ price, quantity, type }: {
+                                            price: number;
+                                            quantity: string;
+                                            type: string;
+                                          }, j: number) => {
+                                            return (
+                                              <Stack key={j}>{quantity} - {price.toString()} - {type}</Stack>
+                                            )
+                                          })
+                                        }
+                                      </Stack>
+                                    </TableCell>
+                                    :
+                                    String(prodList[plKey])?.startsWith("data:image") ?
+                                      <TableCell key={i} align={"center"} sx={{ display: "flex", justifyContent: "center" }}><Avatar src={prodList[plKey].toString()} alt="image" /></TableCell>
+                                      : <TableCell key={i} align={"center"}>{prodList[plKey]}</TableCell>)
                                 );
                               })}
                               <TableCell key={productKey.length} align={"center"}>

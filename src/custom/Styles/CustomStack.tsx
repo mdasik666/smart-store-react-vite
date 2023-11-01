@@ -1,10 +1,12 @@
-import { styled, Stack, Button } from "@mui/material";
+import { styled, Stack } from "@mui/material";
 
 export const CustomStack = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     overflowX: "auto",
+    height: "100vh",
   },
   [theme.breakpoints.up("sm")]: {
+    height: "100vh",
     backgroundImage: `url('../src/asserts/images/login_bg.jpg')`,
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
