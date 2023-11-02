@@ -1,61 +1,61 @@
 @font-face {
   font-family: "Fils-regular";
-  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProRegular.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-medium";
-  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProMedium.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-book";
-  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBook.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-black";
-  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBlack.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-bold";
-  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBold.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-heavy";
-  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProHeavy.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-regular";
-  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProRegular.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-medium";
-  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProMedium.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-book";
-  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBook.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-black";
-  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBlack.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-bold";
-  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBold.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-heavy";
-  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProHeavy.otf") format("opentype");
 }
 
 body {
@@ -1643,28 +1643,28 @@ body {
 }
 
 .pagination button.first {
-  background-image: url(../../../asserts/images/first.png);
+  background-image: url(../../../assets/images/first.png);
 }
 
 .pagination button.first:hover,
 .pagination button.first.active,
 .pagination button.first:focus {
-  background-image: url(../../../asserts/images/first_ac.png);
+  background-image: url(../../../assets/images/first_ac.png);
 }
 
 .pagination button.last {
-  background-image: url(../../../asserts/images/last.png);
+  background-image: url(../../../assets/images/last.png);
 }
 
 .pagination button.last:hover,
 .pagination button.last.active,
 .pagination button.last:focus {
-  background-image: url(../../../asserts/images/last_ac.png);
+  background-image: url(../../../assets/images/last_ac.png);
 }
 
 .pagination button.next {
   width: auto;
-  background-image: url(../../../asserts/images/next.png);
+  background-image: url(../../../assets/images/next.png);
   background-position: right;
 }
 
@@ -1676,7 +1676,7 @@ body {
 .pagination button.next:hover,
 .pagination button.next.active,
 .pagination button.next:focus {
-  background-image: url(../../../asserts/images/next_ac.png);
+  background-image: url(../../../assets/images/next_ac.png);
 }
 
 .pagination button.next:hover span,
@@ -1688,7 +1688,7 @@ body {
 
 .pagination button.prev {
   width: auto;
-  background-image: url(../../../asserts/images/prev.png);
+  background-image: url(../../../assets/images/prev.png);
   background-position: left;
 }
 
@@ -1700,7 +1700,7 @@ body {
 .pagination button.prev:hover,
 .pagination button.prev.active,
 .pagination button.prev:focus {
-  background-image: url(../../../asserts/images/prev_ac.png);
+  background-image: url(../../../assets/images/prev_ac.png);
 }
 
 .pagination button.prev:hover span,

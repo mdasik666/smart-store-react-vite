@@ -68,7 +68,7 @@ const Uregister = () => {
         <div className="logWrapper">
           <div className="register-wrap pt-5 pb-3">
             <Link id="backtoLogin" to={"/user/login"}>
-              <img src="../../../src/asserts/images/arrow-left.svg" alt="back Arrow" />
+              <img src="../../../src/assets/images/arrow-left.svg" alt="back Arrow" />
             </Link>
             <h1 className="text-left mb-0">SIGN UP</h1>
             <p className="text-left">

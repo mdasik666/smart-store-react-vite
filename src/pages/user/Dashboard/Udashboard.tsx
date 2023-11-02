@@ -368,35 +368,35 @@ const Udashboard = () => {
                         <div className="category theme-1 shadow-sm">
                           <span className="cTitle">Spices</span>
                           <span className="prodName">Cinnamon</span>
-                          <img src="../../src/asserts/images/cat1.png" alt="Category 1" />
+                          <img src="../../src/assets/images/cat1.png" alt="Category 1" />
                         </div>
                       </li>
                       <li>
                         <div className="category theme-2 shadow-sm">
                           <span className="cTitle">Packed Items</span>
                           <span className="prodName">Spam 7 oz</span>
-                          <img src="../../src/asserts/images/cat2.png" alt="Category 2" />
+                          <img src="../../src/assets/images/cat2.png" alt="Category 2" />
                         </div>
                       </li>
                       <li>
                         <div className="category theme-3 shadow-sm">
                           <span className="cTitle">Dry Fruits</span>
                           <span className="prodName">Almonds</span>
-                          <img src="../../src/asserts/images/cat3.png" alt="Category 3" />
+                          <img src="../../src/assets/images/cat3.png" alt="Category 3" />
                         </div>
                       </li>
                       <li>
                         <div className="category theme-4 shadow-sm">
                           <span className="cTitle">Candy</span>
                           <span className="prodName">Simpkins</span>
-                          <img src="../../src/asserts/images/cat4.png" alt="Category 4" />
+                          <img src="../../src/assets/images/cat4.png" alt="Category 4" />
                         </div>
                       </li>
                       <li>
                         <div className="category theme-5 shadow-sm">
                           <span className="cTitle">Herbs</span>
                           <span className="prodName">Keya</span>
-                          <img src="../../src/asserts/images/cat5.png" alt="Category 5" />
+                          <img src="../../src/assets/images/cat5.png" alt="Category 5" />
                         </div>
                       </li>
                     </ul>
@@ -456,10 +456,10 @@ const Udashboard = () => {
             <h2>BRANDS WE DEAL</h2>
 
             <ul>
-              <li><a href="#"><img src="../../src/asserts/images/br-1.png" alt="Amara" /></a></li>
-              <li><a href="#"><img src="../../src/asserts/images/br-2.png" alt="Fossa" /></a></li>
-              <li><a href="#"><img src="../../src/asserts/images/br-3.png" alt="Kyan" /></a></li>
-              <li><a href="#"><img src="../../src/asserts/images/br-4.png" alt="Atica" /></a></li>
+              <li><a href="#"><img src="../../src/assets/images/br-1.png" alt="Amara" /></a></li>
+              <li><a href="#"><img src="../../src/assets/images/br-2.png" alt="Fossa" /></a></li>
+              <li><a href="#"><img src="../../src/assets/images/br-3.png" alt="Kyan" /></a></li>
+              <li><a href="#"><img src="../../src/assets/images/br-4.png" alt="Atica" /></a></li>
             </ul>
           </div>
         </section>

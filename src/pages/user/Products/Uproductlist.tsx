@@ -327,7 +327,7 @@ const Uproductlist = () => {
                         <li className="list-group-item">
                           <input className="form-check-input me-1" disabled={categoryFilterByMultipleItem.length === 0} checked={categoryFilterByMultipleItem.length === 0 ? true : false} type="checkbox" aria-label="All" id="all" onChange={(_e: ChangeEvent<HTMLInputElement>) => getFilterbyMultipleItem("")} />
                           <label htmlFor="all">
-                            <img src="../../src/asserts/images/all.png" alt="Allitems" />
+                            <img src="../../src/assets/images/all.png" alt="Allitems" />
                             All
                           </label>
                         </li>
@@ -338,7 +338,7 @@ const Uproductlist = () => {
                                 <li key={i} className="list-group-item">
                                   <input className="form-check-input me-1" type="checkbox" aria-label={cat.categoryName} id={cat.categoryName} checked={categoryFilterByMultipleItem.includes(cat.categoryName)} onChange={(_e: ChangeEvent<HTMLInputElement>) => getFilterbyMultipleItem(cat.categoryName)} />
                                   <label htmlFor={cat.categoryName}>
-                                    <img src={`../../src/asserts/images/${cat.categoryName.toLowerCase()}.png`} alt={cat.categoryName} />
+                                    <img src={`../../src/assets/images/${cat.categoryName.toLowerCase()}.png`} alt={cat.categoryName} />
                                     {cat.categoryName}
                                   </label>
                                 </li>

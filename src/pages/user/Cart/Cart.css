@@ -1,61 +1,61 @@
 @font-face {
   font-family: "Fils-regular";
-  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProRegular.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-medium";
-  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProMedium.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-book";
-  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBook.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-black";
-  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBlack.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-bold";
-  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBold.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-heavy";
-  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProHeavy.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-regular";
-  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProRegular.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-medium";
-  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProMedium.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-book";
-  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBook.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-black";
-  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBlack.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-bold";
-  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBold.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-heavy";
-  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProHeavy.otf") format("opentype");
 }
 
 body {
@@ -357,7 +357,7 @@ body {
   left: -23px;
   top: 4px;
   color: #ffffff;
-  background-image: url(../../../asserts/images/check.svg);
+  background-image: url(../../../assets/images/check.svg);
   background-repeat: no-repeat;
   background-size: 20px;
   background-position: center;
@@ -403,7 +403,7 @@ body {
   display: inline-block;
   top: -8px;
   height: 10px;
-  background-image: url(../../../asserts/images/border-d.png);
+  background-image: url(../../../assets/images/border-d.png);
   background-repeat: repeat-x;
   width: 100%;
   position: absolute;
@@ -416,7 +416,7 @@ body {
   display: inline-block;
   bottom: -8px;
   height: 10px;
-  background-image: url(../../../asserts/images/border-d.png);
+  background-image: url(../../../assets/images/border-d.png);
   background-repeat: repeat-x;
   width: 100%;
   position: absolute;
@@ -570,7 +570,7 @@ body {
   left: -7.7px;
   top: 4px;
   color: #ffffff;
-  background-image: url(../../../asserts/images/check.svg);
+  background-image: url(../../../assets/images/check.svg);
   background-repeat: no-repeat;
   background-size: 20px;
   background-position: center;

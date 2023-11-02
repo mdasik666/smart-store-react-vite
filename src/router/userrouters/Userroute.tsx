@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Ulogin from "@/pages/User/Login/Ulogin";
 import Udashboard from "@/pages/User/Dashboard/Udashboard";
+// const Udashboard = React.lazy(() => import("../../pages/User/Dashboard/Udashboard"))
 import Ucheckout from "@/pages/User/Checkout/Ucheckout";
 import UserNotfound from "@/components/Notfound/UserNotFound";
 import Uregister from "@/pages/User/Register/Uregister";

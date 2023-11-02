@@ -7,7 +7,7 @@ export const CustomStack = styled(Stack)(({ theme }) => ({
   },
   [theme.breakpoints.up("sm")]: {
     height: "100vh",
-    backgroundImage: `url('../src/asserts/images/login_bg.jpg')`,
+    backgroundImage: `url('../src/assets/images/login_bg.jpg')`,
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',

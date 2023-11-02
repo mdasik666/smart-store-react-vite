@@ -1,61 +1,61 @@
 @font-face {
   font-family: "Fils-regular";
-  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProRegular.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-medium";
-  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProMedium.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-book";
-  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBook.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-black";
-  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBlack.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-bold";
-  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBold.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-heavy";
-  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProHeavy.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-regular";
-  src: url("../../../asserts/fonts/FilsonProRegular.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProRegular.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-medium";
-  src: url("../../../asserts/fonts/FilsonProMedium.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProMedium.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-book";
-  src: url("../../../asserts/fonts/FilsonProBook.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBook.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-black";
-  src: url("../../../asserts/fonts/FilsonProBlack.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBlack.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-bold";
-  src: url("../../../asserts/fonts/FilsonProBold.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProBold.otf") format("opentype");
 }
 
 @font-face {
   font-family: "Fils-heavy";
-  src: url("../../../asserts/fonts/FilsonProHeavy.otf") format("opentype");
+  src: url("../../../assets/fonts/FilsonProHeavy.otf") format("opentype");
 }
 
 body {
@@ -191,7 +191,7 @@ body {
 }
 
 #wrapper header h1 a .logo_ic {
-  background-image: url(../../../asserts/images/logo.png);
+  background-image: url(../../../assets/images/logo.png);
   background-color: #ffe200;
   background-repeat: no-repeat;
   background-size: contain;
@@ -254,7 +254,7 @@ body {
 }
 
 #wrapper #searchWrap {
-  background-image: url(../../../asserts/images/login_bg.jpg);
+  background-image: url(../../../assets/images/login_bg.jpg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -385,7 +385,7 @@ body {
 }
 
 #wrapper #productWrap section[id] .colOrdersec {
-  background-image: url(../../../asserts/images/order.jpg);
+  background-image: url(../../../assets/images/order.jpg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -406,7 +406,7 @@ body {
 
 #wrapper #productWrap section[id] .ur-order:after {
   content: "";
-  background-image: url(../../../asserts/images/border-tri.png);
+  background-image: url(../../../assets/images/border-tri.png);
   background-position: center;
   position: absolute;
   top: 0;
@@ -700,7 +700,7 @@ body {
 
 #wrapper #brandWrap:before {
   content: "";
-  background-image: url(../../../asserts/images/art-pic-left.png);
+  background-image: url(../../../assets/images/art-pic-left.png);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: left bottom;
@@ -714,7 +714,7 @@ body {
 
 #wrapper #brandWrap:after {
   content: "";
-  background-image: url(../../../asserts/images/art-pic-right.png);
+  background-image: url(../../../assets/images/art-pic-right.png);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: right bottom;

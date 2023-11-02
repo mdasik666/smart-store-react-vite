@@ -11,21 +11,21 @@ import AdminNotfound from "../../components/Notfound/AdminNotfound";
 import Profile from "../../pages/Admin/Profile/Profile";
 
 const Adminroute = () => {
-    return (
-        <Routes>
-            <Route path="/" element={<Alogin />} />
-            <Route path="login" element={<Alogin />} />
-            <Route path="register" element={<Aregister />} />
-            <Route path="dashboard" element={<Adashboard />} >
-                <Route path="sspanel" element={<Sspanel />} />
-                <Route path="product" element={<Aproduct />} />
-                <Route path="orderlist" element={<Aorder />} />
-                <Route path="userlist" element={<Ausers />} />
-                <Route path="myprofile" element={<Profile />} />
-            </Route>            
-            <Route path="*" element={<AdminNotfound />} />      
-        </Routes>
-    );
+  return (
+    <Routes>
+      <Route path="/" element={<Alogin />} />
+      <Route path="login" element={<Alogin />} />
+      <Route path="register" element={<Aregister />} />
+      <Route path="dashboard" element={<Adashboard />} >
+        <Route path="sspanel" element={<Sspanel />} />
+        <Route path="product" element={<Aproduct />} />
+        <Route path="orderlist" element={<Aorder />} />
+        <Route path="userlist" element={<Ausers />} />
+        <Route path="myprofile" element={<Profile />} />
+      </Route>
+      <Route path="*" element={<AdminNotfound />} />
+    </Routes>
+  );
 }
 
 export default Adminroute;

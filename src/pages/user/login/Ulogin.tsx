@@ -62,7 +62,7 @@ const Ulogin = () => {
         <div className="logWrapper">
           <div className="login-wrap pt-5 pb-3">
             <div className="img d-flex align-items-center justify-content-center"
-              style={{ backgroundImage: "url(../src/asserts/images/logo.png)" }}></div>
+              style={{ backgroundImage: "url(../src/assets/images/logo.png)" }}></div>
             <h1 className="text-left mb-0">Login</h1>
             <p className="text-left">Enter your username and password
               to get access your account

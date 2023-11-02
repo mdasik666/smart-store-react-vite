@@ -177,7 +177,7 @@ const Ucheckout = () => {
               "currency": resOrder.data.order.currency,
               "name": "SS",
               "description": "SS Testing",
-              "image": "../../src/asserts/images/logo.png",
+              "image": "../../src/assets/images/logo.png",
               "order_id": resOrder.data.order.id,
               "handler": async function (response: any) {
                 try {
