@@ -103,7 +103,7 @@ const Ucheckout = () => {
         }
       }
     })();
-  }, [])
+  }, [nav])
 
   const addOrUpdateAddress = async (data: any) => {
     try {
@@ -220,13 +220,10 @@ const Ucheckout = () => {
     }
   }
 
-
   return (
     <>
-      <Helmet>
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Smart Store | Checkout</title>
+      <Helmet>        
+        <title>Checkout</title>
         <link rel="stylesheet" type="text/css" href="../../src/pages/User/Checkout/Checkout.css" />
       </Helmet>
       <section id="wrapper">

@@ -31,7 +31,7 @@ const Ulogin = () => {
         }
       }
     })();
-  }, [])
+  }, [nav])
 
   
 
@@ -55,8 +55,6 @@ const Ulogin = () => {
   return (
     <>
       <Helmet>
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Login</title>
         <link rel="stylesheet" type="text/css" href="../src/pages/User/Login/Login.css" />
       </Helmet>

@@ -32,7 +32,7 @@ const Uprofile = () => {
 
     const [isLoading, setLoading] = useState<boolean>(false)
     const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
-    const [cartData, setCartDate] = useState<Array<{}>>([])
+    const [cartData, setCartDate] = useState<Array<any>>([])
 
     useEffect(() => {
         (async function () {
@@ -58,7 +58,7 @@ const Uprofile = () => {
                 nav("/user/login")
             }
         })();
-    }, [])
+    }, [nav])
 
     const getCartDate = async (id: string) => {
         try {
@@ -98,8 +98,6 @@ const Uprofile = () => {
     return (
         <>
             <Helmet>
-                <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>Profile</title>
                 <link rel="stylesheet" type="text/css" href="../../src/pages/User/Cart/Cart.css" />
             </Helmet>

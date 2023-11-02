@@ -43,7 +43,7 @@ const Ureset = () => {
         nav('/user/forgotpassword')
       }
     })()
-  }, [])
+  }, [nav])
 
   const updatePassword = async (data: any) => {
     try {
@@ -62,8 +62,6 @@ const Ureset = () => {
   return (
     <>
       <Helmet>
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reset</title>
         <link rel="stylesheet" type="text/css" href="../src/pages/User/Reset/Reset.css" />
       </Helmet>

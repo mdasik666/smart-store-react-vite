@@ -80,7 +80,7 @@ const Udashboard = () => {
         nav("/user/login")
       }
     })();
-  }, [])
+  }, [nav])
 
   const getProductList = async (id: string) => {
     try {
@@ -141,10 +141,8 @@ const Udashboard = () => {
 
   return (
     <>
-      <Helmet>
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Dashboard</title>
+      <Helmet>        
+        <title>Smart Store | Dashboard</title>
         <link rel="stylesheet" type="text/css" href="../../src/pages/User/Dashboard/Dashboard.css" />
       </Helmet>
       <section id="wrapper">

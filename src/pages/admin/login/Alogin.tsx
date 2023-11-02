@@ -35,7 +35,7 @@ const Alogin = () => {
         nav("/admin/dashboard/sspanel")
       }
     })();
-  }, [])
+  }, [nav])
 
   const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {

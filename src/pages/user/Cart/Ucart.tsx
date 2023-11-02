@@ -102,7 +102,7 @@ const Ucart = () => {
                 nav("/user/login")
             }
         })();
-    }, [])
+    }, [nav])
 
     const addOrRemoveQuantity = (type: string, cart: IPropsProductOrderList, idx: number) => {
         const addOrder = orderCartData.map((cd) => {
@@ -201,9 +201,7 @@ const Ucart = () => {
 
     return (
         <>
-            <Helmet>
-                <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <Helmet>                
                 <title>Cart</title>
                 <link rel="stylesheet" type="text/css" href="../../src/pages/User/Cart/Cart.css" />
             </Helmet>

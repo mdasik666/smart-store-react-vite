@@ -19,7 +19,7 @@ const Adashboard = () => {
                 setAdminDate(verify.data.data)
             }
         })();        
-    },[])
+    },[nav])
 
     return (
         <Admindrawer adminDate={adminDate}/>        

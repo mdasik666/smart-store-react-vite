@@ -112,7 +112,7 @@ const Aproduct = () => {
         nav("/admin/login")
       }
     })();
-  }, [])
+  }, [nav])
 
   const addOrUpdateProduct = async (data: any) => {
     try {

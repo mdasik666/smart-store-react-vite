@@ -1,10 +1,8 @@
 import { Stack, Typography } from "@mui/material"
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { adminLoginVerify } from "../../services/Adminservice";
 
 const UserNotfound = () => {
-    var nav = useNavigate()
+    
     useEffect(() => {
         // setTimeout(() => {
         //     (async function () {
