@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useForm } from 'react-hook-form'
 import { EditNoteSharp } from "@mui/icons-material";
-import { AlertColor, IconButton } from "@mui/material";
+import { AlertColor, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
 
 interface IPropsUserData {
@@ -164,6 +164,13 @@ const Ucheckout = () => {
     setPaymentOption(type)
   }
 
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+
+  const handleDialogClose = () => {    
+    setOpenDialog(false)
+    nav('/user/dashboard/products')
+  }
+
   const placeOrder = async () => {
     if (selectedAddress.length) {
       if (paymentOption === 'razorpay') {
@@ -181,10 +188,9 @@ const Ucheckout = () => {
               "order_id": resOrder.data.order.id,
               "handler": async function (response: any) {
                 try {
-                  const resVerify = await userPaymentVerify(userData._id, { ...response, checkoutList, ...{ paymentType: 'razorpay' } })
+                  const resVerify = await userPaymentVerify(userData._id, { ...response, ...{orderedProducts:checkoutList, paymentType: 'razorpay', paid:"Yes", deliveryStatus:"Ordered"} })
                   if (resVerify.data.status === "Success") {
-                    console.log(resVerify.data)
-                    nav('/user/dashboard/products')
+                    setOpenDialog(true)                    
                   }
                 } catch (error: any) {
                   console.log(error.message)
@@ -202,12 +208,12 @@ const Ucheckout = () => {
                 "color": "#3399cc"
               }
             };
-            var rzp1 = new (window as any).Razorpay(options);
+            var rzp1 = new (window as any).Razorpay(options);            
             rzp1.on('payment.failed', function (response: any) {
               setSnackOpen({ open: true, severity: "error", message: response.error.reason })
             });
-            rzp1.open();
-            setLoading(false)
+            rzp1.open();            
+            setLoading(false)            
           }
         } catch (error: any) {
           setLoading(false)
@@ -222,7 +228,7 @@ const Ucheckout = () => {
 
   return (
     <>
-      <Helmet>        
+      <Helmet>
         <title>Checkout</title>
         <link rel="stylesheet" type="text/css" href="../../src/pages/User/Checkout/Checkout.css" />
       </Helmet>
@@ -245,7 +251,7 @@ const Ucheckout = () => {
                   <i className="fa-regular fa-user"></i>
                   <span>Profile</span>
                 </button>
-                <button id="ordersMenu" className="transBtn">
+                <button id="ordersMenu" className="transBtn" onClick={() => nav('/user/dashboard/orders')}>
                   <i className="fa-regular fa-file-lines"></i>
                   <span>Orders</span>
                 </button>
@@ -400,7 +406,7 @@ const Ucheckout = () => {
                                         </div>
                                       )
                                     })
-                                    : isLoading ? <div>Loading...</div> : <div>Address Not Found</div> 
+                                    : isLoading ? <div>Loading...</div> : <div>Address Not Found</div>
                                 }
                               </div>
                             </div>
@@ -459,7 +465,7 @@ const Ucheckout = () => {
                   </div>
                   <div className="col">
                     <div className="text-end mt-2 mt-sm-0">
-                      <button className="btn btn-success" onClick={placeOrder}>
+                      <button className="btn btn-success" onClick={placeOrder} disabled={isLoading}>
                         <i className="mdi mdi-cart-outline me-1"></i> Procced </button>
                     </div>
                   </div>
@@ -581,6 +587,19 @@ const Ucheckout = () => {
         </section>
       </section>
       <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>
+          Order Confirmed
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Order Placed Sccessfully
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}>Ok</Button>                      
+        </DialogActions>
+      </Dialog>
     </>
 
   )

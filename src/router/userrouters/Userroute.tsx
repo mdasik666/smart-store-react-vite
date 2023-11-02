@@ -10,6 +10,7 @@ import Ureset from "@/pages/User/Reset/Ureset";
 import Ucart from "@/pages/User/Cart/Ucart";
 import Uproductlist from "@/pages/User/Products/Uproductlist";
 import Uprofile from "@/pages/User/Profile/Uprofile";
+import { Uorders } from "@/pages/User/Orders/Uorders";
 
 const Userroute = () => {
     return (
@@ -24,6 +25,7 @@ const Userroute = () => {
             <Route path="dashboard/checkout" element={<Ucheckout />} />
             <Route path="dashboard/products" element={<Uproductlist />} />
             <Route path="dashboard/profile" element={<Uprofile />} />
+            <Route path="dashboard/orders" element={<Uorders />} />
             <Route path="*" element={<UserNotfound />} />
         </Routes>
     );

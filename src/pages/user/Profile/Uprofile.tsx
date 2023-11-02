@@ -121,7 +121,7 @@ const Uprofile = () => {
                                     <i className="fa-regular fa-user"></i>
                                     <span>Profile</span>
                                 </button>
-                                <button id="ordersMenu" className="transBtn">
+                                <button id="ordersMenu" className="transBtn" onClick={() => nav('/user/dashboard/orders')}>
                                     <i className="fa-regular fa-file-lines"></i>
                                     <span>Orders</span>
                                 </button>

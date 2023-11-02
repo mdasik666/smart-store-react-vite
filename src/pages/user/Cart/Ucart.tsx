@@ -52,12 +52,12 @@ const Ucart = () => {
         (async function () {
             if (Cookies.get("usertoken")) {
                 try {
-                const verify = await userLoginVerify();
-                if (verify.data.status === "Failed") {
-                    nav("/user/login")
-                } else {
-                    const { _id, fullName, email } = verify.data.userData
-                    setUserData({ _id, fullName, email })
+                    const verify = await userLoginVerify();
+                    if (verify.data.status === "Failed") {
+                        nav("/user/login")
+                    } else {
+                        const { _id, fullName, email } = verify.data.userData
+                        setUserData({ _id, fullName, email })
                         setLoading(true)
                         const getCart = await userGetCart(_id);
                         if (getCart.data.status === "Success") {
@@ -97,6 +97,7 @@ const Ucart = () => {
                     }
                 } catch (error: any) {
                     setSnackOpen({ open: true, severity: "warning", message: error.message })
+                    setLoading(false)
                 }
             } else {
                 nav("/user/login")
@@ -158,7 +159,7 @@ const Ucart = () => {
             });
             var selectedWithEmptyQuantity = filterUserQuantity.filter((ocd: IPropsProductOrderList) => ocd.quantityAndTypeAndPrice.length === 0);
             if (selectedWithEmptyQuantity.length) {
-                setSnackOpen({ open: true, severity: "warning", message: "Selected items quantity is 0. Check cart list" })                
+                setSnackOpen({ open: true, severity: "warning", message: "Selected items quantity is 0. Check cart list" })
             } else {
                 var finalOrderListData = filterUserQuantity.filter((ocd: IPropsProductOrderList) => ocd.quantityAndTypeAndPrice.length > 0);
                 if (finalOrderListData.length) {
@@ -174,19 +175,19 @@ const Ucart = () => {
                         if (resOrder.data.status === "Success") {
                             nav('/user/dashboard/checkout')
                         } else {
-                            setSnackOpen({ open: true, severity: "error", message: resOrder.data.message })                            
+                            setSnackOpen({ open: true, severity: "error", message: resOrder.data.message })
                         }
                         setLoading(false)
                     } catch (error: any) {
                         setLoading(false)
-                        setSnackOpen({ open: true, severity: "warning", message: error.message })                                                    
+                        setSnackOpen({ open: true, severity: "warning", message: error.message })
                     }
                 } else {
-                    setSnackOpen({ open: true, severity: "warning", message: "Select any one product" })                                                                        
+                    setSnackOpen({ open: true, severity: "warning", message: "Select any one product" })
                 }
             }
         } else {
-            setSnackOpen({ open: true, severity: "warning", message: "Select minimum one item from cart" })                                                                                    
+            setSnackOpen({ open: true, severity: "warning", message: "Select minimum one item from cart" })
         }
     }
 
@@ -201,7 +202,7 @@ const Ucart = () => {
 
     return (
         <>
-            <Helmet>                
+            <Helmet>
                 <title>Cart</title>
                 <link rel="stylesheet" type="text/css" href="../../src/pages/User/Cart/Cart.css" />
             </Helmet>
@@ -226,7 +227,7 @@ const Ucart = () => {
                                     <i className="fa-regular fa-user"></i>
                                     <span>Profile</span>
                                 </button>
-                                <button id="ordersMenu" className="transBtn">
+                                <button id="ordersMenu" className="transBtn" onClick={() => nav('/user/dashboard/orders')}>
                                     <i className="fa-regular fa-file-lines"></i>
                                     <span>Orders</span>
                                 </button>
@@ -318,7 +319,7 @@ const Ucart = () => {
 
                                                         </div>
                                                     )
-                                                }) : isLoading ? <div>Loading...</div> : <div>Product not available on cart</div>
+                                                }) : <div className="m-2">Loading...</div>
                                         }
                                     </div>
                                 </div>
@@ -351,7 +352,7 @@ const Ucart = () => {
                                         </div>
                                     </section>
                                     <div className="d-flex justify-content-center">
-                                        <button onClick={checkOut} className="btn btn-primary">Checkout {orderCartDataSelected.length > 0 ? orderCartDataSelected.length : 0} items</button>
+                                        <button onClick={checkOut} className="btn btn-primary" disabled={isLoading}>Checkout {orderCartDataSelected.length > 0 ? orderCartDataSelected.length : 0} items</button>
                                     </div>
                                 </section>
                             </div>

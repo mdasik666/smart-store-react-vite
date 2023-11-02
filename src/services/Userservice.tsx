@@ -84,3 +84,6 @@ export const userUpdatePassword = async (data:any) => {
     return await axiosInstance.post(`/user/updatepassword/`, data)
 }
 
+export const userOrderList = async (userId:any) => {
+    return await axiosInstance.get(`/user/orderlist/${userId}`)
+}
