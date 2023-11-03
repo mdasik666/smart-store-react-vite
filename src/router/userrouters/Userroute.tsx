@@ -1,7 +1,8 @@
+import React, { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Ulogin from "@/pages/User/Login/Ulogin";
-import Udashboard from "@/pages/User/Dashboard/Udashboard";
-// const Udashboard = React.lazy(() => import("../../pages/User/Dashboard/Udashboard"))
+// import Udashboard from "@/pages/User/Dashboard/Udashboard";
+const Udashboard = React.lazy(() => import("@/pages/User/Dashboard/Udashboard"))
 import Ucheckout from "@/pages/User/Checkout/Ucheckout";
 import UserNotfound from "@/components/Notfound/UserNotFound";
 import Uregister from "@/pages/User/Register/Uregister";
@@ -12,23 +13,27 @@ import Uproductlist from "@/pages/User/Products/Uproductlist";
 import Uprofile from "@/pages/User/Profile/Uprofile";
 import { Uorders } from "@/pages/User/Orders/Uorders";
 
+
 const Userroute = () => {
-    return (
-        <Routes>
-            <Route path="/" element={<Ulogin />} />
-            <Route path="login" element={<Ulogin />} />
-            <Route path="forgotpassword" element={<Uforgotpassword />} />
-            <Route path="reset" element={<Ureset />} />
-            <Route path="register" element={<Uregister />} />
-            <Route path="dashboard" element={<Udashboard />} />
-            <Route path="dashboard/cart" element={<Ucart />} />
-            <Route path="dashboard/checkout" element={<Ucheckout />} />
-            <Route path="dashboard/products" element={<Uproductlist />} />
-            <Route path="dashboard/profile" element={<Uprofile />} />
-            <Route path="dashboard/orders" element={<Uorders />} />
-            <Route path="*" element={<UserNotfound />} />
-        </Routes>
-    );
+  return (
+    <Routes>
+      <Route path="/" element={<Ulogin />} />
+      <Route path="login" element={<Ulogin />} />
+      <Route path="forgotpassword" element={<Uforgotpassword />} />
+      <Route path="reset" element={<Ureset />} />
+      <Route path="register" element={<Uregister />} />
+      <Route path="dashboard" element={<Suspense fallback={"Loading..."}>
+      <Udashboard />
+      </Suspense>
+      } />
+      <Route path="dashboard/cart" element={<Ucart />} />
+      <Route path="dashboard/checkout" element={<Ucheckout />} />
+      <Route path="dashboard/products" element={<Uproductlist />} />
+      <Route path="dashboard/profile" element={<Uprofile />} />
+      <Route path="dashboard/orders" element={<Uorders />} />
+      <Route path="*" element={<UserNotfound />} />
+    </Routes>
+  );
 }
 
 export default Userroute;

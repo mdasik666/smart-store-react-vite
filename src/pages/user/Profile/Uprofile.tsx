@@ -1,7 +1,7 @@
 import { userGetCart, userLoginVerify } from "@/services/Userservice";
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { userProfileupdate } from "@/services/Userservice";
 import { useForm } from "react-hook-form";
@@ -107,10 +107,10 @@ const Uprofile = () => {
                         <div className="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-between">
                             <div className="col-md-5">
                                 <h1>
-                                    <a href="/" className="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+                                    <Link to={"/user/dashboard"} className="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
                                         <span className="logo_ic"></span>
                                         <span className="logo_txt">SMART STORE</span>
-                                    </a>
+                                    </Link>
                                 </h1>
                             </div>
                             <div className="mobiBar">
@@ -178,7 +178,7 @@ const Uprofile = () => {
                                                             <label htmlFor="customFile">
                                                                 {
                                                                     profileImage.length > 0 ?
-                                                                        <img src={profileImage.toString()} className="position-absolute top-50 start-50 translate-middle text-secondary" width={"60px"} height={"auto"} style={{ border: "1px solid", borderRadius: "100px" }} />
+                                                                        <img src={profileImage.toString()} className="position-absolute top-50 start-50 translate-middle text-secondary" width={"100px"} height={"auto"} style={{ border: "1px solid", borderRadius: "100px" }} />
                                                                         :
                                                                         <i className="fas fa-fw fa-user position-absolute top-50 start-50 translate-middle text-secondary"></i>
                                                                 }
@@ -200,7 +200,7 @@ const Uprofile = () => {
                                                             },
                                                         })} />
                                                         {Boolean(errors?.image) && <small className="form-text text-danger" style={{ color: "red 1important" }}>{errors?.image && errors.image?.message?.toString() || ""}</small>}
-                                                        <button type="button" className="btn btn-danger-soft">Remove</button>
+                                                        {/* <button type="button" className="btn btn-danger-soft">Remove</button> */}
                                                     </div>
                                                 </div>
                                             </div>

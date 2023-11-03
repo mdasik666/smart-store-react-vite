@@ -1,11 +1,11 @@
 import { ChangeEvent, useEffect, useState } from 'react'
-import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCategoryList, userLoginVerify } from '@/services/Userservice';
+import { userAddOrDeleteCart, userAddOrDeleteWishList, userGetCategoryList, userLoginVerify, userOrderList } from '@/services/Userservice';
 import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
-import { AlertColor, IconButton } from '@mui/material';
-import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
+import { AlertColor, IconButton, Skeleton, Stack } from '@mui/material';
+import { ArrowRight, Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
 import SnackbarAlert from '@/custom/components/SnackbarAlert';
 
 interface IPropsProductList {
@@ -72,6 +72,7 @@ const Udashboard = () => {
             setUserData({ _id, fullName, email, image })
             getCategoryList()
             getProductList(_id)
+            getOrderList(_id)
           }
         } catch (error: any) {
           setSnackOpen({ open: true, severity: "warning", message: error.message })
@@ -99,6 +100,25 @@ const Udashboard = () => {
       setLoading(false)
       setSnackOpen({ open: true, severity: "warning", message: error.message })
     }
+  }
+
+  const [orderList, setOrderList] = useState<Array<any>>([])
+
+  const getOrderList = async (_id: string) => {
+    try {
+      setLoading(true)
+      const resOrderList = await userOrderList(_id)
+      if (resOrderList.data.status === "Success") {
+        setOrderList(resOrderList.data.orderList)
+      } else {
+        setSnackOpen({ open: true, severity: "error", message: resOrderList.data.message })
+      }
+      setLoading(false)
+    } catch (error: any) {
+      setLoading(false)
+      setSnackOpen({ open: true, severity: "warning", message: error.message })
+    }
+
   }
 
   const getCategoryList = async () => {
@@ -141,8 +161,8 @@ const Udashboard = () => {
 
   return (
     <>
-      <Helmet>        
-        <title>Smart Store | Dashboard</title>
+      <Helmet>
+        <title>Dashboard</title>
         <link rel="stylesheet" type="text/css" href="../../src/pages/User/Dashboard/Dashboard.css" />
       </Helmet>
       <section id="wrapper">
@@ -262,32 +282,46 @@ const Udashboard = () => {
                       <button className="btn btn-primary" onClick={() => nav('/user/dashboard/orders')}>View All</button>
                     </div>
                     <ul>
-                      <li>
-                        <div className="orders">
-                          <span className="date">Sep 1 2023</span>
-                          <span className="brand">Mr. Nuttz</span>
-                          <span className="product">Premium Almonds</span>
-                          <span className="tracking">Arriving on Sep 6 2023</span>
-                          <p className="text-right">
-                            <a href="#">
-                              <i className="fa-solid fa-arrow-up"></i>
-                            </a>
-                          </p>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="orders">
-                          <span className="date">Sep 1 2023</span>
-                          <span className="brand">TROFFINO</span>
-                          <span className="product">Assorted Candy</span>
-                          <span className="tracking">Arriving on Sep 6 2023</span>
-                          <p className="text-right">
-                            <a href="#">
-                              <i className="fa-solid fa-arrow-up"></i>
-                            </a>
-                          </p>
-                        </div>
-                      </li>
+                      {
+                        orderList.length ?
+                          orderList[orderList.length - 1].orderedProducts.map((op: any, j: number) => {
+                            return (
+                              <li>
+                                <div className="orders">
+                                  <span className="date">{convertDate(orderList[orderList.length - 1].createdAt)}</span>
+                                  <span className="brand">{op.title}</span>
+                                  <span className="product">{op.productName}</span>
+                                  <span className="tracking">Arriving on {orderList[orderList.length - 1].deliveryDate ? convertDate(orderList[orderList.length - 1].deliveryDate) : "Soon"}</span>
+                                  <p className="text-right">
+                                    <a href="#">
+                                      <i className="fa-solid fa-arrow-up"></i>
+                                    </a>
+                                  </p>
+                                </div>
+                              </li>
+                            )
+                          })
+                          :
+                          Array(2).fill(0).map((_, i: number) => {
+                            return (
+                              <li key={i}>
+                                <Stack className="orders" spacing={1}>
+                                  <span className="date"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="brand"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="product"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="tracking"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <p className="text-right">
+                                    <IconButton>
+                                      <Skeleton variant="circular" animation="wave">
+                                        <ArrowRight/>
+                                      </Skeleton>
+                                    </IconButton>
+                                  </p>
+                                </Stack>
+                              </li>
+                            )
+                          })
+                      }
                     </ul>
                   </div>
                 </div>
@@ -318,45 +352,72 @@ const Udashboard = () => {
               </ul>
               <div className="tab-content" id="prodTabcontent">
                 <div className="tab-pane fade show active" id="trends" role="tabpanel" aria-labelledby="trends-tab">
-                  {
-                    productList.length > 0 ?
-                      <>
-                        <div className="tabHeader">
-                          <h2>NEW ARRIVALS</h2>
-                          <Link to={"/user/dashboard/products"} className="btn btn-primary">View All</Link>
-                        </div>
-                        <div className="tabContent">
-                          <ul className="prodList">
-                            {
-                              productList.slice(0, 11).map((prod, i) => {
-                                return (<li key={i}>
-                                  <div className="product shadow">
-                                    <div className="actionBtn">
-                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
-                                        {
-                                          prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
-                                        }
-                                      </button>
-                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
-                                        {
-                                          prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
-                                        }
-                                      </button>
-                                    </div>
-                                    <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                    <span className="title">{prod.productName}</span>
-                                    <span className="measure">{prod.productDescription}</span>
-                                    <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
-                                    <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
+                  <div className="tabHeader">
+                    <h2>NEW ARRIVALS</h2>
+                    <Link to={"/user/dashboard/products"} className="btn btn-primary">View All</Link>
+                  </div>
+                  <div className="tabContent">
+                    <ul className="prodList">
+                      {
+                        productList.length > 0 ?
+                          productList.slice(0, 11).map((prod, i) => {
+                            return (
+                              <li key={i}>
+                                <div className="product shadow">
+                                  <div className="actionBtn">
+                                    <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                      {
+                                        prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
+                                      }
+                                    </button>
+                                    <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                      {
+                                        prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
+                                      }
+                                    </button>
                                   </div>
-                                </li>)
-                              })
-                            }
-                          </ul>
-                        </div>
-                      </>
-                      : isLoading ? <div>Loading...</div> : <div>Product Not Found</div>
-                  }
+                                  <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                  <span className="title">{prod.productName}</span>
+                                  <span className="measure">{prod.productDescription}</span>
+                                  <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
+                                  <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
+                                </div>
+                              </li>
+                            )
+                          })
+                          :
+                          Array(5).fill(0).map((_, i: number) => {
+                            return (
+                              <li key={i}>
+                                <Stack className="product shadow" spacing={2}>
+                                  <div className="actionBtn">
+                                    <button className="btn" >
+                                      <IconButton>
+                                        <Skeleton variant="circular" animation="wave">
+                                          <Favorite />
+                                        </Skeleton>
+                                      </IconButton>
+                                    </button>
+                                    <button className="btn" >
+                                      <IconButton>
+                                        <Skeleton variant="circular" animation="wave">
+                                          <ShoppingCart />
+                                        </Skeleton>
+                                      </IconButton>
+                                    </button>
+                                  </div>
+                                  <span className="image"><Skeleton animation="wave" variant="rounded" height={60} /></span>
+                                  <span className="title"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="measure"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="price"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="stock"><Skeleton animation="wave" variant="rounded" /></span>
+                                </Stack>
+                              </li>
+                            )
+                          })
+                      }
+                    </ul>
+                  </div>
                 </div>
                 <div className="tab-pane fade" id="avail" role="tabpanel" aria-labelledby="avail-tab">
                   <div className="tabHeader">
@@ -403,48 +464,74 @@ const Udashboard = () => {
                   </div>
                 </div>
                 <div className="tab-pane fade" id="recom" role="tabpanel" aria-labelledby="recom-tab">
-                  {
-                    productList.length > 0 ?
-                      <>
-                        <div className="tabHeader">
-                          <h2>FEATURED PRODUCTS</h2>
-                          <Link to={"/user/dashboard/products"} className="btn btn-primary">View All</Link>
-                        </div>
-                        <div className="tabContent">
-                          <ul className="prodList">
-                            {
-                              productList.slice(0, (categoryFilter.length || categoryFilterByName.length ? productList.length : 11))
-                                .filter(pc => (pc.category.indexOf(categoryFilter) > -1))
-                                .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
-                                .map((prod, i) => {
-                                  return (<li key={i}>
-                                    <div className="product shadow">
-                                      <div className="actionBtn">
-                                        <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
-                                          {
-                                            prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
-                                          }
-                                        </button>
-                                        <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
-                                          {
-                                            prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
-                                          }
-                                        </button>
-                                      </div>
-                                      <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                      <span className="title">{prod.productName}</span>
-                                      <span className="measure">{prod.productDescription}</span>
-                                      <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
-                                      <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
-                                    </div>
-                                  </li>)
-                                })
-                            }
-                          </ul>
-                        </div>
-                      </>
-                      : isLoading ? <div>Loading...</div> : <div>Product Not Found</div>
-                  }
+
+                  <div className="tabHeader">
+                    <h2>FEATURED PRODUCTS</h2>
+                    <Link to={"/user/dashboard/products"} className="btn btn-primary">View All</Link>
+                  </div>
+                  <div className="tabContent">
+                    <ul className="prodList">
+                      {
+                        productList.length > 0 ?
+                          productList.slice(0, (categoryFilter.length || categoryFilterByName.length ? productList.length : 11))
+                            .filter(pc => (pc.category.indexOf(categoryFilter) > -1))
+                            .filter(pc => (pc.productName.indexOf(categoryFilterByName) > -1))
+                            .map((prod, i) => {
+                              return (<li key={i}>
+                                <div className="product shadow">
+                                  <div className="actionBtn">
+                                    <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                      {
+                                        prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
+                                      }
+                                    </button>
+                                    <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                      {
+                                        prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
+                                      }
+                                    </button>
+                                  </div>
+                                  <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                  <span className="title">{prod.productName}</span>
+                                  <span className="measure">{prod.productDescription}</span>
+                                  <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
+                                  <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
+                                </div>
+                              </li>)
+                            })
+                          :
+                          Array(5).fill(0).map((_, i: number) => {
+                            return (
+                              <li key={i}>
+                                <Stack className="product shadow" spacing={2}>
+                                  <div className="actionBtn">
+                                    <button className="btn" >
+                                      <IconButton>
+                                        <Skeleton variant="circular" animation="wave">
+                                          <Favorite />
+                                        </Skeleton>
+                                      </IconButton>
+                                    </button>
+                                    <button className="btn" >
+                                      <IconButton>
+                                        <Skeleton variant="circular" animation="wave">
+                                          <ShoppingCart />
+                                        </Skeleton>
+                                      </IconButton>
+                                    </button>
+                                  </div>
+                                  <span className="image"><Skeleton animation="wave" variant="rounded" height={60} /></span>
+                                  <span className="title"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="measure"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="price"><Skeleton animation="wave" variant="rounded" /></span>
+                                  <span className="stock"><Skeleton animation="wave" variant="rounded" /></span>
+                                </Stack>
+                              </li>
+                            )
+                          })
+                      }
+                    </ul>
+                  </div>
                 </div>
               </div>
             </section>
@@ -481,6 +568,10 @@ const Udashboard = () => {
 
     </>
   )
+}
+
+const convertDate = (date: string) => {
+  return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(date))
 }
 
 export default Udashboard;

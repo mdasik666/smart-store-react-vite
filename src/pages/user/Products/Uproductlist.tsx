@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
-import { AlertColor, IconButton } from '@mui/material';
+import { AlertColor, IconButton, Skeleton, Stack } from '@mui/material';
 import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
 import SnackbarAlert from '@/custom/components/SnackbarAlert';
 
@@ -397,41 +397,67 @@ const Uproductlist = () => {
                 <div className="row product-list">
                   {
                     productList.length > 0 ?
-                      <>
-                        {
-                          productList.slice((currentPage - 1) * itemsPerPage, ((currentPage - 1) * itemsPerPage) + itemsPerPage)
-                            .filter(pc => (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1))
-                            .filter((pc: any) => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.toLowerCase().indexOf(pc.category.toLowerCase()) > -1).includes(pc.category.toLowerCase())) : (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1)))
-                            .filter(pc => (pc.productName.toLowerCase().indexOf(categoryFilterByName.toLowerCase()) > -1))
-                            .filter(pc => (pc.quantityAndTypeAndPrice[0].price > parseInt(minPrice) && pc.quantityAndTypeAndPrice[0].price < parseInt(maxPrice)))
-                            .filter(pc => (changeMinMax.length ? pc?.minOrder?.toString() === (changeMinMax) : pc?.minOrder?.toString().indexOf("") > -1))
-                            .map((prod, i) => {
-                              return (
-                                <div key={i} className="col-md-3">
-                                  <div className="product shadow">
-                                    <div className="actionBtn">
-                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
-                                        {
-                                          prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
-                                        }
-                                      </button>
-                                      <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
-                                        {
-                                          prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
-                                        }
-                                      </button>
-                                    </div>
-                                    <img src={prod.image?.toString()} alt={`Product ${i}`} />
-                                    <span className="title">{prod.productName}</span>
-                                    <span className="measure">{prod.productDescription}</span>
-                                    <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
-                                    <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
-                                  </div>
+                      productList.slice((currentPage - 1) * itemsPerPage, ((currentPage - 1) * itemsPerPage) + itemsPerPage)
+                        .filter(pc => (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1))
+                        .filter((pc: any) => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.toLowerCase().indexOf(pc.category.toLowerCase()) > -1).includes(pc.category.toLowerCase())) : (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1)))
+                        .filter(pc => (pc.productName.toLowerCase().indexOf(categoryFilterByName.toLowerCase()) > -1))
+                        .filter(pc => (pc.quantityAndTypeAndPrice[0].price > parseInt(minPrice) && pc.quantityAndTypeAndPrice[0].price < parseInt(maxPrice)))
+                        .filter(pc => (changeMinMax.length ? pc?.minOrder?.toString() === (changeMinMax) : pc?.minOrder?.toString().indexOf("") > -1))
+                        .map((prod, i) => {
+                          return (
+                            <div key={i} className="col-md-3">
+                              <div className="product shadow">
+                                <div className="actionBtn">
+                                  <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                    {
+                                      prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
+                                    }
+                                  </button>
+                                  <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                    {
+                                      prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
+                                    }
+                                  </button>
                                 </div>
-                              )
-                            })
-                        }
-                      </> : isLoading ? <div>Loading...</div> : <div>Product Not Found</div>
+                                <img src={prod.image?.toString()} alt={`Product ${i}`} />
+                                <span className="title">{prod.productName}</span>
+                                <span className="measure">{prod.productDescription}</span>
+                                <span className="price">₹ {prod.quantityAndTypeAndPrice[0].price.toString()}</span>
+                                <span className="stock">Min. Order: {prod.minOrder?.toString()} pieces</span>
+                              </div>
+                            </div>
+                          )
+                        })
+                      :
+                      Array(10).fill(0).map((_, i: number) => {
+                        return (
+                          <div key={i} className="col-md-3">
+                            <Stack className="product shadow" spacing={2}>
+                              <div className="actionBtn">
+                                <button className="btn" >
+                                  <IconButton>
+                                    <Skeleton variant="circular" animation="wave">
+                                      <Favorite />
+                                    </Skeleton>
+                                  </IconButton>
+                                </button>
+                                <button className="btn" >
+                                  <IconButton>
+                                    <Skeleton variant="circular" animation="wave">
+                                      <ShoppingCart />
+                                    </Skeleton>
+                                  </IconButton>
+                                </button>
+                              </div>
+                              <span className="image"><Skeleton animation="wave" variant="rounded" height={60} /></span>
+                              <span className="title"><Skeleton animation="wave" variant="rounded" /></span>
+                              <span className="measure"><Skeleton animation="wave" variant="rounded" /></span>
+                              <span className="price"><Skeleton animation="wave" variant="rounded" /></span>
+                              <span className="stock"><Skeleton animation="wave" variant="rounded" /></span>
+                            </Stack>
+                          </div>
+                        )
+                      })
                   }
                 </div>
 

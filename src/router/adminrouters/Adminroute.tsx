@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import React from 'react'
+import React, { Suspense } from 'react'
 const Adashboard = React.lazy(() => import("../../pages/Admin/Dashboard/Adashboard"))
 import Alogin from "../../pages/Admin/Login/Alogin";
 import Aproduct from "../../pages/Admin/Productlist/Aproduct";
@@ -16,7 +16,9 @@ const Adminroute = () => {
       <Route path="/" element={<Alogin />} />
       <Route path="login" element={<Alogin />} />
       <Route path="register" element={<Aregister />} />
-      <Route path="dashboard" element={<Adashboard />} >
+      <Route path="dashboard" element={<Suspense fallback={"Loading..."}>
+        <Adashboard />
+      </Suspense>} >
         <Route path="sspanel" element={<Sspanel />} />
         <Route path="product" element={<Aproduct />} />
         <Route path="orderlist" element={<Aorder />} />
