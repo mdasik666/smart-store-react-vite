@@ -87,3 +87,7 @@ export const userUpdatePassword = async (data:any) => {
 export const userOrderList = async (userId:any) => {
     return await axiosInstance.get(`/user/orderlist/${userId}`)
 }
+
+export const userGetOrder = async (id:any) => {
+    return await axiosInstance.get(`/user/getorder/${id}`)
+}

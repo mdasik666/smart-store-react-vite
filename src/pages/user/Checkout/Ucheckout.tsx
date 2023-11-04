@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useForm } from 'react-hook-form'
 import { EditNoteSharp } from "@mui/icons-material";
-import { AlertColor, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material";
+import { AlertColor, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Skeleton } from "@mui/material";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
 
 interface IPropsUserData {
@@ -157,6 +157,7 @@ const Ucheckout = () => {
 
   const chooseAddress = (id: string) => {
     const selectAddress = shippingAddressList.filter((sa) => sa._id === id)
+    console.log(selectAddress[0])
     setSelectedAddress(selectAddress)
   }
 
@@ -166,7 +167,7 @@ const Ucheckout = () => {
 
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
-  const handleDialogClose = () => {    
+  const handleDialogClose = () => {
     setOpenDialog(false)
     nav('/user/dashboard/products')
   }
@@ -188,12 +189,15 @@ const Ucheckout = () => {
               "order_id": resOrder.data.order.id,
               "handler": async function (response: any) {
                 try {
-                  const resVerify = await userPaymentVerify(userData._id, { ...response, ...{orderedProducts:checkoutList, paymentType: 'razorpay', paid:"Yes", deliveryStatus:"Ordered"} })
+                  setLoading(true)
+                  setOpenDialog(true)
+                  const resVerify = await userPaymentVerify(userData._id, { ...response, ...{ orderedProducts: checkoutList, shippingAddress: selectedAddress[0], paymentType: 'razorpay', paid: "Yes", deliveryStatus: "Ordered" } })
                   if (resVerify.data.status === "Success") {
-                    setOpenDialog(true)                    
+                    setLoading(false)
                   }
                 } catch (error: any) {
                   console.log(error.message)
+                  setLoading(false)
                 }
               },
               "prefill": {
@@ -208,12 +212,12 @@ const Ucheckout = () => {
                 "color": "#3399cc"
               }
             };
-            var rzp1 = new (window as any).Razorpay(options);            
+            var rzp1 = new (window as any).Razorpay(options);
             rzp1.on('payment.failed', function (response: any) {
               setSnackOpen({ open: true, severity: "error", message: response.error.reason })
             });
-            rzp1.open();            
-            setLoading(false)            
+            rzp1.open();
+            setLoading(false)
           }
         } catch (error: any) {
           setLoading(false)
@@ -406,7 +410,24 @@ const Ucheckout = () => {
                                         </div>
                                       )
                                     })
-                                    : isLoading ? <div>Loading...</div> : <div>Address Not Found</div>
+                                    :
+                                    Array(2).fill(0).map((_, i: number) => {
+                                      return (
+                                        <div key={i} className="col-lg-4 col-md-6" >
+                                          <div data-bs-toggle="collapse">
+                                            <label className="card-radio-label mb-4">                                              
+                                              <div className="card-radio text-truncate p-3">
+                                                <span className="fs-14 mb-4 d-block"><Skeleton animation="wave" variant="rounded" /></span>
+                                                <span className="fs-14 mb-2 d-block"><Skeleton animation="wave" variant="rounded" /></span>
+                                                <span className="text-muted fw-normal text-wrap mb-1 d-block"><Skeleton animation="wave" variant="rounded" /></span>
+                                                <span className="text-muted fw-normal d-block"><Skeleton animation="wave" variant="rounded" /></span>
+                                                <div className="text-end m-2 d-flex justify-content-end"><Skeleton animation="wave" variant="circular" ><IconButton><EditNoteSharp color="warning" /></IconButton></Skeleton></div>
+                                              </div>
+                                            </label>
+                                          </div>
+                                        </div>
+                                      )
+                                    })
                                 }
                               </div>
                             </div>
@@ -520,7 +541,27 @@ const Ucheckout = () => {
                                       }, 0)
                                     }</td>
                                   </tr>)
-                              }) : <div>Loading...</div>
+                              }) : 
+                              Array(2).fill(0).map((_, i: number) => {
+                                return (
+                                  <tr key={i}>
+                                    <th scope="row">
+                                    </th>
+                                    <td>
+                                      <h5 className="font-size-16 text-truncate"><Skeleton animation="wave" variant="rounded" /></h5>
+                                      <p className="text-muted mb-0">
+                                        <i className="bx bxs-star text-warning"></i>
+                                        <i className="bx bxs-star text-warning"></i>
+                                        <i className="bx bxs-star text-warning"></i>
+                                        <i className="bx bxs-star text-warning"></i>
+                                        <i className="bx bxs-star-half text-warning"></i>
+                                      </p>
+                                      <p className="text-muted mb-0 mt-1"><Skeleton animation="wave" variant="rounded" /></p>
+                                    </td>
+                                    <td><Skeleton animation="wave" variant="rounded" /></td>
+                                  </tr>
+                                )
+                              })
                           }
                           <tr>
                             <td colSpan={2}>
@@ -587,17 +628,29 @@ const Ucheckout = () => {
         </section>
       </section>
       <SnackbarAlert snackopen={snackopen} setSnackOpen={setSnackOpen} />
-      <Dialog open={openDialog} onClose={handleDialogClose}>
+      <Dialog open={openDialog}>
         <DialogTitle>
-          Order Confirmed
+          Order Confirmation
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Order Placed Sccessfully
+            {
+              isLoading ?
+                "Order Payment Successfull"
+                :
+                "Order Placed Sccessfully"
+            }
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Ok</Button>                      
+          {
+            isLoading ?
+              <Box p={2}>
+                <CircularProgress />
+              </Box>
+              :
+              <Button onClick={handleDialogClose}>Ok</Button>
+          }
         </DialogActions>
       </Dialog>
     </>

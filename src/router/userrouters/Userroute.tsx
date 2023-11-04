@@ -11,7 +11,8 @@ import Ureset from "@/pages/User/Reset/Ureset";
 import Ucart from "@/pages/User/Cart/Ucart";
 import Uproductlist from "@/pages/User/Products/Uproductlist";
 import Uprofile from "@/pages/User/Profile/Uprofile";
-import { Uorders } from "@/pages/User/Orders/Uorders";
+import Uorderlist from "@/pages/User/OrderList/Uorderlist";
+import Uorder from "@/pages/User/Order/Uorder";
 
 
 const Userroute = () => {
@@ -30,7 +31,8 @@ const Userroute = () => {
       <Route path="dashboard/checkout" element={<Ucheckout />} />
       <Route path="dashboard/products" element={<Uproductlist />} />
       <Route path="dashboard/profile" element={<Uprofile />} />
-      <Route path="dashboard/orders" element={<Uorders />} />
+      <Route path="dashboard/orders" element={<Uorderlist />} />
+      <Route path="dashboard/order/:id" element={<Uorder />} />
       <Route path="*" element={<UserNotfound />} />
     </Routes>
   );

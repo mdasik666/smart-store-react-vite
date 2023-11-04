@@ -5,7 +5,7 @@ import { userGetCart, userGetCheckOut, userLoginVerify, userPostCheckOut } from 
 import { useEffect, useState } from 'react'
 import Cookies from "js-cookie";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
-import { AlertColor } from "@mui/material";
+import { AlertColor, Skeleton, Stack } from "@mui/material";
 
 interface IPropsQTP {
     price: number,
@@ -319,7 +319,23 @@ const Ucart = () => {
 
                                                         </div>
                                                     )
-                                                }) : <div className="m-2">Loading...</div>
+                                                }) :
+                                                Array(2).fill(0).map((_, i: number) => {
+                                                    return (
+                                                        <div key={i} className="cart-item shadow" style={{ width: "100%" }}>
+                                                            <Stack direction={"row"} width={"100%"} height={"100%"} spacing={2}>
+                                                                <Stack flex={1}>
+                                                                    <Skeleton animation="wave" variant="rounded" width={"100%"} height={"100%"}/>
+                                                                </Stack>
+                                                                <Stack flex={3} spacing={2}>
+                                                                    <Skeleton animation="wave" variant="rounded" width={"100%"} />
+                                                                    <Skeleton animation="wave" variant="rounded" width={"100%"} />
+                                                                    <Skeleton animation="wave" variant="rounded" width={"100%"} />
+                                                                </Stack>
+                                                            </Stack>
+                                                        </div>
+                                                    )
+                                                })
                                         }
                                     </div>
                                 </div>
