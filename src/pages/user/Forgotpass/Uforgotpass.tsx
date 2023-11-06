@@ -1,16 +1,11 @@
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
 import { userForgotPassword } from "@/services/Userservice";
-import { AlertColor } from "@mui/material";
 import { useState } from "react";
 import { Helmet } from "react-helmet";
-import { useForm } from 'react-hook-form'
+import { FieldValues, useForm } from 'react-hook-form'
 import { useNavigate } from "react-router-dom";
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsError } from "../Interface";
+import { AxiosError } from "axios";
 
 const Uforgotpassword = () => {
   const nav = useNavigate()
@@ -20,7 +15,7 @@ const Uforgotpassword = () => {
 
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
-  const forgotPassword = async (data: any) => {
+  const forgotPassword = async (data: FieldValues) => {
     try {
       setLoading(true)
       const forgot = await userForgotPassword(data.email)
@@ -32,8 +27,8 @@ const Uforgotpassword = () => {
         console.log(forgot.data.message)
       }
       setLoading(false)
-    } catch (error: any) {
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
       setLoading(false)
     }
   }

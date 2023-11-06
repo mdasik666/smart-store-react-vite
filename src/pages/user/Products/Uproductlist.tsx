@@ -4,42 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
-import { AlertColor, IconButton, Skeleton, Stack } from '@mui/material';
+import { Skeleton, Stack } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
 import SnackbarAlert from '@/custom/components/SnackbarAlert';
-
-interface IPropsProductList {
-  _id: string,
-  productName: string,
-  productDescription: string,
-  category: string,
-  title: string,
-  quantityAndTypeAndPrice: Array<{ price: number, quantity: string, type: string }>,
-  minOrder: number,
-  image: string,
-  adminId: string,
-  isWishlist?: boolean,
-  isCart?: boolean
-}
-
-interface IPropsUserData {
-  _id: string,
-  fullName: string,
-  email: string
-}
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsError, IPropsProductList, IPropsUserData, IPropsCategory } from "../Interface";
+import { AxiosError } from 'axios';
 
 const Uproductlist = () => {
   const nav = useNavigate()
 
   const [productList, setProductList] = useState<IPropsProductList[]>([])
-  const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
-  const [isLoading, setLoading] = useState<boolean>(false)
+  const [productCategory, setProductCategory] = useState<IPropsCategory[]>([])
+  const [_, setLoading] = useState<boolean>(false)
   const [_isError, setError] = useState<string>("")
   const [categoryFilter, setCategoryFilter] = useState<string>("")
   const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
@@ -49,7 +26,7 @@ const Uproductlist = () => {
   const [maxPrice, setMaxPrice] = useState<string>("1000")
   const [changeMinMax, setChangeMinMax] = useState<string>("")
   const [cartDate, setCartDate] = useState<IPropsProductList[]>([])
-  const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
+  const [userData, setUserData] = useState<IPropsUserData>({} as IPropsUserData)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -141,8 +118,8 @@ const Uproductlist = () => {
             getProductList(_id)
             getCategoryList(_id)
           }
-        } catch (error: any) {
-          setSnackOpen({ open: true, severity: "warning", message: error.message })
+        } catch (error: unknown) {
+          setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
         }
       } else {
         nav("/user/login")
@@ -162,9 +139,9 @@ const Uproductlist = () => {
         setError(res.data.message)
       }
       setLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       setLoading(false)
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
@@ -179,8 +156,8 @@ const Uproductlist = () => {
         var cart = getCart.data.cartData
         setCartDate(cart)
       }
-    } catch (error: any) {
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
@@ -199,9 +176,9 @@ const Uproductlist = () => {
         setSnackOpen({ open: true, severity: "error", message: res.data.message })
       }
       setLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       setLoading(false)
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
@@ -399,11 +376,11 @@ const Uproductlist = () => {
                     productList.length > 0 ?
                       productList.slice((currentPage - 1) * itemsPerPage, ((currentPage - 1) * itemsPerPage) + itemsPerPage)
                         .filter(pc => (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1))
-                        .filter((pc: any) => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.toLowerCase().indexOf(pc.category.toLowerCase()) > -1).includes(pc.category.toLowerCase())) : (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1)))
+                        .filter(pc => (categoryFilterByMultipleItem.length ? (categoryFilterByMultipleItem.filter((fmi) => fmi.toLowerCase().indexOf(pc.category.toLowerCase()) > -1).includes(pc.category.toLowerCase())) : (pc.category.toLowerCase().indexOf(categoryFilter.toLowerCase()) > -1)))
                         .filter(pc => (pc.productName.toLowerCase().indexOf(categoryFilterByName.toLowerCase()) > -1))
                         .filter(pc => (pc.quantityAndTypeAndPrice[0].price > parseInt(minPrice) && pc.quantityAndTypeAndPrice[0].price < parseInt(maxPrice)))
                         .filter(pc => (changeMinMax.length ? pc?.minOrder?.toString() === (changeMinMax) : pc?.minOrder?.toString().indexOf("") > -1))
-                        .map((prod, i) => {
+                        .map((prod: IPropsProductList, i: number) => {
                           return (
                             <div key={i} className="col-md-3">
                               <div className="product shadow">
@@ -436,14 +413,14 @@ const Uproductlist = () => {
                               <div className="actionBtn">
                                 <button className="btn" >
                                   <IconButton>
-                                    <Skeleton variant="circular" animation="wave">
+                                    <Skeleton variant="circular" animation="wave" width={40} height={40}>
                                       <Favorite />
                                     </Skeleton>
                                   </IconButton>
                                 </button>
                                 <button className="btn" >
                                   <IconButton>
-                                    <Skeleton variant="circular" animation="wave">
+                                    <Skeleton variant="circular" animation="wave" width={40} height={40}>
                                       <ShoppingCart />
                                     </Skeleton>
                                   </IconButton>

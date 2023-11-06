@@ -1,17 +1,12 @@
-import { AlertColor } from "@mui/material";
 import { useState, useEffect } from 'react';
 import { userLogin, userLoginVerify } from "@/services/Userservice";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues } from "react-hook-form";
 import { Helmet } from "react-helmet";
 import Cookies from "js-cookie";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsError } from "../Interface";
+import { AxiosError } from 'axios';
 
 const Ulogin = () => {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({
@@ -35,7 +30,7 @@ const Ulogin = () => {
 
   
 
-  const loginValidate = async (data: any) => {
+  const loginValidate = async (data: FieldValues) => {
     try {
       setLoading(true)
       const res = await userLogin(data)
@@ -46,8 +41,8 @@ const Ulogin = () => {
         setSnackOpen({ open: true, severity: "error", message: res.data.message })
       }
       setLoading(false)
-    } catch (err: any) {
-      setSnackOpen({ open: true, severity: "warning", message: err.messsage })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
       setLoading(false)
     }
   }

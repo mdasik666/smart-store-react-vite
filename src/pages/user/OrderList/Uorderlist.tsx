@@ -3,40 +3,17 @@ import { Helmet } from "react-helmet"
 import Cookies from "js-cookie"
 import { userGetCart, userLoginVerify, userOrderList } from "@/services/Userservice"
 import { Link, useNavigate } from "react-router-dom"
-import { AlertColor } from "@mui/material"
 import SnackbarAlert from "@/custom/components/SnackbarAlert"
+import { IPropsError, IPropsOrders, IPropsProductList, IPropsQTP, IPropsUserData } from "../Interface";
+import { AxiosError } from "axios"
 
-interface IPropsError {
-    open: boolean,
-    severity: AlertColor | undefined,
-    message: string
-}
-
-interface IPropsQTP {
-    price: number,
-    quantity: string,
-    type: string,
-    userQuantity?: number
-}
-
-interface IPropsProductOrderList {
-    _id: string,
-    productName: string,
-    productDescription: string,
-    category: string,
-    title: string,
-    quantityAndTypeAndPrice: Array<IPropsQTP>,
-    minOrder: number,
-    image: string,
-    isSelect?: boolean
-}
 
 const Uorderlist = () => {
     const nav = useNavigate()
-    const [orderList, setOrderList] = useState<Array<any>>([])
-    const [userData, setUserData] = useState<any>()
+    const [orderList, setOrderList] = useState<IPropsOrders[]>([])
+    const [_, setUserData] = useState<IPropsUserData>({} as IPropsUserData)
     const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
-    const [orderCartData, setOrderCartData] = useState<IPropsProductOrderList[]>([])
+    const [orderCartData, setOrderCartData] = useState<IPropsProductList[]>([])
 
     useEffect(() => {
         (async function () {
@@ -44,8 +21,8 @@ const Uorderlist = () => {
                 try {
                     const verify = await userLoginVerify();
                     if (verify.data.status === "Success") {
-                        const { _id, name, email } = verify.data.userData
-                        setUserData({ _id, name, email })
+                        const { _id, fullName, email } = verify.data.userData
+                        setUserData({ _id, fullName, email })
                         const resOrderList = await userOrderList(_id)
                         if (resOrderList.data.status === "Success") {
                             setOrderList(resOrderList.data.orderList)
@@ -60,22 +37,14 @@ const Uorderlist = () => {
                     } else {
                         nav("/user/login")
                     }
-                } catch (error: any) {
-                    setSnackOpen({ open: true, severity: "warning", message: error.message })
+                } catch (error: unknown) {
+                    setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
                 }
             } else {
                 nav("/user/login")
             }
         })();
     }, [nav])
-
-    const getTotal = (orders: any) => {
-        return orders.orderedProducts.reduce((total: number, ocd: IPropsProductOrderList) => {
-            return total + ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
-                return stotal + (qtp.userQuantity as number) * qtp.price
-            }, 0)
-        }, 0)
-    }
 
     return (
         <>
@@ -108,7 +77,7 @@ const Uorderlist = () => {
                                     <span>Orders</span>
                                 </button>
                                 <button id="cartAdd" className="transBtn" onClick={() => nav("/user/dashboard/cart")}>
-                                    <b>5</b>
+                                    <b>{orderCartData.length}</b>
                                     <i className="fa-solid fa-cart-shopping"></i>
                                     <span>Cart</span>
                                 </button>
@@ -137,12 +106,12 @@ const Uorderlist = () => {
                                     <h2 className="h5 mb-0"><a href="#" className="text-muted"></a> My Orders</h2>
                                 </div>
                                 <div className="tab-content" id="myTabContent">
-                                    <div className="tab-pane  fade  active show" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                    <div className="tab-pane fade active show" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                         {
                                             orderList.length ?
-                                                orderList.map((order: any, i: number) => {
+                                                orderList.map((order: IPropsOrders, i: number) => {
                                                     return (
-                                                        <div className="bg-white card mb-4 order-list shadow-sm">
+                                                        <div key={i} className="bg-white card mb-4 order-list shadow-sm">
                                                             <div className="gold-members p-4">
                                                                 <div className="media">
                                                                     <div className="media-body">
@@ -172,8 +141,8 @@ const Uorderlist = () => {
                                                                         </p>
                                                                         <p className="text-dark">
                                                                             {
-                                                                                order.orderedProducts.map((op:any,i:number)=>{
-                                                                                    return op.quantityAndTypeAndPrice.map((qtp:any,j:number)=>{
+                                                                                order.orderedProducts.map((op:IPropsProductList)=>{
+                                                                                    return op.quantityAndTypeAndPrice.map((qtp:IPropsQTP)=>{
                                                                                         return (
                                                                                             <div>{op.productName}: {qtp.price} x {qtp.userQuantity} = {
                                                                                                 op.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
@@ -197,7 +166,7 @@ const Uorderlist = () => {
                                                                         <p className="mb-0 text-black text-primary pt-2"><span
                                                                             className="text-black font-weight-bold">
                                                                             Total Paid:</span> {
-                                                                                order.orderedProducts.reduce((total: number, ocd: IPropsProductOrderList) => {
+                                                                                order.orderedProducts.reduce((total: number, ocd: IPropsProductList) => {
                                                                                     return total + ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
                                                                                         return stotal + (qtp.userQuantity as number) * qtp.price
                                                                                     }, 0)
@@ -239,8 +208,8 @@ const Uorderlist = () => {
 }
 
 function convertDate(dateData: string) {
-    var date: any = new Date(dateData);
-    const options:any = {
+    var date: Date = new Date(dateData);
+    const options:Intl.DateTimeFormatOptions = {
         weekday: 'short',
         month: 'short',  
         day: 'numeric',  

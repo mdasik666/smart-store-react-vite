@@ -2,23 +2,19 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { useForm } from 'react-hook-form'
+import { useForm, FieldValues } from 'react-hook-form'
 import { userUpdatePassword, userVerifyForgotPassword } from "@/services/Userservice";
-import { AlertColor } from "@mui/material";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsUserData } from "../Interface";
+import { IPropsError } from "../Interface";
+import { AxiosError } from "axios";
 
 const Ureset = () => {
   const nav = useNavigate()
   const { handleSubmit, register, formState: { errors, isValid }, getValues } = useForm({
     mode: "onChange",
   })
-  const [userData, setUserData] = useState<any>({})
+  const [userData, setUserData] = useState<Pick<IPropsUserData,'email'>>({} as IPropsUserData)
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
@@ -31,13 +27,13 @@ const Ureset = () => {
           if (verify.data.status === "Failed") {
             nav('/user/forgotpassword')
           } else {
-            const { email } = verify.data.userData
-            setUserData({ email })
+            const  {email}:Pick<IPropsUserData,'email'> = verify.data.userData
+            setUserData({email})
           }
           setLoading(false)
-        } catch (error: any) {
+        } catch (error: unknown) {
           setLoading(false)
-          setSnackOpen({ open: true, severity: "warning", message: error.messsage })
+          setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
         }
       } else {
         nav('/user/forgotpassword')
@@ -45,7 +41,7 @@ const Ureset = () => {
     })()
   }, [nav])
 
-  const updatePassword = async (data: any) => {
+  const updatePassword = async (data: FieldValues) => {
     try {
       const update = await userUpdatePassword({ email: userData.email, password: data.password })
       if (update.data.status === "Success") {
@@ -54,8 +50,8 @@ const Ureset = () => {
       } else {
         setSnackOpen({ open: true, severity: "error", message: update.data.messsage })
       }
-    } catch (error: any) {
-      setSnackOpen({ open: true, severity: "warning", message: error.messsage })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 

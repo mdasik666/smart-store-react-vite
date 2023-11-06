@@ -4,48 +4,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { userGetProducts } from '@/services/Userservice';
 import { Helmet } from "react-helmet";
 import Cookies from 'js-cookie';
-import { AlertColor, IconButton, Skeleton, Stack } from '@mui/material';
+import { IconButton, Skeleton, Stack } from '@mui/material';
 import { ArrowRight, Favorite, FavoriteBorder, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material';
 import SnackbarAlert from '@/custom/components/SnackbarAlert';
-
-interface IPropsProductList {
-  _id: string,
-  productName: String,
-  productDescription: String,
-  category: String,
-  title: String,
-  quantityAndTypeAndPrice: Array<{ price: Number, quantity: String, type: String }>,
-  minOrder: Number,
-  image: String,
-  adminId: String,
-  isWishlist?: boolean,
-  isCart?: boolean
-}
-
-interface IPropsUserData {
-  _id: string,
-  fullName: string,
-  email: string,
-  image: string
-}
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsError, IPropsProductList, IPropsUserData, IPropsCategory } from "../Interface";
+import { AxiosError } from 'axios';
 
 const Udashboard = () => {
   const nav = useNavigate()
-
+  
   const [productList, setProductList] = useState<IPropsProductList[]>([])
-  const [productCategory, setProductCategory] = useState<{ categoryName: string }[]>([])
+  const [productCategory, setProductCategory] = useState<IPropsCategory[]>([])
   const [_error, setError] = useState<string>("")
   const [categoryFilter, setCategoryFilter] = useState<string>("")
   const [categoryFilterByNameTrack, setCategoryFilterByNameTrack] = useState<string>("")
   const [categoryFilterByName, setCategoryFilterByName] = useState<string>("")
   const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "", image: "" })
-  const [isLoading, setLoading] = useState<boolean>(false)
+  const [_, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
   const filterByNameChange = (e: string) => {
@@ -74,8 +49,8 @@ const Udashboard = () => {
             getProductList(_id)
             getOrderList(_id)
           }
-        } catch (error: any) {
-          setSnackOpen({ open: true, severity: "warning", message: error.message })
+        } catch (error: unknown) {
+          setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
         }
       } else {
         nav("/user/login")
@@ -95,10 +70,10 @@ const Udashboard = () => {
         setError(res.data.message)
       }
       setLoading(false)
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      setError((error as AxiosError).message)
       setLoading(false)
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
@@ -114,9 +89,9 @@ const Udashboard = () => {
         setSnackOpen({ open: true, severity: "error", message: resOrderList.data.message })
       }
       setLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       setLoading(false)
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
 
   }
@@ -127,8 +102,8 @@ const Udashboard = () => {
       if (prodCat.data.status === "Success") {
         setProductCategory(prodCat.data.category)
       }
-    } catch (error: any) {
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
@@ -148,9 +123,9 @@ const Udashboard = () => {
 
       }
       setLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       setLoading(false)
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
@@ -234,12 +209,12 @@ const Udashboard = () => {
                       <span id="srch-category">Category</span> <i className="fa fa-angle-down"></i>
                     </button>
                     <ul className="dropdown-menu" role="menu" aria-labelledby="catDrop" id="mnu-category">
-                      <li key={0} className={'p-2 ' + (categoryFilter.length === 0 && 'bg-dark text-light')} onClick={() => setCategoryFilter("")}>{"All"}</li>
+                      <li className={'p-2 ' + (categoryFilter.length === 0 && 'bg-dark text-light')} onClick={() => setCategoryFilter("")}>{"All"}</li>
                       {
                         productCategory.length > 0 ?
-                          productCategory.map((cat, i) => {
+                          productCategory.map((cat, i: number) => {
                             return (
-                              <li key={i + 1} className={'p-2 ' + (categoryFilter === cat?.categoryName && 'bg-dark text-light')} onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
+                              <li key={i} className={'p-2 ' + (categoryFilter === cat?.categoryName && 'bg-dark text-light')} onClick={() => setCategoryFilter(cat?.categoryName)}>{cat?.categoryName}</li>
                             )
                           }) : <li>Loading...</li>
                       }
@@ -284,9 +259,9 @@ const Udashboard = () => {
                     <ul>
                       {
                         orderList.length ?
-                          orderList[orderList.length - 1].orderedProducts.map((op: any, j: number) => {
+                          orderList[orderList.length - 1].orderedProducts.map((op: IPropsProductList, j: number) => {
                             return (
-                              <li>
+                              <li key={j}>
                                 <div className="orders">
                                   <span className="date">{convertDate(orderList[orderList.length - 1].createdAt)}</span>
                                   <span className="brand">{op.title}</span>
@@ -312,8 +287,8 @@ const Udashboard = () => {
                                   <span className="tracking"><Skeleton animation="wave" variant="rounded" /></span>
                                   <p className="text-right">
                                     <IconButton>
-                                      <Skeleton variant="circular" animation="wave">
-                                        <ArrowRight/>
+                                      <Skeleton variant="circular" animation="wave" width={40} height={40}>
+                                        <ArrowRight />
                                       </Skeleton>
                                     </IconButton>
                                   </p>
@@ -365,16 +340,16 @@ const Udashboard = () => {
                               <li key={i}>
                                 <div className="product shadow">
                                   <div className="actionBtn">
-                                    <button className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
+                                    <IconButton className="btn" onClick={() => addCartAndWishList(prod._id, "wishlist")}>
                                       {
-                                        prod.isWishlist ? <IconButton><Favorite sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><FavoriteBorder sx={{ color: '#ff666d' }} /></IconButton>
+                                        prod.isWishlist ? <Favorite sx={{ color: '#ff666d' }} /> : <FavoriteBorder sx={{ color: '#ff666d' }} />
                                       }
-                                    </button>
-                                    <button className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
+                                    </IconButton>
+                                    <IconButton className="btn" onClick={() => addCartAndWishList(prod._id, "cart")}>
                                       {
-                                        prod.isCart ? <IconButton><ShoppingCart sx={{ color: '#ff666d' }} /></IconButton> : <IconButton><ShoppingCartOutlined sx={{ color: '#ff666d' }} /></IconButton>
+                                        prod.isCart ? <ShoppingCart sx={{ color: '#ff666d' }} /> : <ShoppingCartOutlined sx={{ color: '#ff666d' }} />
                                       }
-                                    </button>
+                                    </IconButton>
                                   </div>
                                   <img src={prod.image?.toString()} alt={`Product ${i}`} />
                                   <span className="title">{prod.productName}</span>
@@ -393,14 +368,14 @@ const Udashboard = () => {
                                   <div className="actionBtn">
                                     <button className="btn" >
                                       <IconButton>
-                                        <Skeleton variant="circular" animation="wave">
+                                        <Skeleton variant="circular" animation="wave" width={40} height={40}>
                                           <Favorite />
                                         </Skeleton>
                                       </IconButton>
                                     </button>
                                     <button className="btn" >
                                       <IconButton>
-                                        <Skeleton variant="circular" animation="wave">
+                                        <Skeleton variant="circular" animation="wave" width={40} height={40}>
                                           <ShoppingCart />
                                         </Skeleton>
                                       </IconButton>
@@ -507,14 +482,14 @@ const Udashboard = () => {
                                   <div className="actionBtn">
                                     <button className="btn" >
                                       <IconButton>
-                                        <Skeleton variant="circular" animation="wave">
+                                        <Skeleton variant="circular" animation="wave" width={40} height={40}>
                                           <Favorite />
                                         </Skeleton>
                                       </IconButton>
                                     </button>
                                     <button className="btn" >
                                       <IconButton>
-                                        <Skeleton variant="circular" animation="wave">
+                                        <Skeleton variant="circular" animation="wave" width={40} height={40}>
                                           <ShoppingCart />
                                         </Skeleton>
                                       </IconButton>

@@ -3,41 +3,12 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useForm } from 'react-hook-form'
+import { FieldValues, useForm } from 'react-hook-form'
 import { EditNoteSharp } from "@mui/icons-material";
-import { AlertColor, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Skeleton } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Skeleton } from "@mui/material";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
-
-interface IPropsUserData {
-  _id: string,
-  fullName: string,
-  email: string
-}
-
-interface IPropsQTP {
-  price: number,
-  quantity: string,
-  type: string,
-  userQuantity?: number
-}
-
-interface IPropsProductOrderList {
-  _id: string,
-  productName: string,
-  productDescription: string,
-  category: string,
-  title: string,
-  quantityAndTypeAndPrice: Array<IPropsQTP>,
-  minOrder: number,
-  image: string,
-  isSelect?: boolean
-}
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsError, IPropsProductList, IPropsShippingAddressDetails, IPropsUserData, IPropsQTP, IPropsCheckout } from "../Interface";
+import { AxiosError } from "axios";
 
 const Ucheckout = () => {
   const nav = useNavigate()
@@ -46,13 +17,13 @@ const Ucheckout = () => {
   })
   const [userData, setUserData] = useState<IPropsUserData>({ _id: "", fullName: "", email: "" })
   const [countryData, setCountryData] = useState<Array<any>>([])
-  const [shippingAddressList, setShippingAddressList] = useState<Array<any>>([])
+  const [shippingAddressList, setShippingAddressList] = useState<IPropsShippingAddressDetails[]>([])
   const [updateState, setUpdateState] = useState<boolean>(false)
   const [updateId, setUpdateId] = useState<string>("")
-  const [orderCartData, setOrderCartData] = useState<IPropsProductOrderList[]>([])
-  const [checkoutList, setCheckoutList] = useState<IPropsProductOrderList[]>([])
-  const [checkoutListWithTotal, setCheckoutListWithTotal] = useState<any>({})
-  const [selectedAddress, setSelectedAddress] = useState<Array<any>>([])
+  const [orderCartData, setOrderCartData] = useState<IPropsProductList[]>([])
+  const [checkoutList, setCheckoutList] = useState<IPropsProductList[]>([])
+  const [checkoutListWithTotal, setCheckoutListWithTotal] = useState<IPropsCheckout>({} as IPropsCheckout)
+  const [selectedAddress, setSelectedAddress] = useState<IPropsShippingAddressDetails[]>([])
   const [paymentOption, setPaymentOption] = useState<string>("razorpay")
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
@@ -68,7 +39,7 @@ const Ucheckout = () => {
             const { _id, fullName, email } = verify.data.userData
             setUserData({ _id, fullName, email })
             const countryList = await userGetCountryList()
-            var country = countryList.data.sort((a: any, b: any) => a.name.common.localeCompare(b.name.common)).filter((c: any) => c.name.common.toLowerCase() === "india");
+            var country = countryList.data.sort((a: {name:{common:string}}, b: {name:{common:string}}) => a.name.common.localeCompare(b.name.common)).filter((c: {name:{common:string}}) => c.name.common.toLowerCase() === "india");
             if (country.length) {
               setCountryData(country)
             }
@@ -97,19 +68,19 @@ const Ucheckout = () => {
             }
             setLoading(false)
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           setLoading(false)
-          setSnackOpen({ open: true, severity: "warning", message: error.message })
+          setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
         }
       }
     })();
   }, [nav])
 
-  const addOrUpdateAddress = async (data: any) => {
+  const addOrUpdateAddress = async (data: FieldValues) => {
     try {
       var finalAddress;
       if (updateState) {
-        const newShipping = shippingAddressList.map((sa) => {
+        const newShipping = shippingAddressList.map((sa: IPropsShippingAddressDetails) => {
           if (sa._id === updateId) {
             return { ...sa, ...data }
           } else {
@@ -136,16 +107,16 @@ const Ucheckout = () => {
         setSnackOpen({ open: true, severity: "error", message: addShippingAddress.data.message })
       }
       setLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       setLoading(false)
-      setSnackOpen({ open: true, severity: "warning", message: error.message })
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
     }
   }
 
   const updateShippingAddress = (id: string) => {
     setUpdateState(true)
     setUpdateId(id)
-    const { fullName, phoneNumber, houseNoOrBuildingName, areaOrColony, country, city, zipOrPostalCode } = shippingAddressList.filter((a) => a._id === id)[0]
+    const { fullName, phoneNumber, houseNoOrBuildingName, areaOrColony, country, city, zipOrPostalCode }: IPropsShippingAddressDetails = shippingAddressList.filter((a: IPropsShippingAddressDetails) => a._id === id)[0]
     setValue("fullName", fullName)
     setValue("phoneNumber", phoneNumber)
     setValue("houseNoOrBuildingName", houseNoOrBuildingName)
@@ -156,8 +127,7 @@ const Ucheckout = () => {
   }
 
   const chooseAddress = (id: string) => {
-    const selectAddress = shippingAddressList.filter((sa) => sa._id === id)
-    console.log(selectAddress[0])
+    const selectAddress: IPropsShippingAddressDetails[] = shippingAddressList.filter((sa: IPropsShippingAddressDetails) => sa._id === id)
     setSelectedAddress(selectAddress)
   }
 
@@ -187,7 +157,7 @@ const Ucheckout = () => {
               "description": "SS Testing",
               "image": "../../src/assets/images/logo.png",
               "order_id": resOrder.data.order.id,
-              "handler": async function (response: any) {
+              "handler": async function (response: object) {
                 try {
                   setLoading(true)
                   setOpenDialog(true)
@@ -195,8 +165,7 @@ const Ucheckout = () => {
                   if (resVerify.data.status === "Success") {
                     setLoading(false)
                   }
-                } catch (error: any) {
-                  console.log(error.message)
+                } catch (error: unknown) {
                   setLoading(false)
                 }
               },
@@ -209,19 +178,19 @@ const Ucheckout = () => {
                 "address": "Razorpay Corporate Office"
               },
               "theme": {
-                "color": "#3399cc"
+                "color": "#ff666d"
               }
             };
             var rzp1 = new (window as any).Razorpay(options);
-            rzp1.on('payment.failed', function (response: any) {
+            rzp1.on('payment.failed', function (response: {error:{reason:string}}) {
               setSnackOpen({ open: true, severity: "error", message: response.error.reason })
             });
             rzp1.open();
             setLoading(false)
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           setLoading(false)
-          setSnackOpen({ open: true, severity: "warning", message: error.message })
+          setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
         }
       } else {
       }
@@ -392,18 +361,18 @@ const Ucheckout = () => {
                               <div className="row">
                                 {
                                   shippingAddressList.length ?
-                                    shippingAddressList.map((sa, i) => {
+                                    shippingAddressList.map((sa: IPropsShippingAddressDetails, i: number) => {
                                       return (
                                         <div key={i} className="col-lg-4 col-md-6" >
                                           <div data-bs-toggle="collapse">
                                             <label className="card-radio-label mb-4">
                                               <input type="radio" name="address" id="info-address1" className="card-radio-input" />
-                                              <div className="card-radio text-truncate p-3" onClick={() => chooseAddress(sa._id)}>
+                                              <div className="card-radio text-truncate p-3" onClick={() => chooseAddress(sa?._id)}>
                                                 <span className="fs-14 mb-4 d-block">Address {i + 1}</span>
                                                 <span className="fs-14 mb-2 d-block">{sa.fullName}</span>
                                                 <span className="text-muted fw-normal text-wrap mb-1 d-block">{sa.houseNoOrBuildingName} {sa.areaOrColony} {sa.zipOrPostalCode}</span>
                                                 <span className="text-muted fw-normal d-block">Mo. {sa.phoneNumber}</span>
-                                                <div className="text-end" onClick={() => updateShippingAddress(sa._id)}><IconButton><EditNoteSharp color="warning" /></IconButton></div>
+                                                <div className="text-end" onClick={() => updateShippingAddress(sa?._id)}><IconButton><EditNoteSharp color="warning" /></IconButton></div>
                                               </div>
                                             </label>
                                           </div>
@@ -415,7 +384,7 @@ const Ucheckout = () => {
                                       return (
                                         <div key={i} className="col-lg-4 col-md-6" >
                                           <div data-bs-toggle="collapse">
-                                            <label className="card-radio-label mb-4">                                              
+                                            <label className="card-radio-label mb-4">
                                               <div className="card-radio text-truncate p-3">
                                                 <span className="fs-14 mb-4 d-block"><Skeleton animation="wave" variant="rounded" /></span>
                                                 <span className="fs-14 mb-2 d-block"><Skeleton animation="wave" variant="rounded" /></span>
@@ -511,7 +480,7 @@ const Ucheckout = () => {
                         <tbody>
                           {
                             checkoutList.length ?
-                              checkoutList.map((cl, i) => {
+                              checkoutList.map((cl: IPropsProductList, i: number) => {
                                 return (
                                   <tr key={i}>
                                     <th scope="row"><img src={cl.image.toString()} alt="product-img"
@@ -541,7 +510,7 @@ const Ucheckout = () => {
                                       }, 0)
                                     }</td>
                                   </tr>)
-                              }) : 
+                              }) :
                               Array(2).fill(0).map((_, i: number) => {
                                 return (
                                   <tr key={i}>
@@ -569,7 +538,7 @@ const Ucheckout = () => {
                             </td>
                             <td>
                               &#8377; {
-                                checkoutList.reduce((total: number, ocd: IPropsProductOrderList) => {
+                                checkoutList.reduce((total: number, ocd: IPropsProductList) => {
                                   return total + (ocd.isSelect ? ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
                                     return stotal + (qtp.userQuantity as number) * qtp.price
                                   }, 0) : 0)
@@ -593,7 +562,7 @@ const Ucheckout = () => {
                             </td>
                             <td>
                               &#8377; {
-                                checkoutList.reduce((total: number, ocd: IPropsProductOrderList) => {
+                                checkoutList.reduce((total: number, ocd: IPropsProductList) => {
                                   return total + (ocd.isSelect ? ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
                                     return stotal + (qtp.userQuantity as number) * qtp.price
                                   }, 0) : 0)

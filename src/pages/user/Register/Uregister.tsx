@@ -1,16 +1,11 @@
-import { AlertColor } from "@mui/material";
 import { useState } from 'react';
 import { userOTPVerify, userRegister } from "@/services/Userservice";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import SnackbarAlert from "@/custom/components/SnackbarAlert";
-
-interface IPropsError {
-  open: boolean,
-  severity: AlertColor | undefined,
-  message: string
-}
+import { IPropsError } from "../Interface";
+import { AxiosError } from 'axios';
 
 const Uregister = () => {
   const { register, handleSubmit, formState: { errors, isValid }, reset, getValues } = useForm({
@@ -20,7 +15,7 @@ const Uregister = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
 
-  const registerValidate = async (data: any) => {
+  const registerValidate = async (data: FieldValues) => {
     try {
       setLoading(true)
       var res = await userRegister(data)
@@ -32,8 +27,8 @@ const Uregister = () => {
         reset();
       }
       setLoading(false)
-    } catch (err: any) {
-      setSnackOpen({ open: true, severity: "warning", message: err?.messsage })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
       setLoading(false)
     }
   }
@@ -51,8 +46,8 @@ const Uregister = () => {
         setSnackOpen({ open: true, severity: "error", message: res.data.message })
       }
       setLoading(false)
-    } catch (err: any) {
-      setSnackOpen({ open: true, severity: "warning", message: err?.message })
+    } catch (error: unknown) {
+      setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
       setOtpVerified(false)
       setLoading(false)
     }

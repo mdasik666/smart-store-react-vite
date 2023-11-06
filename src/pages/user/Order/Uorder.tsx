@@ -1,45 +1,20 @@
 import SnackbarAlert from "@/custom/components/SnackbarAlert"
-import { AlertColor } from "@mui/material"
 import { useState } from "react"
 import { Helmet } from "react-helmet"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useEffect } from 'react';
 import { userGetOrder, userLoginVerify } from "@/services/Userservice"
 import Cookies from "js-cookie"
-
-interface IPropsError {
-    open: boolean,
-    severity: AlertColor | undefined,
-    message: string
-}
-
-interface IPropsQTP {
-    price: number,
-    quantity: string,
-    type: string,
-    userQuantity?: number
-}
-
-interface IPropsProductOrderList {
-    _id: string,
-    productName: string,
-    productDescription: string,
-    category: string,
-    title: string,
-    quantityAndTypeAndPrice: Array<IPropsQTP>,
-    minOrder: number,
-    image: string,
-    isSelect?: boolean
-}
+import { IPropsError, IPropsOrders, IPropsProductList, IPropsQTP, IPropsUserData } from "../Interface";
+import { AxiosError } from "axios";
 
 const Uorder = () => {
     const nav = useNavigate()
     const { id } = useParams()
 
-    const [orderData, setOrderData] = useState<any>()
-    const [userData, setUserData] = useState<any>()
-    const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })
-    const [orderCartData, setOrderCartData] = useState<IPropsProductOrderList[]>([])
+    const [orderData, setOrderData] = useState<IPropsOrders>({} as IPropsOrders)
+    const [_, setUserData] = useState<IPropsUserData>({} as IPropsUserData)
+    const [snackopen, setSnackOpen] = useState<IPropsError>({ open: false, severity: undefined, message: "" })    
 
     useEffect(() => {
         (async function () {
@@ -47,8 +22,8 @@ const Uorder = () => {
                 try {
                     const verify = await userLoginVerify();
                     if (verify.data.status === "Success") {
-                        const { _id, name, email } = verify.data.userData
-                        setUserData({ _id, name, email })
+                        const { _id, fullName, email }:IPropsUserData = verify.data.userData
+                        setUserData({ _id, fullName, email })
                         const getOrderData = await userGetOrder(id)
                         if (getOrderData.data.status === "Success") {
                             setOrderData(getOrderData.data.orderData)
@@ -58,14 +33,22 @@ const Uorder = () => {
                     } else {
                         nav("/user/login")
                     }
-                } catch (error: any) {
-                    setSnackOpen({ open: true, severity: "warning", message: error.message })
+                } catch (error: unknown) {
+                    setSnackOpen({ open: true, severity: "warning", message: (error as AxiosError).message })
                 }
             } else {
                 nav("/user/login")
             }
         })();
     }, [nav])
+
+    const getTotal = (orders: IPropsOrders) => {
+        return orders.orderedProducts.reduce((total: number, ocd: IPropsProductList) => {
+            return total + ocd.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
+                return stotal + (qtp.userQuantity as number) * qtp.price
+            }, 0)
+        }, 0)
+    }
 
     return (
         <>
@@ -137,7 +120,7 @@ const Uorder = () => {
                                                     <div className="card-body">
                                                         <div className="mb-3 d-flex justify-content-between">
                                                             <div>
-                                                                <span className="me-3">{orderData.deliveryStatus === "Ordered" ? convertDate(orderData.createdAt):convertDate(orderData.updatedAt)}</span>                                                                
+                                                                <span className="me-3">{orderData.deliveryStatus === "Ordered" ? convertDate(orderData.createdAt) : convertDate(orderData.updatedAt)}</span>
                                                                 <span className="me-3">{orderData.paymentType}</span>
                                                                 <span className="badge rounded-pill bg-danger">{orderData.deliveryStatus}</span>
                                                             </div>
@@ -161,58 +144,55 @@ const Uorder = () => {
                                                         </div>
                                                         <table className="table table-borderless">
                                                             <tbody>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className="d-flex mb-2">
-                                                                            <div className="flex-shrink-0">
-                                                                                <img src="../../../src/assets/images/prod4.jpg" alt="" width="65"
-                                                                                    className="img-fluid" />
-                                                                            </div>
-                                                                            <div className="flex-lg-grow-1 ms-3">
-                                                                                <h6 className="mb-0"><a href="#" className="text-reset">Tata
-                                                                                    Sampann Spice</a>
-                                                                                </h6>
-                                                                                <span className="small">1 Kg</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>2</td>
-                                                                    <td className="text-end">&#8377; 520</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <div className="d-flex mb-2">
-                                                                            <div className="flex-shrink-0">
-                                                                                <img src="../../../src/assets/images/prod2.jpg" alt="" width="65"
-                                                                                    className="img-fluid" />
-                                                                            </div>
-                                                                            <div className="flex-lg-grow-1 ms-3">
-                                                                                <h6 className="mb-0"><a href="#" className="text-reset">Ceylon
-                                                                                    CINNAMON</a></h6>
-                                                                                <span className="small">200 G</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>1</td>
-                                                                    <td className="text-end">&#8377; 260</td>
-                                                                </tr>
+                                                                {
+                                                                    orderData.orderedProducts.map((op: IPropsProductList, i: number) => {
+                                                                        return (
+                                                                            <tr key={i}>
+                                                                                <td>
+                                                                                    <div className="d-flex mb-2">
+                                                                                        <div className="flex-shrink-0">
+                                                                                            <img src={op.image.toString()} alt="" width="65"
+                                                                                                className="img-fluid" />
+                                                                                        </div>
+                                                                                        <div className="flex-lg-grow-1 ms-3">
+                                                                                            <h6 className="mb-0"><a href="#" className="text-reset">{op.productName}</a>
+                                                                                            </h6>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </td>
+                                                                                {
+                                                                                    op.quantityAndTypeAndPrice.map((qtp: IPropsQTP, j: number) => {
+                                                                                        return (
+                                                                                            <td key={j}>{qtp.quantity} {qtp.type} x {qtp.userQuantity}</td>
+                                                                                        )
+                                                                                    })
+                                                                                }
+                                                                                <td className="text-end">&#8377; {
+                                                                                    op.quantityAndTypeAndPrice.reduce((stotal: number, qtp: IPropsQTP) => {
+                                                                                        return stotal + (qtp.userQuantity as number) * qtp.price
+                                                                                    }, 0)
+                                                                                }</td>
+                                                                            </tr>
+                                                                        )
+                                                                    })
+                                                                }
                                                             </tbody>
                                                             <tfoot>
                                                                 <tr>
                                                                     <td colSpan={2}>Subtotal</td>
-                                                                    <td className="text-end">&#8377; 780</td>
+                                                                    <td className="text-end">&#8377; {getTotal(orderData)}.00</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td colSpan={2}>Shipping</td>
-                                                                    <td className="text-end">&#8377; 20.00</td>
+                                                                    <td className="text-end">&#8377; 500.00</td>
                                                                 </tr>
-                                                                <tr>
+                                                                {/* <tr>
                                                                     <td colSpan={2}>Discount (Code: PMGDiwaliOffer)</td>
                                                                     <td className="text-danger text-end">-&#8377; 30.00</td>
-                                                                </tr>
+                                                                </tr> */}
                                                                 <tr className="fw-bold">
                                                                     <td colSpan={2}>TOTAL</td>
-                                                                    <td className="text-end">&#8377; 750.00</td>
+                                                                    <td className="text-end">&#8377; {getTotal(orderData) + 500}.00</td>
                                                                 </tr>
                                                             </tfoot>
                                                         </table>
@@ -224,18 +204,18 @@ const Uorder = () => {
                                                         <div className="row">
                                                             <div className="col-lg-6">
                                                                 <h3 className="h6">Payment Method</h3>
-                                                                <p>Visa -1234 </p>
-                                                                <p>Total: &#8377; 750.00 <span
-                                                                    className="badge bg-success rounded-pill">PAID</span>
+                                                                <p>{orderData.paymentType}</p>
+                                                                <p>Total: &#8377; {getTotal(orderData) + 500}.00 <span
+                                                                    className="badge bg-success rounded-pill">{orderData.paid === "Yes" ? "PAID" : "UNPAID"}</span>
                                                                 </p>
                                                             </div>
                                                             <div className="col-lg-6">
                                                                 <h3 className="h6">Billing address</h3>
                                                                 <address>
-                                                                    <strong>Ajith Kumar</strong><br />
-                                                                    12-5 Market St, <br />
-                                                                    Madurai, TN 624103<br />
-                                                                    <abbr title="Phone">P:</abbr> (123) 456-7890
+                                                                    <strong>{orderData.shippingAddress.fullName}</strong><br />
+                                                                    {orderData.shippingAddress.houseNoOrBuildingName} {orderData.shippingAddress.areaOrColony}, <br />
+                                                                    {orderData.shippingAddress.city}, {orderData.shippingAddress.country} {orderData.shippingAddress.zipOrPostalCode}<br />
+                                                                    <abbr title="Phone">P:</abbr> {orderData.shippingAddress.phoneNumber}
                                                                 </address>
                                                             </div>
                                                         </div>
@@ -252,10 +232,10 @@ const Uorder = () => {
                                                         <hr />
                                                         <h3 className="h6">Address</h3>
                                                         <address>
-                                                            <strong>Ajith Kumar</strong><br />
-                                                            12-5 Market St, <br />
-                                                            Madurai, TN 624103<br />
-                                                            <abbr title="Phone">P:</abbr> (123) 456-7890
+                                                            <strong>{orderData.shippingAddress.fullName}</strong><br />
+                                                            {orderData.shippingAddress.houseNoOrBuildingName} {orderData.shippingAddress.areaOrColony}, <br />
+                                                            {orderData.shippingAddress.city}, {orderData.shippingAddress.country} {orderData.shippingAddress.zipOrPostalCode}<br />
+                                                            <abbr title="Phone">P:</abbr> {orderData.shippingAddress.phoneNumber}
                                                         </address>
                                                     </div>
                                                 </div>
@@ -288,9 +268,9 @@ const Uorder = () => {
     )
 }
 
-function convertDate(dateData:string){
-    const date:any = new Date(dateData); 
-    const options:any = { year: 'numeric', month: '2-digit', day: '2-digit' };
+function convertDate(dateData: string) {
+    const date: Date = new Date(dateData);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Intl.DateTimeFormat('en-US', options).format(date);
 }
 
