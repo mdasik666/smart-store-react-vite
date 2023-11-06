@@ -1,10 +1,10 @@
 import axiosInstance from "./axiosInstance"
 
-export const userRegister = async (data: any) => {
+export const userRegister = async (data: object) => {
     return await axiosInstance.post('/user/register', data)
 }
 
-export const userLogin = async (data: any) => {
+export const userLogin = async (data: object) => {
     return await axiosInstance.post('/user/login', data)
 }
 
@@ -40,11 +40,11 @@ export const userGetCart = async (userId: string) => {
     return await axiosInstance.get(`/user/getcart/${userId}`)
 }
 
-export const userProfileupdate = async (userId: string, data: any) => {
+export const userProfileupdate = async (userId: string, data: object) => {
     return await axiosInstance.put(`/user/profileupdate/${userId}`, data)
 }
 
-export const userPostCheckOut = async (userId: string, data: any) => {
+export const userPostCheckOut = async (userId: string, data: object) => {
     return await axiosInstance.post(`/user/checkout/${userId}`, data)
 }
 
@@ -60,15 +60,15 @@ export const userGetShippingAddress = async (userId: string) => {
     return await axiosInstance.get(`/user/shipping/${userId}`)
 }
 
-export const userPostShippingAddress = async (userId: string, data:any) => {
+export const userPostShippingAddress = async (userId: string, data:object) => {
     return await axiosInstance.post(`/user/shipping/${userId}`,data)
 }
 
-export const userPaymentOrders = async (data:any) => {
+export const userPaymentOrders = async (data:object) => {
     return await axiosInstance.post(`/user/payment/orders`,data)
 }
 
-export const userPaymentVerify = async (userId: string, data:any) => {
+export const userPaymentVerify = async (userId: string, data:object) => {
     return await axiosInstance.post(`/user/payment/verify/${userId}`,data)
 }
 
@@ -80,14 +80,14 @@ export const userVerifyForgotPassword = async () => {
     return await axiosInstance.get(`/user/verifyforgotpassword/`)
 }
 
-export const userUpdatePassword = async (data:any) => {
+export const userUpdatePassword = async (data:object) => {
     return await axiosInstance.post(`/user/updatepassword/`, data)
 }
 
-export const userOrderList = async (userId:any) => {
+export const userOrderList = async (userId:string) => {
     return await axiosInstance.get(`/user/orderlist/${userId}`)
 }
 
-export const userGetOrder = async (id:any) => {
+export const userGetOrder = async (id:string) => {
     return await axiosInstance.get(`/user/getorder/${id}`)
 }
